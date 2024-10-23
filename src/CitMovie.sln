@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CitMovie.Api", "CitMovie.Api\CitMovie.Api.csproj", "{DD3A4E15-FE69-4168-B4B9-A93B35477A67}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CitMovie.Data", "CitMovie.Data\CitMovie.Data.csproj", "{89A3C17F-2E1B-4E3F-A7ED-15BBE03228A0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CitMovie.Models", "CitMovie.Models\CitMovie.Models.csproj", "{5ED1CD0D-EBCD-4C4D-9EFD-77941BC74020}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DD3A4E15-FE69-4168-B4B9-A93B35477A67}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DD3A4E15-FE69-4168-B4B9-A93B35477A67}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DD3A4E15-FE69-4168-B4B9-A93B35477A67}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DD3A4E15-FE69-4168-B4B9-A93B35477A67}.Release|Any CPU.Build.0 = Release|Any CPU
+		{89A3C17F-2E1B-4E3F-A7ED-15BBE03228A0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{89A3C17F-2E1B-4E3F-A7ED-15BBE03228A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{89A3C17F-2E1B-4E3F-A7ED-15BBE03228A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{89A3C17F-2E1B-4E3F-A7ED-15BBE03228A0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5ED1CD0D-EBCD-4C4D-9EFD-77941BC74020}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5ED1CD0D-EBCD-4C4D-9EFD-77941BC74020}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5ED1CD0D-EBCD-4C4D-9EFD-77941BC74020}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5ED1CD0D-EBCD-4C4D-9EFD-77941BC74020}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
