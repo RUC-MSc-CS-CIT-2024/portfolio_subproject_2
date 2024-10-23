@@ -22,4 +22,8 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\CitMovie.Business\CitMovie.Business.csproj" />
+  </ItemGroup>
+
 </Project>
