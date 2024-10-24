@@ -1,0 +1,58 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CitMovie.Api", "CitMovie.Api\CitMovie.Api.csproj", "{DD3A4E15-FE69-4168-B4B9-A93B35477A67}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CitMovie.Data", "CitMovie.Data\CitMovie.Data.csproj", "{89A3C17F-2E1B-4E3F-A7ED-15BBE03228A0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CitMovie.Models", "CitMovie.Models\CitMovie.Models.csproj", "{5ED1CD0D-EBCD-4C4D-9EFD-77941BC74020}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CitMovie.Business", "CitMovie.Business\CitMovie.Business.csproj", "{20A6068A-97F0-4169-9775-D2E6B56F4514}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CitMovie.Api.Tests", "CitMovie.Api.Tests\CitMovie.Api.Tests.csproj", "{57570914-BDC2-492A-B9DE-963DBDBE6645}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CitMovie.Business.Tests", "CitMovie.Business.Tests\CitMovie.Business.Tests.csproj", "{4355058D-3BAE-420C-AF41-E1BF8138C0FB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CitMovie.Data.Tests", "CitMovie.Data.Tests\CitMovie.Data.Tests.csproj", "{B1C7DDBA-188E-45CF-88B8-09D942120548}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DD3A4E15-FE69-4168-B4B9-A93B35477A67}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DD3A4E15-FE69-4168-B4B9-A93B35477A67}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DD3A4E15-FE69-4168-B4B9-A93B35477A67}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DD3A4E15-FE69-4168-B4B9-A93B35477A67}.Release|Any CPU.Build.0 = Release|Any CPU
+		{89A3C17F-2E1B-4E3F-A7ED-15BBE03228A0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{89A3C17F-2E1B-4E3F-A7ED-15BBE03228A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{89A3C17F-2E1B-4E3F-A7ED-15BBE03228A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{89A3C17F-2E1B-4E3F-A7ED-15BBE03228A0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5ED1CD0D-EBCD-4C4D-9EFD-77941BC74020}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5ED1CD0D-EBCD-4C4D-9EFD-77941BC74020}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5ED1CD0D-EBCD-4C4D-9EFD-77941BC74020}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5ED1CD0D-EBCD-4C4D-9EFD-77941BC74020}.Release|Any CPU.Build.0 = Release|Any CPU
+		{20A6068A-97F0-4169-9775-D2E6B56F4514}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{20A6068A-97F0-4169-9775-D2E6B56F4514}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{20A6068A-97F0-4169-9775-D2E6B56F4514}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{20A6068A-97F0-4169-9775-D2E6B56F4514}.Release|Any CPU.Build.0 = Release|Any CPU
+		{57570914-BDC2-492A-B9DE-963DBDBE6645}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{57570914-BDC2-492A-B9DE-963DBDBE6645}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{57570914-BDC2-492A-B9DE-963DBDBE6645}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{57570914-BDC2-492A-B9DE-963DBDBE6645}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4355058D-3BAE-420C-AF41-E1BF8138C0FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4355058D-3BAE-420C-AF41-E1BF8138C0FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4355058D-3BAE-420C-AF41-E1BF8138C0FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4355058D-3BAE-420C-AF41-E1BF8138C0FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B1C7DDBA-188E-45CF-88B8-09D942120548}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1C7DDBA-188E-45CF-88B8-09D942120548}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1C7DDBA-188E-45CF-88B8-09D942120548}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1C7DDBA-188E-45CF-88B8-09D942120548}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
