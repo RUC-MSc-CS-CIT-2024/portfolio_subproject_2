@@ -28,5 +28,16 @@ public class DataContext : DbContext
     
     public DataContext(DbContextOptions<DataContext> options) 
         : base(options) { }
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
+        if (!optionsBuilder.IsConfigured)
+            optionsBuilder.UseNpgsql("host=localhost;uid=postgres;pwd=postgres;port=5433;db=portfolio_database");
+        base.OnConfiguring(optionsBuilder);
+    }
 
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<MediaProductionCompany>()
+            .HasKey(od => new { od.MediaId, od.ProductionCompanyId });
+
+    }
 }
