@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CitMovie.Models\CitMovie.Models.csproj" />
+    <ProjectReference Include="..\CitMovie.Data\CitMovie.Data.csproj" />
   </ItemGroup>
 
 </Project>
