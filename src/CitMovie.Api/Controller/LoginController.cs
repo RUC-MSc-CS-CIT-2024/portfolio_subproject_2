@@ -6,13 +6,15 @@ namespace CitMovie.Api;
 [Route("api")]
 public class LoginController : ControllerBase {
     private readonly ILogger<LoginController> _logger;
+    private readonly ILoginManager _loginService;
 
-    public LoginController(ILogger<LoginController> logger)
+    public LoginController(ILogger<LoginController> logger, ILoginManager loginService)
     {
         _logger = logger;
+        _loginService = loginService;
     }
     
-    [HttpPost("login"), RequireHttps()]
+    [HttpPost("login"), RequireHttps]
     public ActionResult Login([FromHeader(Name = "Authorization")] string? authorizationHeader) {
         if (authorizationHeader == null) {
             return Unauthorized("Authorization header is missing");
@@ -39,6 +41,12 @@ public class LoginController : ControllerBase {
 
         _logger.LogInformation($"Login attempt with username: {username} and password: {password}");
 
-        return Ok();
+        try {
+            string token = _loginService.Login(username, password);
+            return Ok(token);
+        } catch (Exception ex) {
+            _logger.LogInformation(ex, "Login failed");
+            return Unauthorized("Invalid username or password");
+        }
     }
 }

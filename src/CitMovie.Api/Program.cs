@@ -10,6 +10,8 @@ builder.Services.AddDbContext<FrameworkContext>(options =>
 builder.Services.AddDbContext<DataContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("PostgresConnection")));;
 
+builder.Services.AddCitMovieServices();
+
 builder.Services.AddControllers();
 
 builder.Services.AddHttpsRedirection(options =>
