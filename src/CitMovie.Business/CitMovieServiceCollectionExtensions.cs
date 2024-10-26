@@ -9,7 +9,9 @@ public static class CitMovieServiceCollectionExtensions
     {
         ArgumentNullException.ThrowIfNull(services);
 
-        services.AddTransient<ILoginManager, LoginManager>();
+        services.AddScoped<IUserRepository, UserRepository>();
+
+        services.AddScoped<ILoginManager, LoginManager>();
         services.AddOptions<JwtOptions>()
             .Configure<IConfiguration>((options, configuration) => {
                 configuration.Bind("JwtOptions", options);
