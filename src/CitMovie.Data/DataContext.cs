@@ -1,5 +1,6 @@
 using CitMovie.Models.DomainObjects;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 
 namespace CitMovie.Data;
