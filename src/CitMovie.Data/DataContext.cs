@@ -1,6 +1,7 @@
 using CitMovie.Models.DomainObjects;
 using Microsoft.EntityFrameworkCore;
 
+
 namespace CitMovie.Data;
 
 public class DataContext : DbContext
@@ -30,8 +31,15 @@ public class DataContext : DbContext
         : base(options) { }
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
         if (!optionsBuilder.IsConfigured)
-            optionsBuilder.UseNpgsql("host=localhost;uid=postgres;pwd=postgres;port=5433;db=portfolio_database");
-        base.OnConfiguring(optionsBuilder);
+        {
+            // var configuration = new ConfigurationBuilder()
+            //     .SetBasePath(Directory.GetCurrentDirectory())
+            //     .AddJsonFile("appsettings.json")
+            //     .AddEnvironmentVariables()
+            //     .Build();
+            //
+            // optionsBuilder.UseNpgsql(configuration.GetConnectionString("PostgresConnection"));
+        }
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

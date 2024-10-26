@@ -24,6 +24,6 @@ public class Release
     
     public ICollection<PromotionalMedia> PromotionalMedias { get; } = new List<PromotionalMedia>();
     
-    public List<Language> Languages { get; } = [];
+    public List<Language> SpokenLanguages { get; } = [];
 
 }

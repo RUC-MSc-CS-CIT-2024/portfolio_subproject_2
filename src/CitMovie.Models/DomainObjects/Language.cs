@@ -13,4 +13,6 @@ public class Language
     public string Name { get; set; }
 
     public List<Release> Releases { get; } = [];
+    public List<Title> Titles { get; } = [];
+
 }

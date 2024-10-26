@@ -13,5 +13,5 @@ public class Episode
     [ForeignKey(nameof(MediaId))]
     public Media Media { get; set; }
     [ForeignKey(nameof(SeasonId))]
-    public Season Season { get; set; }
+    public Media Season { get; set; }
 }

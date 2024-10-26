@@ -16,8 +16,6 @@ public class Media
     public string? Budget { get; set; }
     [Column("imdb_id")]
     public string? ImdbId { get; set; }
-    [Column("website")]
-    public string? Website { get; set; }
     [Column("awards")]
     public string? Awards { get; set; }
     [Column("original_title_id")]
