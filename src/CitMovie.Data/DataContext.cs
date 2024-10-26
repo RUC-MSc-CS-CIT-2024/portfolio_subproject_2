@@ -1,5 +1,7 @@
 using CitMovie.Models.DomainObjects;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+
 
 namespace CitMovie.Data;
 
@@ -28,5 +30,23 @@ public class DataContext : DbContext
     
     public DataContext(DbContextOptions<DataContext> options) 
         : base(options) { }
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
+        if (!optionsBuilder.IsConfigured)
+        {
+            var configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json")
+                .AddEnvironmentVariables()
+                .Build();
 
+            optionsBuilder.UseNpgsql(configuration.GetConnectionString("PostgresConnection"));
+        }
+    }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<MediaProductionCompany>()
+            .HasKey(od => new { od.MediaId, od.ProductionCompanyId });
+
+    }
 }
