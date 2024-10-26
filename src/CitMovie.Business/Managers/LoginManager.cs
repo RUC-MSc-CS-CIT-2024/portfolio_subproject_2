@@ -1,19 +1,13 @@
-using System.Data;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using Microsoft.IdentityModel.Tokens;
-
 namespace CitMovie.Business;
 
 public class LoginManager : ILoginManager
 {
     private readonly IUserRepository _repository;
-    private JwtOptions _config;
+    private readonly IJwtTokenGenerator _jwtTokenGenerator;
 
-    public LoginManager(IUserRepository repository, IOptionsSnapshot<JwtOptions> optionsAccessor)
+    public LoginManager(IUserRepository repository, IJwtTokenGenerator jwtTokenGenerator)
     {
-        _config = optionsAccessor.Value;
+        _jwtTokenGenerator = jwtTokenGenerator;
         _repository = repository;
     }
 
@@ -23,7 +17,7 @@ public class LoginManager : ILoginManager
         if (user.Password != password)
             throw new UnauthorizedAccessException();
 
-        return GenerateEncodedAccessToken(user, new List<string> {"default"}); 
+        return _jwtTokenGenerator.GenerateEncodedToken(user, new List<string> {"default"}); 
     }
 
     public Task<string> RefreshTokenAsync(string token)
@@ -34,31 +28,5 @@ public class LoginManager : ILoginManager
     public Task Revoke(string token)
     {
         throw new NotImplementedException();
-    }
-
-    private string GenerateEncodedAccessToken(User user, IEnumerable<string> roles)
-    {
-        DateTime now = DateTime.UtcNow;
-        JwtSecurityTokenHandler handler = new();
-
-        List<Claim> claims = [
-            new(JwtRegisteredClaimNames.Sub, user.Username),
-            new(JwtRegisteredClaimNames.Email, user.Email),
-            .. roles.Select(role => new Claim(ClaimTypes.Role, role)),
-        ];
-
-        SymmetricSecurityKey key = new(Encoding.UTF8.GetBytes(_config.SigningKey));
-        SigningCredentials creds = new(key, SecurityAlgorithms.HmacSha256);
-        string token = handler.CreateEncodedJwt(
-            _config.Issuer,
-            _config.Audience,
-            new(claims),
-            notBefore: now,
-            expires: DateTime.UtcNow.AddMinutes(15),
-            issuedAt: now,
-            signingCredentials: creds
-        );
-
-        return token;
     }
 }
