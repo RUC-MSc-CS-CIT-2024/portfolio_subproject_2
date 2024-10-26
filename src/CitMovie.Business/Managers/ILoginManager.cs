@@ -1,8 +1,7 @@
 namespace CitMovie.Business;
 
 public interface ILoginManager {
-    string Login(string username, string password);
-    void Logout(string token);
-
-    string RefreshToken(string token);
+    Task<string> LoginAsync(string username, string password);
+    Task Revoke(string token);
+    Task<string> RefreshTokenAsync(string token);
 }
