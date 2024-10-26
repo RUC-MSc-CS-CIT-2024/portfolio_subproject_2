@@ -1,4 +1,6 @@
+using CitMovie.Business;
 using CitMovie.Data;
+using CitMovie.Data.FollowRepository;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,6 +12,9 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<FrameworkContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("PostgresConnection")));
 
+builder.Services.AddControllers();
+builder.Services.AddScoped<IFollowRepository, FollowRepository>();
+builder.Services.AddScoped<FollowService>();
 
 var app = builder.Build();
 
@@ -21,6 +26,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseRouting();
+
+app.MapControllers();
 
 app.MapGet("/test-connection", async (FrameworkContext context) =>
 {
