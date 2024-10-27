@@ -18,8 +18,9 @@ All paths are prefixed with `/api/` and support pagination in the form of `page=
 
 |Method|Path|Status code|Description|
 |---|---|---|---|
-|`POST`|`/api/login`|200 or 4xx|Authenticate a user and return a token.|
-|`POST`|`/api/refresh_token`|200 or 401|Refresh an expired token.|
+|`POST`|`/api/auth/login`|200 or 4xx|Authenticate a user and return a token.|
+|`POST`|`/api/auth/revoke`|200 or 4xx|Invalidate auth token.|
+|`POST`|`/api/auth/refresh_token`|200 or 401|Refresh an expired token.|
 
 > **Note**: All endpoints involving creation, update, or deletion should require proper authorization, with status codes like `401 Unauthorized` or `403 Forbidden` when access is denied.
 

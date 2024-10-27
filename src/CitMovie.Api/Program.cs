@@ -1,5 +1,6 @@
 using CitMovie.Business;
 using CitMovie.Data;
+using CitMovie.Data.FollowRepository;
 using CitMovie.Data.JobCategoryRepository;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,16 +17,52 @@ builder.Services.AddControllers();
 builder.Services.AddScoped<IJobCategoryRepository, JobCategoryRepository>();
 builder.Services.AddScoped<JobCategoryService>();
 
+
+builder.Services.AddControllers();
+builder.Services.AddScoped<IFollowRepository, FollowRepository>();
+builder.Services.AddScoped<FollowService>();
+builder.Services.AddScoped<IJobCategoryRepository, JobCategoryRepository>();
+builder.Services.AddScoped<JobCategoryService>();
+
+builder.Services.AddCitMovieServices();
+
+builder.Services.AddControllers();
+
+builder.Services.AddHttpsRedirection(options =>
+{
+    options.RedirectStatusCode = StatusCodes.Status307TemporaryRedirect;
+    options.HttpsPort = 5001;
+});
+
+
+builder.Services.AddControllers();
+builder.Services.AddScoped<IFollowRepository, FollowRepository>();
+builder.Services.AddScoped<FollowService>();
+
+builder.Services.AddCitMovieServices();
+
+builder.Services.AddControllers();
+
+builder.Services.AddHttpsRedirection(options =>
+{
+    options.RedirectStatusCode = StatusCodes.Status307TemporaryRedirect;
+    options.HttpsPort = 5001;
+});
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+} else {
+    app.UseHsts();
 }
 
 app.UseHttpsRedirection();
 app.UseRouting();
+
+app.MapControllers();
 
 app.MapControllers();
 
