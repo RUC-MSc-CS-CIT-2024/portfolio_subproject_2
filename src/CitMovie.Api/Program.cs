@@ -12,10 +12,20 @@ builder.Services.AddDbContext<FrameworkContext>(options =>
 builder.Services.AddDbContext<DataContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("PostgresConnection")));;
 
+
 builder.Services.AddControllers();
 builder.Services.AddScoped<IFollowRepository, FollowRepository>();
 builder.Services.AddScoped<FollowService>();
 
+builder.Services.AddCitMovieServices();
+
+builder.Services.AddControllers();
+
+builder.Services.AddHttpsRedirection(options =>
+{
+    options.RedirectStatusCode = StatusCodes.Status307TemporaryRedirect;
+    options.HttpsPort = 5001;
+});
 
 var app = builder.Build();
 
@@ -23,10 +33,14 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+} else {
+    app.UseHsts();
 }
 
 app.UseHttpsRedirection();
 app.UseRouting();
+
+app.MapControllers();
 
 app.MapControllers();
 
