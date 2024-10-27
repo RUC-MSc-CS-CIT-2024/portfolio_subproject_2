@@ -20,6 +20,7 @@ public class JwtTokenGenerator : IJwtTokenGenerator {
         List<Claim> claims = [
             new(JwtRegisteredClaimNames.Sub, user.Username),
             new(JwtRegisteredClaimNames.Email, user.Email),
+            new("user_id", user.Id.ToString()),
             .. roles.Select(role => new Claim(ClaimTypes.Role, role)),
         ];
 
