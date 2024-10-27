@@ -1,5 +1,6 @@
 using CitMovie.Data.FollowRepository;
 using CitMovie.Models.DomainObjects;
+using CitMovie.Models.DTOs;
 
 namespace CitMovie.Business;
 
@@ -12,23 +13,39 @@ public class FollowService
         _followRepository = followRepository;
     }
 
-    public async Task<IEnumerable<Follow>> GetFollowings(int userId, int page, int pageSize)
+    public async Task<IEnumerable<FollowDto>> GetFollowingsAsync(int userId, int page, int pageSize)
     {
-        return await _followRepository.GetFollowings(userId, page, pageSize);
+        return await _followRepository.GetFollowingsAsync(userId, page, pageSize);
     }
 
-    public async Task<Follow> CreateFollow(int userId, int personId)
+    public async Task<FollowDto> CreateFollowAsync(int userId, int personId)
     {
-        return await _followRepository.CreateFollow(userId, personId);
+        var user = new User { UserId = userId };
+
+        var follow = new Follow
+        {
+            UserId = user.UserId,
+            PersonId = personId,
+            FollowedSince = DateTime.UtcNow
+        };
+
+        await _followRepository.CreateFollowAsync(follow);
+
+        return new FollowDto
+        {
+            FollowingId = follow.FollowingId,
+            PersonId = follow.PersonId,
+            FollowedSince = follow.FollowedSince
+        };
     }
 
-    public async Task<bool> RemoveFollowing(int userId, int followingId)
+    public async Task<bool> RemoveFollowingAsync(int userId, int followingId)
     {
-        return await _followRepository.RemoveFollowing(userId, followingId);
+        return await _followRepository.RemoveFollowingAsync(userId, followingId);
     }
 
-    public async Task<int> GetTotalFollowingsCount(int userId)
+    public async Task<int> GetTotalFollowingsCountAsync(int userId)
     {
-        return await _followRepository.GetTotalFollowingsCount(userId);
+        return await _followRepository.GetTotalFollowingsCountAsync(userId);
     }
 }

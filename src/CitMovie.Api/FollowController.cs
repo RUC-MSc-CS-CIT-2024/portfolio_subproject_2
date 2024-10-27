@@ -1,7 +1,6 @@
 using CitMovie.Business;
 using CitMovie.Models.DTOs;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration.UserSecrets;
 
 namespace CitMovie.Api;
 
@@ -21,8 +20,8 @@ public class FollowController : ControllerBase
     [HttpGet(Name = nameof(GetFollowings))]
     public async Task<IActionResult> GetFollowings(int userId, int page = 0, int pageSize = 10)
     {
-        var followings = await _followService.GetFollowings(userId, page, pageSize);
-        var totalItems = await _followService.GetTotalFollowingsCount(userId);
+        var followings = await _followService.GetFollowingsAsync(userId, page, pageSize);
+        var totalItems = await _followService.GetTotalFollowingsCountAsync(userId);
 
         object result = CreatePaging(
             nameof(GetFollowings),
@@ -38,14 +37,14 @@ public class FollowController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<FollowDto>> CreateFollow(int userId, [FromBody] CreateFollowDto createFollowDto)
     {
-        var follow = await _followService.CreateFollow(userId, createFollowDto.PersonId);
+        var follow = await _followService.CreateFollowAsync(userId, createFollowDto.PersonId);
         return CreatedAtAction(nameof(GetFollowings), new { userId }, follow);
     }
 
     [HttpDelete("{followingId}")]
     public async Task<IActionResult> RemoveFollowing(int userId, int followingId)
     {
-        var result = await _followService.RemoveFollowing(userId, followingId);
+        var result = await _followService.RemoveFollowingAsync(userId, followingId);
         if (!result)
             return NotFound();
 

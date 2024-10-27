@@ -1,7 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Json.Serialization;
-
 namespace CitMovie.Models.DomainObjects;
 
 
@@ -16,7 +12,6 @@ public class Follow
     public int UserId { get; set; }
 
     [ForeignKey("UserId")]
-     [JsonIgnore]
     public User User { get; set; }
 
     [Column("person_id")]

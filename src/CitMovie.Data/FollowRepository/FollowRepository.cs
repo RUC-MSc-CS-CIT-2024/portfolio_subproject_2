@@ -1,4 +1,5 @@
 using CitMovie.Models.DomainObjects;
+using CitMovie.Models.DTOs;
 using Microsoft.EntityFrameworkCore;
 
 namespace CitMovie.Data.FollowRepository
@@ -12,36 +13,33 @@ namespace CitMovie.Data.FollowRepository
             _context = context;
         }
 
-        public async Task<IList<Follow>> GetFollowings(int userId, int page, int pageSize)
+        public async Task<IList<FollowDto>> GetFollowingsAsync(int userId, int page, int pageSize)
         {
             return await _context.Follows
                 .Where(f => f.UserId == userId)
                 .Skip(page * pageSize)
                 .Take(pageSize)
+                .Select(f => new FollowDto
+                {
+                    FollowingId = f.FollowingId,
+                    PersonId = f.PersonId,
+                    FollowedSince = f.FollowedSince
+                })
                 .ToListAsync();
         }
 
-        public async Task<int> GetTotalFollowingsCount(int userId)
+        public async Task<int> GetTotalFollowingsCountAsync(int userId)
         {
             return await _context.Follows.CountAsync(f => f.UserId == userId);
         }
 
-        public async Task<Follow> CreateFollow(int userId, int personId)
+        public async Task CreateFollowAsync(Follow follow)
         {
-            var follow = new Follow
-            {
-                UserId = userId,
-                PersonId = personId,
-                FollowedSince = DateTime.UtcNow
-            };
-
-            _context.Follows.Add(follow);
+            await _context.Follows.AddAsync(follow);
             await _context.SaveChangesAsync();
-
-            return follow;
         }
 
-        public async Task<bool> RemoveFollowing(int userId, int followingId)
+        public async Task<bool> RemoveFollowingAsync(int userId, int followingId)
         {
             var follow = await _context.Follows
                 .FirstOrDefaultAsync(f => f.UserId == userId && f.FollowingId == followingId);
