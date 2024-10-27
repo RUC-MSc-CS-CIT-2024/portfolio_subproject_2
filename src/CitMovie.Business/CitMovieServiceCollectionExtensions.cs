@@ -9,6 +9,8 @@ public static class CitMovieServiceCollectionExtensions
     {
         ArgumentNullException.ThrowIfNull(services);
 
+        services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
+
         services.AddScoped<IUserRepository, UserRepository>();
 
         services.AddScoped<ILoginManager, LoginManager>();
