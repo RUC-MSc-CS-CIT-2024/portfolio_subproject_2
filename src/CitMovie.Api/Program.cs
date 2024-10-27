@@ -16,10 +16,9 @@ builder.Services.AddDbContext<DataContext>(options =>
 builder.Services.AddControllers();
 builder.Services.AddScoped<IFollowRepository, FollowRepository>();
 builder.Services.AddScoped<FollowService>();
+builder.Services.AddScoped<LanguageService>();
 
 builder.Services.AddCitMovieServices();
-
-builder.Services.AddControllers();
 
 builder.Services.AddHttpsRedirection(options =>
 {
@@ -39,8 +38,6 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseRouting();
-
-app.MapControllers();
 
 app.MapControllers();
 
