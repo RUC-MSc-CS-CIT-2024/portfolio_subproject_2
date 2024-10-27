@@ -14,8 +14,7 @@ public class Score
     [Column("at")]
     public DateTime At { get; set; }
     [Column("media_id")]
-    public string MediaId { get; set; }
-    
+    public int MediaId { get; set; }
     [ForeignKey(nameof(MediaId))]
     public Media Media { get; set; }
 }

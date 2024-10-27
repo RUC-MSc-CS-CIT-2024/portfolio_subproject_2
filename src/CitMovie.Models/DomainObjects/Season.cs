@@ -18,4 +18,6 @@ public class Season
     public Media Media { get; set; }
     [ForeignKey(nameof(SeriesId))]
     public Media Series { get; set; }
+    
+    public ICollection<Episode> Episodes { get; set; } = new List<Episode>();
 }
