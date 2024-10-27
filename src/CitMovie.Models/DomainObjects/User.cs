@@ -20,9 +20,9 @@ public class User
     [MaxLength(100), Column("email")]
     public required string Email { get; set; }
 
-    public ICollection<SearchHistory> SearchHistories { get; } = [];
-    public ICollection<Bookmark> Bookmarks { get; } = [];
-    public ICollection<Completed> Completeds { get; } = [];
-    public ICollection<UserScore> UserScores { get; } = [];
-    public ICollection<Follow> Followings { get; } = [];
+    public ICollection<SearchHistory> SearchHistories { get; } = new List<SearchHistory>();
+    public ICollection<Bookmark> Bookmarks { get; } = new List<Bookmark>();
+    public ICollection<Completed> Completeds { get; } = new List<Completed>();
+    public ICollection<UserScore> UserScores { get; } = new List<UserScore>();
+    public ICollection<Follow> Followings { get; } = new List<Follow>();
 }

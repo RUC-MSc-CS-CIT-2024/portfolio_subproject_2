@@ -24,7 +24,7 @@ public class FrameworkContext : DbContext
         : base(options) { }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
-        if (!optionsBuilder.IsConfigured)
+        if (!optionsBuilder.IsConfigured && _connectionString != null)
             optionsBuilder.UseNpgsql(_connectionString);
     }
 }
