@@ -20,11 +20,10 @@ public class FollowService
 
     public async Task<FollowDto> CreateFollowAsync(int userId, int personId)
     {
-        var user = new User { UserId = userId };
 
         var follow = new Follow
         {
-            UserId = user.UserId,
+            UserId = userId,
             PersonId = personId,
             FollowedSince = DateTime.UtcNow
         };
