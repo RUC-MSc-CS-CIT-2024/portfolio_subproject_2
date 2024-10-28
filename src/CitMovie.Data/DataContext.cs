@@ -30,49 +30,25 @@ public class DataContext : DbContext
     public DbSet<Title> Titles { get; set; }
     public DbSet<TitleAttribute> TitleAttributes { get; set; }
     public DbSet<TitleType> TitleTypes { get; set; }
-    
-    public DataContext(string connectionString) {
+
+    public DataContext(string connectionString)
+    {
         _connectionString = connectionString;
     }
-    
+
     [ActivatorUtilitiesConstructor]
-    public DataContext(DbContextOptions<DataContext> options) 
+    public DataContext(DbContextOptions<DataContext> options)
         : base(options) { }
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
         if (!optionsBuilder.IsConfigured && _connectionString != null)
             optionsBuilder.UseNpgsql(_connectionString);
     }
 
-   
-    
-     protected override void OnModelCreating(ModelBuilder modelBuilder)
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<MediaProductionCompany>()
             .HasKey(od => new { od.MediaId, od.ProductionCompanyId });
 
-        modelBuilder.Entity<Episode>()
-            .HasOne(e => e.Media)
-            .WithMany(m => m.Episodes)
-            .HasForeignKey(e => e.MediaId);
-
-        modelBuilder.Entity<Episode>()
-            .HasOne(e => e.Season)
-            .WithMany(s => s.Episodes)
-            .HasForeignKey(e => e.SeasonId);
-
-        modelBuilder.Entity<Season>()
-            .HasOne(s => s.Media)
-            .WithMany(m => m.Seasons)
-            .HasForeignKey(s => s.MediaId);
-
-        modelBuilder.Entity<RelatedMedia>()
-            .HasOne(rm => rm.Media)
-            .WithMany(m => m.RelatedMedia)
-            .HasForeignKey(rm => rm.MediaId);
-
-        modelBuilder.Entity<Score>()
-            .HasOne(s => s.Media)
-            .WithOne(m => m.Score)
-            .HasForeignKey<Score>(s => s.MediaId);
     }
 }
