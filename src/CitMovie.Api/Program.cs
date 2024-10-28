@@ -3,7 +3,6 @@ using System.Security.Claims;
 using System.Text;
 using CitMovie.Data;
 using CitMovie.Data.FollowRepository;
-using CitMovie.Data.JobCategoryRepository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -44,13 +43,11 @@ builder.Services.AddSwaggerGen(options => {
 
 builder.Services.AddDbContext<FrameworkContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("PostgresConnection")));
+builder.Services.AddDbContext<DataContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("PostgresConnection")));;
+
 
 builder.Services.AddControllers();
-builder.Services.AddScoped<IFollowRepository, FollowRepository>();
-builder.Services.AddScoped<FollowService>();
-builder.Services.AddScoped<IJobCategoryRepository, JobCategoryRepository>();
-builder.Services.AddScoped<JobCategoryService>();
-
 
 builder.Services.AddCitMovieServices();
 

@@ -3,10 +3,10 @@ using CitMovie.Models.Dto;
 
 namespace CitMovie.Business
 {
-    public class JobCategoryService
+    public class JobCategoryManager
     {
         private readonly IJobCategoryRepository _jobCategoryRepository;
-        public JobCategoryService(IJobCategoryRepository jobCategoryRepository)
+        public JobCategoryManager(IJobCategoryRepository jobCategoryRepository)
         {
             _jobCategoryRepository = jobCategoryRepository;
         }

@@ -1,6 +1,4 @@
-using CitMovie.Business;
 using CitMovie.Models.Dto;
-using Microsoft.AspNetCore.Mvc;
 
 namespace CitMovie.Api
 {
@@ -8,20 +6,20 @@ namespace CitMovie.Api
     [Route("api/job_categories")]
     public class JobCategoryController : ControllerBase
     {
-        private readonly JobCategoryService _jobCategoryService;
+        private readonly JobCategoryManager _jobCategoryManager;
         private readonly LinkGenerator _linkGenerator;
 
-        public JobCategoryController(JobCategoryService jobCategoryService, LinkGenerator linkGenerator)
+        public JobCategoryController(JobCategoryManager jobCategoryManager, LinkGenerator linkGenerator)
         {
-            _jobCategoryService = jobCategoryService;
+            _jobCategoryManager = jobCategoryManager;
             _linkGenerator = linkGenerator;
         }
 
         [HttpGet(Name = nameof(GetAllJobCategories))]
         public async Task<ActionResult<IEnumerable<JobCategoryDto>>> GetAllJobCategories(int page = 0, int pageSize = 10)
         {
-            var totalItems = await _jobCategoryService.GetTotalJobCategoriesCountAsync();
-            var jobCategories = await _jobCategoryService.GetAllJobCategoriesAsync(page, pageSize);
+            var totalItems = await _jobCategoryManager.GetTotalJobCategoriesCountAsync();
+            var jobCategories = await _jobCategoryManager.GetAllJobCategoriesAsync(page, pageSize);
 
             var result = CreatePaging(
                 nameof(GetAllJobCategories),
