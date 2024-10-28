@@ -51,9 +51,8 @@ builder.Services.AddControllers();
 builder.Services.AddScoped<IFollowRepository, FollowRepository>();
 builder.Services.AddScoped<FollowService>();
 
-builder.Services.AddCitMovieServices();
 
-builder.Services.AddControllers();
+builder.Services.AddCitMovieServices();
 
 builder.Services.AddHttpsRedirection(options =>
 {
