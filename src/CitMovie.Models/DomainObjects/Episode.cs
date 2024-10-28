@@ -10,6 +10,7 @@ public class Episode
     [Column("season_id")]
     public int SeasonId { get; set; }
     
+    [NotMapped]
     [ForeignKey(nameof(MediaId))]
     public Media Media { get; set; }
     [ForeignKey(nameof(SeasonId))]

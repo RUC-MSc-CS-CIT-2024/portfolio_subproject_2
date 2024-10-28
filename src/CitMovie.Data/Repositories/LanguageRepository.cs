@@ -18,9 +18,12 @@ namespace CitMovie.Data
                 .FirstAsync(l => l.LanguageId == languageId);
         }
 
-        public async Task<IList<Language>> GetLanguagesAsync()
+        public async Task<IList<Language>> GetLanguagesAsync(int page, int pageSize)
         {
-            return await _context.Languages.ToListAsync();
+            return await _context.Languages
+                .Skip(pageSize * page)
+                .Take(pageSize)
+                .ToListAsync();
         }
 
         public Task<Language> CreateLanguageAsync(Language language)
@@ -36,6 +39,11 @@ namespace CitMovie.Data
         public Task<Language> DeleteLanguageAsync(int languageId)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<int> GetTotalFollowingsCountAsync()
+        {
+            return await _context.Languages.CountAsync();
         }
     }
 }

@@ -5,19 +5,61 @@ namespace CitMovie.Api;
 
 public class LanguageController : ControllerBase
 {
-    private readonly LanguageService _languageService;
+    private readonly LanguageManager _languageManager;
+    private readonly LinkGenerator _linkGenerator;
 
-    public LanguageController(LanguageService languageService)
+    public LanguageController(LanguageManager languageManager, LinkGenerator linkGenerator)
     {
-        _languageService = languageService;
+        _languageManager = languageManager;
+        _linkGenerator = linkGenerator;
     }
 
-    [HttpGet("/")]
-    public async Task<IActionResult> GetLanguages()
+    [HttpGet(Name = nameof(GetLanguages))]
+    public async Task<IActionResult> GetLanguages( int page = 0, int pageSize = 10)
     {
         
-        var languages = await _languageService.GetLanguagesAsync();
+        var languages = await _languageManager.GetLanguagesAsync(page, pageSize);
+        var total_items = await _languageManager.GetTotalLanguageCountAsync();
         
-        return Ok(languages);
+        var result = CreatePaging(nameof(GetLanguages),page, pageSize, total_items, languages);
+        
+        return Ok(result);
     }    
+    
+    private string? GetLink(string linkName, int page, int pageSize)
+    {
+        var uri = _linkGenerator.GetUriByName(
+            HttpContext,
+            linkName,
+            new {page, pageSize }
+        );
+        return uri;
+    }
+    
+    private object CreatePaging<T>(string linkName, int page, int pageSize, int total, IEnumerable<T?> items)
+    {
+        var numberOfPages = (int)Math.Ceiling(total / (double)pageSize);
+
+        var curPage = GetLink(linkName, page, pageSize);
+
+        var nextPage = page < numberOfPages - 1
+            ? GetLink(linkName, page + 1, pageSize)
+            : null;
+
+        var prevPage = page > 0
+            ? GetLink(linkName, page - 1, pageSize)
+            : null;
+
+        var result = new
+        {
+            CurPage = curPage,
+            NextPage = nextPage,
+            PrevPage = prevPage,
+            NumberOfItems = total,
+            NumberPages = numberOfPages,
+            Items = items
+        };
+        return result;
+    }
+    
 }
