@@ -26,21 +26,6 @@ namespace CitMovie.Data
                 .ToListAsync();
         }
 
-        public Task<Language> CreateLanguageAsync(Language language)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<Language> UpdateLanguageAsync(Language language)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<Language> DeleteLanguageAsync(int languageId)
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<int> GetTotalFollowingsCountAsync()
         {
             return await _context.Languages.CountAsync();

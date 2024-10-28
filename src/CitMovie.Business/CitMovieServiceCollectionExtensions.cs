@@ -15,6 +15,10 @@ public static class CitMovieServiceCollectionExtensions
 
         services.AddScoped<IUserManager, UserManager>();
         services.AddScoped<ILoginManager, LoginManager>();
+        
+        services.AddScoped<ILanguageRepository, LanguageRepository>();
+        services.AddScoped<LanguageManager>();
+        
         services.AddOptions<JwtOptions>()
             .Configure<IConfiguration>((options, configuration) => {
                 configuration.Bind("JwtOptions", options);

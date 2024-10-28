@@ -39,9 +39,8 @@ public class DataContext : DbContext
     public DataContext(DbContextOptions<DataContext> options) 
         : base(options) { }
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
-        var connectionString = "Port=5433;Database=portfolio_database;Username=postgres;Password=postgres";
-        if (!optionsBuilder.IsConfigured)
-            optionsBuilder.UseNpgsql(connectionString);
+        if (!optionsBuilder.IsConfigured && _connectionString != null)
+            optionsBuilder.UseNpgsql(_connectionString);
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
