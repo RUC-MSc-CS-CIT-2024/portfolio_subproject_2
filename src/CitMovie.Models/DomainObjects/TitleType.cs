@@ -3,7 +3,7 @@ namespace CitMovie.Models.DomainObjects;
 [Table("title_type")]
 public class TitleType
 {
-    [Column("title_type_id")]
+    [Key, Column("title_type_id")]
     public int TitleTypeId { get; set; }
     [Column("name")]
     public string Name { get; set; }
