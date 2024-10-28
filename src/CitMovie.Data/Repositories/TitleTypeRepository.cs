@@ -25,21 +25,6 @@ public class TitleTypeRepository : ITitleTypeRepository
             .FirstAsync(t => t.TitleTypeId == TitleTypeId);
     }
 
-    public Task<TitleType> AddTitleTypeAsync(TitleType titleType)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<TitleType> UpdateTitleTypeAsync(TitleType titleType)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<TitleType> DeleteTitleTypeAsync(TitleType titleType)
-    {
-        throw new NotImplementedException();
-    }
-
     public async Task<int> GetTotalTitleTypesCountAsync()
     {
         return await _context.TitleTypes.CountAsync();

@@ -50,8 +50,6 @@ builder.Services.AddDbContext<DataContext>(options =>
 builder.Services.AddControllers();
 builder.Services.AddScoped<IFollowRepository, FollowRepository>();
 builder.Services.AddScoped<FollowService>();
-builder.Services.AddScoped<ITitleTypeRepository, TitleTypeRepository>();
-builder.Services.AddScoped<ITitleTypeManager, TitleTypeManager>();
 
 builder.Services.AddCitMovieServices();
 
