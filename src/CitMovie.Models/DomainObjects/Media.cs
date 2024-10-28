@@ -35,14 +35,16 @@ public class Media
 
     public Title Title { get; set; }
     public Release Release { get; set; }
+    [NotMapped]
     public Season? Season { get; set; }
     public Episode? Episode { get; set; }
     public MediaProductionCompany? MediaProductionCompany { get; set; }
     public Score? Score { get; set; }
-
-    public ICollection<RelatedMedia> RelatedMedia { get; set; } = new List<RelatedMedia>();
-    public ICollection<CastMember> CastMembers { get; set; } = new List<CastMember>();
-    public ICollection<CrewMember> CrewMembers { get; set; } = new List<CrewMember>();
+    
+    [NotMapped]
+    public ICollection<RelatedMedia>? RelatedMedia { get; } = new List<RelatedMedia>();
+    public ICollection<CastMember> CastMembers { get; } = new List<CastMember>();
+    public ICollection<CrewMember> CrewMembers { get; } = new List<CrewMember>();
 
     public List<Collection> Collections { get; set; } = new List<Collection>();
     public List<Country> Countries { get; set; } = new List<Country>();

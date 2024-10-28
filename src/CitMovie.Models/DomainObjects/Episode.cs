@@ -1,22 +1,18 @@
-using CitMovie.Models.DomainObjects;
+namespace CitMovie.Models.DomainObjects;
 
-[Table("episode")]
+[Table("esiode")]
 public class Episode
 {
-    [Key, Column("episode_id")]
-    public int EpisodeId { get; set; }
-
+    [Key, Column("media_id")]
+    public int MediaId { get; set; }
     [Column("episode_number")]
     public int EpisodeNumber { get; set; }
-
     [Column("season_id")]
     public int SeasonId { get; set; }
-
-    [Column("media_id")]
-    public int MediaId { get; set; }
-
+    
+    [NotMapped]
+    [ForeignKey(nameof(MediaId))]
     public Media Media { get; set; }
-
     [ForeignKey(nameof(SeasonId))]
-    public Season Season { get; set; }
+    public Media Season { get; set; }
 }

@@ -39,8 +39,6 @@ public class LoginController : ControllerBase {
         string username = credentialParts[0];
         string password = credentialParts[1];
 
-        _logger.LogInformation($"Login attempt with username: {username} and password: {password}");
-
         try {
             string token = await _loginService.LoginAsync(username, password);
             return Ok(token);
