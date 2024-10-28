@@ -1,4 +1,3 @@
-using CitMovie.Models.DomainObjects;
 using Microsoft.EntityFrameworkCore;
 
 namespace CitMovie.Data;
@@ -12,14 +11,23 @@ public class UserRepository : IUserRepository
         _context = context;
     }
 
-    public Task<User> CreateUserAsync(User user)
+    public async Task<User> CreateUserAsync(User user)
     {
-        throw new NotImplementedException();
+        _context.Users.Add(user);
+        await _context.SaveChangesAsync();
+        return user;
     }
 
-    public Task<bool> DeleteUserAsync(int id)
-    {
-        throw new NotImplementedException();
+    public async Task<bool> DeleteUserAsync(int id)
+    {   
+        try {
+            User userToDelete = _context.Users.First(x => x.Id == id);
+            _context.Users.Remove(userToDelete);
+            await _context.SaveChangesAsync();
+            return true;
+        } catch {
+            return false;
+        }
     }
 
     public Task<User> GetUserAsync(string username)
@@ -28,8 +36,12 @@ public class UserRepository : IUserRepository
     public Task<User> GetUserAsync(int id)
         => _context.Users.FirstAsync(x => x.Id == id);
 
-    public Task<User> UpdateUserAsync(User user)
+    public async Task<User> UpdateUserAsync(User user)
     {
-        throw new NotImplementedException();
+        User existingUser = await _context.Users.FirstAsync(x => x.Id == user.Id);
+        _context.Entry(existingUser).CurrentValues.SetValues(user);
+        
+        await _context.SaveChangesAsync();
+        return existingUser;
     }
 }
