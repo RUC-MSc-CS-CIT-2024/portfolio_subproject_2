@@ -4,7 +4,7 @@ namespace CitMovie.Data.JobCategoryRepository
 {
     public interface IJobCategoryRepository
     {
-        Task<IList<JobCategoryDto>> GetAllJobCategoriesAsync(int page, int pageSize);
+        Task<IList<JobCategory>> GetAllJobCategoriesAsync(int page, int pageSize);
         Task<int> GetTotalJobCategoriesCountAsync();
     }
 }

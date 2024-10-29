@@ -12,12 +12,12 @@ namespace CitMovie.Data.JobCategoryRepository
             _context = context;
         }
 
-        public async Task<IList<JobCategoryDto>> GetAllJobCategoriesAsync(int page, int pageSize)
+        public async Task<IList<JobCategory>> GetAllJobCategoriesAsync(int page, int pageSize)
         {
             return await _context.JobCategories
                 .Skip(page * pageSize)
                 .Take(pageSize)
-                .Select(jc => new JobCategoryDto
+                .Select(jc => new JobCategory
                 {
                     JobCategoryId = jc.JobCategoryId,
                     Name = jc.Name

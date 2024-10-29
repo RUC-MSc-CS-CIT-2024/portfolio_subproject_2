@@ -11,11 +11,15 @@ namespace CitMovie.Business
             _jobCategoryRepository = jobCategoryRepository;
         }
 
-        public async Task<IEnumerable<JobCategoryDto>> GetAllJobCategoriesAsync(int page, int pageSize)
+        public async Task<IList<JobCategoryDto>> GetAllJobCategoriesAsync(int page, int pageSize)
         {
-            return await _jobCategoryRepository.GetAllJobCategoriesAsync(page, pageSize);
+            var jobCategories = await _jobCategoryRepository.GetAllJobCategoriesAsync(page, pageSize);
+            return jobCategories.Select(jc => new JobCategoryDto
+            {
+                JobCategoryId = jc.JobCategoryId,
+                Name = jc.Name
+            }).ToList();
         }
-
         public async Task<int> GetTotalJobCategoriesCountAsync()
         {
             return await _jobCategoryRepository.GetTotalJobCategoriesCountAsync();
