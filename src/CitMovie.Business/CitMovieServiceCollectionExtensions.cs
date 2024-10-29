@@ -17,10 +17,12 @@ public static class CitMovieServiceCollectionExtensions
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IMediaRepository, MediaRepository>();
 
         services.AddScoped<IUserManager, UserManager>();
         services.AddScoped<ILoginManager, LoginManager>();
-
+        services.AddScoped<IMediaManager, MediaManager>();
+        
 
         services.AddScoped<ITitleTypeRepository, TitleTypeRepository>();
         services.AddScoped<ITitleTypeManager, TitleTypeManager>();
