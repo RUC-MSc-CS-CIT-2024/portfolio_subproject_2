@@ -1,10 +1,15 @@
 using CitMovie.Models.DomainObjects;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+
 
 namespace CitMovie.Data;
 
 public class DataContext : DbContext
 {
+    private readonly string? _connectionString;
+
     public DbSet<CastMember> CastMembers { get; set; }
     public DbSet<Collection> Collections { get; set; }
     public DbSet<Country> Countries { get; set; }
@@ -26,7 +31,22 @@ public class DataContext : DbContext
     public DbSet<TitleAttribute> TitleAttributes { get; set; }
     public DbSet<TitleType> TitleTypes { get; set; }
     
+    public DataContext(string connectionString) {
+        _connectionString = connectionString;
+    }
+    
+    [ActivatorUtilitiesConstructor]
     public DataContext(DbContextOptions<DataContext> options) 
         : base(options) { }
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
+        if (!optionsBuilder.IsConfigured && _connectionString != null)
+            optionsBuilder.UseNpgsql(_connectionString);
+    }
 
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<MediaProductionCompany>()
+            .HasKey(od => new { od.MediaId, od.ProductionCompanyId });
+
+    }
 }
