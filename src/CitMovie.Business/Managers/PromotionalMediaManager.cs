@@ -43,6 +43,28 @@ public class PromotionalMediaManager : IPromotionalMediaManager
         return await _repository.DeletePromotionalMediaAsync(id);
     }
 
+    public async Task<PromotionalMediaDto> CreatePromotionalMediaAsync(CreatePromotionalMediaDto model)
+    {
+        var createModel = new PromotionalMedia
+        {
+            ReleaseId = model.ReleaseId,
+            Type = model.Type,
+            Uri = model.Uri,
+        };
+        
+        var response = await _repository.CreatePromotionalMediaAsync(createModel);
+
+        var result = new PromotionalMediaDto
+        {
+            PromotionalMediaId = response.PromotionalMediaId,
+            ReleaseId = response.ReleaseId,
+            Type = response.Type,
+            Uri = response.Uri
+        };
+        return (result);
+    }
+
+
     public async Task<int> GetPromotionalMediaCountAsync()
     {
         return await _repository.GetPromotionalMediaCountAsync();

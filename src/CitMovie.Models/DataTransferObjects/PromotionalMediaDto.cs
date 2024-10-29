@@ -8,3 +8,11 @@ public class PromotionalMediaDto
     public string Uri { get; set; }
     
 }
+
+public class CreatePromotionalMediaDto
+{
+    public int ReleaseId { get; set; }
+    public string Type { get; set; }
+    public string Uri { get; set; }
+
+}

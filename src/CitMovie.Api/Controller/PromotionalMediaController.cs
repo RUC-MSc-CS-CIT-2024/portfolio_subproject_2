@@ -59,6 +59,20 @@ public class PromotionalMediaController : ControllerBase
             return BadRequest("Delete failed");
         }
     }
+
+    [HttpPost]
+    public async Task<IActionResult> CreatePromotionalMedia([FromBody] CreatePromotionalMediaDto model)
+    {
+        try
+        {
+            var response = await _manager.CreatePromotionalMediaAsync(model);
+            return CreatedAtAction(nameof(CreatePromotionalMedia), new { id = response.PromotionalMediaId }, response);
+        }
+        catch (Exception e)
+        {
+            return BadRequest("Can not create promotional media");
+        }
+    }
     
     private string? GetUrl(int id)
     {

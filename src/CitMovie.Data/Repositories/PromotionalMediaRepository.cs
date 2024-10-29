@@ -37,6 +37,12 @@ public class PromotionalMediaRepository : IPromotionalMediaRepository
             return false;
         }
     }
+   public async Task<PromotionalMedia> CreatePromotionalMediaAsync(PromotionalMedia model)
+   {
+       _context.PromotionalMedia.Add(model);
+       await _context.SaveChangesAsync();
+       return model;
+   }
 
     public async Task<int> GetPromotionalMediaCountAsync()
     {
