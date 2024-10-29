@@ -22,7 +22,9 @@ public static class CitMovieServiceCollectionExtensions
 
         services.AddScoped<ILanguageRepository, LanguageRepository>();
         services.AddScoped<LanguageManager>();
-
+        
+        services.AddScoped<IPromotionalMediaRepository, PromotionalMediaRepository>();
+        services.AddScoped<IPromotionalMediaManager, PromotionalMediaManager>();
         
         services.AddOptions<JwtOptions>()
             .Configure<IConfiguration>((options, configuration) => {
