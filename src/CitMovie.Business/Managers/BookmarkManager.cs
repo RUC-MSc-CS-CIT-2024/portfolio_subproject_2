@@ -10,19 +10,24 @@ namespace CitMovie.Business.Managers
     public class BookmarkManager : IBookmarkManager
     {
         private readonly IBookmarkRepository _bookmarkRepository;
+        private readonly IUserRepository _userRepository;
+        private readonly IMediaRepository _mediaRepository;
 
-        public BookmarkManager(IBookmarkRepository bookmarkRepository)
-        {
-            _bookmarkRepository = bookmarkRepository;
-        }
+        public BookmarkManager(IBookmarkRepository bookmarkRepository, IUserRepository userRepository, IMediaRepository mediaRepository) =>
+            (_bookmarkRepository, _userRepository, _mediaRepository) = (bookmarkRepository, userRepository, mediaRepository);
 
         public async Task<BookmarkDto> CreateBookmarkAsync(CreateBookmarkDto createBookmarkDto)
         {
+            var user = await _userRepository.GetUserAsync(createBookmarkDto.UserId);
+            var media = await _mediaRepository.GetMediaAsync(createBookmarkDto.MediaId);
+
             var newBookmark = new Bookmark
             {
                 UserId = createBookmarkDto.UserId,
                 MediaId = createBookmarkDto.MediaId,
-                Note = createBookmarkDto.Note
+                Note = createBookmarkDto.Note != null
+                    ? new Note(user.Username, media.Title, createBookmarkDto.Note).ToString()
+                    : null
             };
             
             var result = await _bookmarkRepository.AddBookmarkAsync(newBookmark);
@@ -36,9 +41,49 @@ namespace CitMovie.Business.Managers
             };
         }
 
-        public async Task<BookmarkDto> GetBookmarkAsync(int bookmarkId)
+        public async Task<BookmarkDto> UpdateBookmarkAsync(int bookmarkId, string? note)
         {
-            var bookmark = await _bookmarkRepository.GetBookmarkByIdAsync(bookmarkId);
+            var existingBookmark = await _bookmarkRepository.GetBookmarkByIdAsync(bookmarkId);
+            if (existingBookmark == null) return null;
+
+            var user = await _userRepository.GetUserAsync(existingBookmark.UserId);
+            var media = await _mediaRepository.GetMediaAsync(existingBookmark.MediaId);
+
+            if (existingBookmark.Note != note)
+            {
+                existingBookmark.Note = note != null
+                    ? new Note(user.Username, media.Title, note).ToString()
+                    : null;
+                existingBookmark = await _bookmarkRepository.UpdateBookmarkAsync(existingBookmark);
+            }
+
+            return new BookmarkDto
+            {
+                BookmarkId = existingBookmark.BookmarkId,
+                UserId = existingBookmark.UserId,
+                MediaId = existingBookmark.MediaId,
+                Note = existingBookmark.Note
+            };
+        }
+
+        public async Task<BookmarkDto> GetBookmarkAsync(int bookmarkId) =>
+            await TransformToBookmarkDto(await _bookmarkRepository.GetBookmarkByIdAsync(bookmarkId));
+
+        public async Task<IEnumerable<BookmarkDto>> GetUserBookmarksAsync(int userId) =>
+            (await _bookmarkRepository.GetUserBookmarksAsync(userId))
+                .Select(b => new BookmarkDto
+                {
+                    BookmarkId = b.BookmarkId,
+                    UserId = b.UserId,
+                    MediaId = b.MediaId,
+                    Note = b.Note
+                });
+
+        public async Task<bool> DeleteBookmarkAsync(int bookmarkId) =>
+            await _bookmarkRepository.DeleteBookmarkAsync(bookmarkId);
+
+        private async Task<BookmarkDto> TransformToBookmarkDto(Bookmark bookmark)
+        {
             return bookmark == null ? null : new BookmarkDto
             {
                 BookmarkId = bookmark.BookmarkId,
@@ -47,37 +92,6 @@ namespace CitMovie.Business.Managers
                 Note = bookmark.Note
             };
         }
-
-        public async Task<IEnumerable<BookmarkDto>> GetUserBookmarksAsync(int userId)
-        {
-            var bookmarks = await _bookmarkRepository.GetUserBookmarksAsync(userId);
-            return bookmarks.Select(b => new BookmarkDto
-            {
-                BookmarkId = b.BookmarkId,
-                UserId = b.UserId,
-                MediaId = b.MediaId,
-                Note = b.Note
-            });
-        }
-
-        public async Task<BookmarkDto> UpdateBookmarkAsync(int bookmarkId, string? note)
-        {
-            var existingBookmark = await _bookmarkRepository.GetBookmarkByIdAsync(bookmarkId);
-            if (existingBookmark == null) return null;
-
-            existingBookmark.Note = note;
-            var updatedBookmark = await _bookmarkRepository.UpdateBookmarkAsync(existingBookmark);
-
-            return new BookmarkDto
-            {
-                BookmarkId = updatedBookmark.BookmarkId,
-                UserId = updatedBookmark.UserId,
-                MediaId = updatedBookmark.MediaId,
-                Note = updatedBookmark.Note
-            };
-        }
-
-        public async Task<bool> DeleteBookmarkAsync(int bookmarkId)
-            => await _bookmarkRepository.DeleteBookmarkAsync(bookmarkId);
     }
 }
+    
