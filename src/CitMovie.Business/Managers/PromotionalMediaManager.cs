@@ -38,6 +38,11 @@ public class PromotionalMediaManager : IPromotionalMediaManager
         };
     }
 
+    public async Task<bool> DeletePromotionalMediaAsync(int id)
+    {
+        return await _repository.DeletePromotionalMediaAsync(id);
+    }
+
     public async Task<int> GetPromotionalMediaCountAsync()
     {
         return await _repository.GetPromotionalMediaCountAsync();

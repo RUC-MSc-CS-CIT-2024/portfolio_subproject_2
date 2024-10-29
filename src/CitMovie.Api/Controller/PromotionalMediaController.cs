@@ -29,16 +29,35 @@ public class PromotionalMediaController : ControllerBase
     [HttpGet("{id}",Name = nameof(GetPromotionalMediaById))]
     public async Task<IActionResult> GetPromotionalMediaById(int id)
     {
-        var promotional_media = await _manager.GetPromotionalMediaByIdAsync(id);
-
-        var result = new
+        try
         {
-            PromotionalMediaId = GetUrl(promotional_media.PromotionalMediaId),
-            ReleaseId = promotional_media.ReleaseId, // Should return ReleaseController.GetReleasebyId
-            Type = promotional_media.Type,
-            Uri = promotional_media.Uri
-        };
-        return Ok(result);
+            var promotional_media = await _manager.GetPromotionalMediaByIdAsync(id);
+            var result = new
+            {
+                PromotionalMediaId = GetUrl(promotional_media.PromotionalMediaId),
+                ReleaseId = promotional_media.ReleaseId, // Should return ReleaseController.GetReleasebyId
+                Type = promotional_media.Type,
+                Uri = promotional_media.Uri
+            };
+            return Ok(result);
+        }
+        catch (Exception e)
+        {
+            return BadRequest("Promotional media not found");
+        }
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeletePromotionalMedia(int id)
+    {
+        try {
+            bool deleted = await _manager.DeletePromotionalMediaAsync(id);
+            return deleted 
+                ? NoContent() 
+                : NotFound("Promotional media not found");
+        } catch (Exception ex) {
+            return BadRequest("Delete failed");
+        }
     }
     
     private string? GetUrl(int id)

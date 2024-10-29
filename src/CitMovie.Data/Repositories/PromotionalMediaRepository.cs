@@ -24,6 +24,20 @@ public class PromotionalMediaRepository : IPromotionalMediaRepository
         return await _context.PromotionalMedia.FirstAsync(p => p.PromotionalMediaId == id);
     }
 
+    public async Task<bool> DeletePromotionalMediaAsync(int id)
+    {
+        try {
+            PromotionalMedia PromotionalMediaToDelete = _context.PromotionalMedia
+                .First(x => x.PromotionalMediaId == id);
+            
+            _context.PromotionalMedia.Remove(PromotionalMediaToDelete);
+            await _context.SaveChangesAsync();
+            return true;
+        } catch {
+            return false;
+        }
+    }
+
     public async Task<int> GetPromotionalMediaCountAsync()
     {
         return await _context.PromotionalMedia.CountAsync();
