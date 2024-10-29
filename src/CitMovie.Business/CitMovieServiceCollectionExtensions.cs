@@ -1,3 +1,4 @@
+using CitMovie.Business.Managers;
 using CitMovie.Data.FollowRepository;
 using CitMovie.Data.JobCategoryRepository;
 using Microsoft.Extensions.Configuration;
@@ -29,7 +30,7 @@ public static class CitMovieServiceCollectionExtensions
         services.AddScoped<FollowManager>();
 
         services.AddScoped<IJobCategoryRepository, JobCategoryRepository>();
-        services.AddScoped<JobCategoryManager>();
+        services.AddScoped<IJobCategoryManager, JobCategoryManager>();
 
 
         services.AddOptions<JwtOptions>()

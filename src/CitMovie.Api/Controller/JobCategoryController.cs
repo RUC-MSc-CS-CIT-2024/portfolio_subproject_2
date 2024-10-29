@@ -1,3 +1,4 @@
+using CitMovie.Business.Managers;
 using CitMovie.Models.Dto;
 
 namespace CitMovie.Api
@@ -6,10 +7,10 @@ namespace CitMovie.Api
     [Route("api/job_categories")]
     public class JobCategoryController : ControllerBase
     {
-        private readonly JobCategoryManager _jobCategoryManager;
+        private readonly IJobCategoryManager _jobCategoryManager;
         private readonly LinkGenerator _linkGenerator;
 
-        public JobCategoryController(JobCategoryManager jobCategoryManager, LinkGenerator linkGenerator)
+        public JobCategoryController(IJobCategoryManager jobCategoryManager, LinkGenerator linkGenerator)
         {
             _jobCategoryManager = jobCategoryManager;
             _linkGenerator = linkGenerator;

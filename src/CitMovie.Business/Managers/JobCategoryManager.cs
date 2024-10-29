@@ -1,9 +1,10 @@
+using CitMovie.Business.Managers;
 using CitMovie.Data.JobCategoryRepository;
 using CitMovie.Models.Dto;
 
 namespace CitMovie.Business
 {
-    public class JobCategoryManager
+    public class JobCategoryManager : IJobCategoryManager
     {
         private readonly IJobCategoryRepository _jobCategoryRepository;
         public JobCategoryManager(IJobCategoryRepository jobCategoryRepository)
