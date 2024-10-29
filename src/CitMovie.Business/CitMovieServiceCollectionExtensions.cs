@@ -1,38 +1,47 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 
-namespace CitMovie.Business;
-
-public static class CitMovieServiceCollectionExtensions
+namespace CitMovie.Business
 {
-    public static IServiceCollection AddCitMovieServices(this IServiceCollection services)
+    public static class CitMovieServiceCollectionExtensions
     {
-        ArgumentNullException.ThrowIfNull(services);
+        public static IServiceCollection AddCitMovieServices(this IServiceCollection services)
+        {
+            ArgumentNullException.ThrowIfNull(services);
 
-        services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
+            // Token Generator
+            services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 
-        services.AddScoped<IUserRepository, UserRepository>();
+            // User Management
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IUserManager, UserManager>();
+            services.AddScoped<ILoginManager, LoginManager>();
 
-        services.AddScoped<IUserManager, UserManager>();
-        services.AddScoped<ILoginManager, LoginManager>();
-        
+            // Title Type Management
+            services.AddScoped<ITitleTypeRepository, TitleTypeRepository>();
+            services.AddScoped<ITitleTypeManager, TitleTypeManager>();
 
-        services.AddScoped<ITitleTypeRepository, TitleTypeRepository>();
-        services.AddScoped<ITitleTypeManager, TitleTypeManager>();
+            // Language Management
+            services.AddScoped<ILanguageRepository, LanguageRepository>();
+            services.AddScoped<ILanguageManager, LanguageManager>();
 
-        services.AddScoped<ILanguageRepository, LanguageRepository>();
-        services.AddScoped<LanguageManager>();
+            // Bookmark Management
+            services.AddScoped<IBookmarkRepository, BookmarkRepository>();
+            services.AddScoped<IBookmarkManager, BookmarkManager>();
 
-        
-        services.AddOptions<JwtOptions>()
-            .Configure<IConfiguration>((options, configuration) => {
-                configuration.Bind("JwtOptions", options);
+            // JWT Options Configuration
+            services.AddOptions<JwtOptions>()
+                .Configure<IConfiguration>((options, configuration) => {
+                    configuration.Bind("JwtOptions", options);
 
-                // Override with environment variables
-                options.Issuer = configuration.GetValue<string>("JWT_ISSUER") ?? options.Issuer;
-                options.Audience = configuration.GetValue<string>("JWT_AUDIENCE") ?? options.Audience;
-                options.SigningKey = configuration.GetValue<string>("JWT_SIGNING_KEY") ?? options.SigningKey;
-            });
-        return services;
+                    // Override with environment variables
+                    options.Issuer = configuration.GetValue<string>("JWT_ISSUER") ?? options.Issuer;
+                    options.Audience = configuration.GetValue<string>("JWT_AUDIENCE") ?? options.Audience;
+                    options.SigningKey = configuration.GetValue<string>("JWT_SIGNING_KEY") ?? options.SigningKey;
+                });
+
+            return services;
+        }
     }
 }
