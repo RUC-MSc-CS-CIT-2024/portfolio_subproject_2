@@ -1,3 +1,5 @@
+using CitMovie.Business.Managers;
+using CitMovie.Data.Repositories;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -23,6 +25,9 @@ public static class CitMovieServiceCollectionExtensions
         services.AddScoped<ILanguageRepository, LanguageRepository>();
         services.AddScoped<LanguageManager>();
 
+
+        services.AddScoped<IGenreRepository, GenreRepository>();
+        services.AddScoped<GenreManager>();
         
         services.AddOptions<JwtOptions>()
             .Configure<IConfiguration>((options, configuration) => {
