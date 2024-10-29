@@ -7,20 +7,20 @@ namespace CitMovie.Api.Controller
     [Route("api/genres")]
     public class GenreController : ControllerBase
     {
-        private readonly GenreManager _genreService;
+        private readonly IGenreManager _genreManager;
         private readonly LinkGenerator _linkGenerator;
 
-        public GenreController(GenreManager genreService, LinkGenerator linkGenerator)
+        public GenreController(IGenreManager genreManager, LinkGenerator linkGenerator)
         {
-            _genreService = genreService;
+            _genreManager = genreManager;
             _linkGenerator = linkGenerator;
         }
 
         [HttpGet(Name = nameof(GetAllGenres))]
         public async Task<ActionResult<IEnumerable<GenreDto>>> GetAllGenres(int page = 0, int pageSize = 10)
         {
-            var totalItems = await _genreService.GetTotalGenresCountAsync();
-            var genres = await _genreService.GetAllGenresAsync(page, pageSize);
+            var totalItems = await _genreManager.GetTotalGenresCountAsync();
+            var genres = await _genreManager.GetAllGenresAsync(page, pageSize);
 
             var result = CreatePaging(
                 nameof(GetAllGenres),

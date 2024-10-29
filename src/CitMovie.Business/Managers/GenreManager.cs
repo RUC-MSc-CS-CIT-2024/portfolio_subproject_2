@@ -1,10 +1,9 @@
-using System;
 using CitMovie.Data.Repositories;
 using CitMovie.Models.DTOs;
 
 namespace CitMovie.Business.Managers;
 
-public class GenreManager
+public class GenreManager : IGenreManager
 {
     private readonly IGenreRepository _genreRepository;
 
@@ -12,10 +11,14 @@ public class GenreManager
     {
         _genreRepository = genreRepository;
     }
-
-    public async Task<IEnumerable<GenreDto>> GetAllGenresAsync(int page, int pageSize)
+    public async Task<IList<GenreDto>> GetAllGenresAsync(int page, int pageSize)
     {
-        return await _genreRepository.GetAllGenresAsync(page, pageSize);
+        var genres = await _genreRepository.GetAllGenresAsync(page, pageSize);
+        return genres.Select(g => new GenreDto
+        {
+            GenreId = g.GenreId,
+            Name = g.Name
+        }).ToList();
     }
 
     public async Task<int> GetTotalGenresCountAsync()
