@@ -11,25 +11,26 @@ namespace CitMovie.Business.Managers
     {
         private readonly IBookmarkRepository _bookmarkRepository;
         private readonly IUserRepository _userRepository;
-        private readonly IMediaRepository _mediaRepository;
 
-        public BookmarkManager(IBookmarkRepository bookmarkRepository, IUserRepository userRepository, IMediaRepository mediaRepository) =>
-            (_bookmarkRepository, _userRepository, _mediaRepository) = (bookmarkRepository, userRepository, mediaRepository);
+        public BookmarkManager(IBookmarkRepository bookmarkRepository, IUserRepository userRepository)
+        {
+            _bookmarkRepository = bookmarkRepository;
+            _userRepository = userRepository;
+        }
 
         public async Task<BookmarkDto> CreateBookmarkAsync(CreateBookmarkDto createBookmarkDto)
         {
             var user = await _userRepository.GetUserAsync(createBookmarkDto.UserId);
-            var media = await _mediaRepository.GetMediaAsync(createBookmarkDto.MediaId);
 
             var newBookmark = new Bookmark
             {
                 UserId = createBookmarkDto.UserId,
                 MediaId = createBookmarkDto.MediaId,
                 Note = createBookmarkDto.Note != null
-                    ? new Note(user.Username, media.Title, createBookmarkDto.Note).ToString()
+                    ? new Note(user.Username, createBookmarkDto.MediaTitle, createBookmarkDto.Note).ToString()
                     : null
             };
-            
+
             var result = await _bookmarkRepository.AddBookmarkAsync(newBookmark);
 
             return new BookmarkDto
@@ -47,12 +48,11 @@ namespace CitMovie.Business.Managers
             if (existingBookmark == null) return null;
 
             var user = await _userRepository.GetUserAsync(existingBookmark.UserId);
-            var media = await _mediaRepository.GetMediaAsync(existingBookmark.MediaId);
 
             if (existingBookmark.Note != note)
             {
                 existingBookmark.Note = note != null
-                    ? new Note(user.Username, media.Title, note).ToString()
+                    ? new Note(user.Username, existingBookmark.Note, note).ToString()
                     : null;
                 existingBookmark = await _bookmarkRepository.UpdateBookmarkAsync(existingBookmark);
             }
@@ -94,4 +94,3 @@ namespace CitMovie.Business.Managers
         }
     }
 }
-    

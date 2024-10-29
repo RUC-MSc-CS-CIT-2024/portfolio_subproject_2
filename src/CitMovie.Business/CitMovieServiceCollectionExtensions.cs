@@ -1,5 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using CitMovie.Data.Repositories;
+using CitMovie.Business.Managers;
 using System;
 
 namespace CitMovie.Business

@@ -10,6 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="FakeItEasy" Version="8.3.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.0" />
     <PackageReference Include="xunit" Version="2.4.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
@@ -24,6 +25,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CitMovie.Api\CitMovie.Api.csproj" />
+    <ProjectReference Include="..\CitMovie.Data\CitMovie.Data.csproj" />
+    <ProjectReference Include="..\CitMovie.Models\CitMovie.Models.csproj" />
   </ItemGroup>
 
 </Project>
