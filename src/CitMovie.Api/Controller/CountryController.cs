@@ -7,20 +7,20 @@ namespace CitMovie.Api.Controller
     [Route("api/countries")]
     public class CountryController : ControllerBase
     {
-        private readonly CountryManager _countryService;
+        private readonly ICountryManager _countryManager;
         private readonly LinkGenerator _linkGenerator;
 
-        public CountryController(CountryManager countryService, LinkGenerator linkGenerator)
+        public CountryController(ICountryManager countryManager, LinkGenerator linkGenerator)
         {
-            _countryService = countryService;
+            _countryManager = countryManager;
             _linkGenerator = linkGenerator;
         }
 
         [HttpGet(Name = nameof(GetAllCountries))]
         public async Task<ActionResult<IEnumerable<CountryDto>>> GetAllCountries(int page = 0, int pageSize = 10)
         {
-            var totalItems = await _countryService.GetTotalCountriesCountAsync();
-            var countries = await _countryService.GetAllCountriesAsync(page, pageSize);
+            var totalItems = await _countryManager.GetTotalCountriesCountAsync();
+            var countries = await _countryManager.GetAllCountriesAsync(page, pageSize);
 
             var result = CreatePaging(
                 nameof(GetAllCountries),

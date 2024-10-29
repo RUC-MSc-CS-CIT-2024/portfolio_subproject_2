@@ -24,10 +24,10 @@ public static class CitMovieServiceCollectionExtensions
 
         services.AddScoped<ILanguageRepository, LanguageRepository>();
         services.AddScoped<LanguageManager>();
-
+          
         services.AddScoped<ICountryRepository, CountryRepository>();
-        services.AddScoped<CountryManager>();
-        
+        services.AddScoped<ICountryManager, CountryManager>();
+
         services.AddOptions<JwtOptions>()
             .Configure<IConfiguration>((options, configuration) => {
                 configuration.Bind("JwtOptions", options);

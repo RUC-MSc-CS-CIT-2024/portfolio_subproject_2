@@ -1,4 +1,3 @@
-using CitMovie.Models.DTOs;
 using Microsoft.EntityFrameworkCore;
 
 namespace CitMovie.Data.Repositories;
@@ -12,12 +11,12 @@ public class CountryRepository : ICountryRepository
         _context = context;
     }
 
-    public async Task<IList<CountryDto>> GetAllCountriesAsync(int page, int pageSize)
+    public async Task<IList<Country>> GetAllCountriesAsync(int page, int pageSize)
     {
         return await _context.Countries
             .Skip(page * pageSize)
             .Take(pageSize)
-            .Select(c => new CountryDto
+            .Select(c => new Country
             {
                 CountryId = c.CountryId,
                 ImdbCountryCode = c.ImdbCountryCode,
