@@ -17,11 +17,6 @@ namespace CitMovie.Data.JobCategoryRepository
             return await _context.JobCategories
                 .Skip(page * pageSize)
                 .Take(pageSize)
-                .Select(jc => new JobCategory
-                {
-                    JobCategoryId = jc.JobCategoryId,
-                    Name = jc.Name
-                })
                 .ToListAsync();
         }
 

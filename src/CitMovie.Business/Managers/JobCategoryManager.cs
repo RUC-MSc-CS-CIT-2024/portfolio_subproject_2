@@ -21,6 +21,7 @@ namespace CitMovie.Business
                 Name = jc.Name
             }).ToList();
         }
+
         public async Task<int> GetTotalJobCategoriesCountAsync()
         {
             return await _jobCategoryRepository.GetTotalJobCategoriesCountAsync();
