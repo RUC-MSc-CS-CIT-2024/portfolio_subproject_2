@@ -13,6 +13,7 @@ public class GenreRepository : IGenreRepository
     public async Task<IEnumerable<Genre>> GetAllGenresAsync(int page, int pageSize)
     {
         return await _context.Genres
+            .AsNoTracking()
             .Skip(page * pageSize)
             .Take(pageSize)
             .ToListAsync();
