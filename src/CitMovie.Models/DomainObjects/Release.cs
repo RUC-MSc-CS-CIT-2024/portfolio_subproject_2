@@ -9,18 +9,15 @@ public class Release
     [Column("type")]
     public string Type { get; set; }
     [Column("country_id")]
-    public int CountryId { get; set; }
+    public int? CountryId { get; set; }
     [Column("media_id")]
     public int MediaId { get; set; }
     [Column("title_id")]
-    public int TitleId { get; set; }
+    public int? TitleId { get; set; }
 
-    [ForeignKey(nameof(CountryId))]
-    public Country Country { get; set; }
-    [ForeignKey(nameof(MediaId))]
-    public Media Media { get; set; }
-    [ForeignKey(nameof(TitleId))]
-    public Title Title { get; set; }
+    public Country? Country { get; set; }
+    public Media Media { get; set; } = null!;
+    public Title? Title { get; set; }
     
     public ICollection<PromotionalMedia> PromotionalMedias { get; } = new List<PromotionalMedia>();
     
