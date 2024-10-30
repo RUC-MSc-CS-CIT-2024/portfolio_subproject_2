@@ -1,6 +1,7 @@
 using System.Net;
 using System.Security.Claims;
 using System.Text;
+using System.Text.Json.Serialization;
 using CitMovie.Data;
 using CitMovie.Data.FollowRepository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -47,7 +48,14 @@ builder.Services.AddDbContext<DataContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("PostgresConnection")));;
 
 
-builder.Services.AddControllers();
+builder.Services
+    .AddControllers()
+    .AddJsonOptions(options =>{
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+    });
+builder.Services.AddScoped<IFollowRepository, FollowRepository>();
+builder.Services.AddScoped<FollowService>();
+
 
 builder.Services.AddCitMovieServices();
 
