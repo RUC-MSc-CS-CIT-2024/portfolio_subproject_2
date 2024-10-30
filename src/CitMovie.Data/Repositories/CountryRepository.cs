@@ -11,7 +11,7 @@ public class CountryRepository : ICountryRepository
         _context = context;
     }
 
-    public async Task<IList<Country>> GetAllCountriesAsync(int page, int pageSize)
+    public async Task<IEnumerable<Country>> GetAllCountriesAsync(int page, int pageSize)
     {
         return await _context.Countries
             .Skip(page * pageSize)

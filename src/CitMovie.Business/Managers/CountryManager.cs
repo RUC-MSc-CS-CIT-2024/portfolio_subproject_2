@@ -13,7 +13,7 @@ public class CountryManager : ICountryManager
         _countryRepository = countryRepository;
     }
 
-    public async Task<IList<CountryDto>> GetAllCountriesAsync(int page, int pageSize)
+    public async Task<IEnumerable<CountryDto>> GetAllCountriesAsync(int page, int pageSize)
     {
         var countries = await _countryRepository.GetAllCountriesAsync(page, pageSize);
         return countries.Select(c => new CountryDto
