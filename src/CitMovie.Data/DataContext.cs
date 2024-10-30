@@ -49,5 +49,10 @@ public class DataContext : DbContext
             .HasKey(od => new { od.MediaId, od.ProductionCompanyId });
         
         modelBuilder.Entity<Media>().UseTptMappingStrategy();    
+
+        modelBuilder.Entity<Media>()
+            .HasMany(x => x.RelatedMedia)
+            .WithOne(x => x.Primary)
+            .HasForeignKey(x => x.PrimaryId);
     }
 }
