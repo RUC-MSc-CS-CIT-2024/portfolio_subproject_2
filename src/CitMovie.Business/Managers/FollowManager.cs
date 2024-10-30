@@ -1,14 +1,13 @@
 using CitMovie.Data.FollowRepository;
-using CitMovie.Models.DomainObjects;
 using CitMovie.Models.DTOs;
 
 namespace CitMovie.Business;
 
-public class FollowService
+public class FollowManager
 {
     private readonly IFollowRepository _followRepository;
 
-    public FollowService(IFollowRepository followRepository)
+    public FollowManager(IFollowRepository followRepository)
     {
         _followRepository = followRepository;
     }

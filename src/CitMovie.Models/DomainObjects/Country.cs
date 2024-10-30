@@ -6,7 +6,7 @@ public class Country
     [Key, Column("country_id")]
     public int CountryId { get; set; }
     [Column("imdb_country_code")]
-    public string ImdbCountryCode { get; set; }
+    public string? ImdbCountryCode { get; set; }
     [Column("iso_code")]
     public string IsoCode { get; set; }
     [Column("name")]
