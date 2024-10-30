@@ -1,9 +1,7 @@
-using CitMovie.Models.Dto;
-
-namespace CitMovie.Business.Managers;
+namespace CitMovie.Business;
 
 public interface IJobCategoryManager
 {
-    Task<IEnumerable<JobCategoryDto>> GetAllJobCategoriesAsync(int page, int pageSize);
+    Task<IEnumerable<JobCategoryResult>> GetAllJobCategoriesAsync(int page, int pageSize);
     Task<int> GetTotalJobCategoriesCountAsync();
 }

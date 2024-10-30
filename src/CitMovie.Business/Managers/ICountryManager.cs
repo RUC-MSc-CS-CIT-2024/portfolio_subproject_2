@@ -1,9 +1,7 @@
-using CitMovie.Models.DTOs;
-
-namespace CitMovie.Business.Managers;
+namespace CitMovie.Business;
 
 public interface ICountryManager
 {
-    Task<IEnumerable<CountryDto>> GetAllCountriesAsync(int page, int pageSize);
+    Task<IEnumerable<CountryResult>> GetAllCountriesAsync(int page, int pageSize);
     Task<int> GetTotalCountriesCountAsync();
 }

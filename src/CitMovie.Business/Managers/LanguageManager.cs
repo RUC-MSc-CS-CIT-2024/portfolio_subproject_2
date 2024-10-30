@@ -1,5 +1,3 @@
-using CitMovie.Models.DTOs;
-
 namespace CitMovie.Business;
 
 public class LanguageManager : ILanguageManager
@@ -12,15 +10,14 @@ public class LanguageManager : ILanguageManager
         _repository = languageRepository;
     }
     
-    public async Task<IEnumerable<LanguageDetailsDto>> GetLanguagesAsync(int pageNumber, int pageSize)
+    public async Task<IEnumerable<LangugeResult>> GetLanguagesAsync(int pageNumber, int pageSize)
     {
         var languages = await _repository.GetLanguagesAsync(pageNumber, pageSize);
-        return languages.Select(l => new LanguageDetailsDto
-        {
-            LanguageId = l.LanguageId,
-            Name = l.Name,
-            IsoCode = l.IsoCode
-        });
+        return languages.Select(l => new LangugeResult(
+            l.LanguageId,
+            l.Name,
+            l.IsoCode
+        ));
     }
     
     public async Task<int> GetTotalLanguageCountAsync()

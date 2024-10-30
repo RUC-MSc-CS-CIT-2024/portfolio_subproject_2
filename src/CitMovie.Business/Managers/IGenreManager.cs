@@ -1,9 +1,7 @@
-using CitMovie.Models.DTOs;
-
-namespace CitMovie.Business.Managers;
+namespace CitMovie.Business;
 
 public interface IGenreManager
 {
-    Task<IEnumerable<GenreDto>> GetAllGenresAsync(int page, int pageSize);
+    Task<IEnumerable<GenreResult>> GetAllGenresAsync(int page, int pageSize);
     Task<int> GetTotalGenresCountAsync();
 }
