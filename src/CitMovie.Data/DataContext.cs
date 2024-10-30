@@ -54,5 +54,31 @@ public class DataContext : DbContext
             .HasMany(x => x.RelatedMedia)
             .WithOne(x => x.Primary)
             .HasForeignKey(x => x.PrimaryId);
+        
+        modelBuilder.HasDbFunction(() => ExactMatchSearch(default!))
+            .HasName("exact_match_titles");
+        modelBuilder.HasDbFunction(() => BestMatchSearch(default!))
+            .HasName("best_match_titles");
+        modelBuilder.HasDbFunction(() => SimpleSearch(default!, default!))
+            .HasName("simple_search");
+        modelBuilder.HasDbFunction(() => StructuredSearch(default!, default!, default!, default!, default!))
+            .HasName("structured_string_search");
+        modelBuilder.HasDbFunction(() => GetSimilarMedia(default!))
+            .HasName("get_similar_movies");
     }
+
+    public IQueryable<MatchSearchResult> ExactMatchSearch(string[] keywords)
+        => FromExpression(() => ExactMatchSearch(keywords));
+    
+    public IQueryable<MatchSearchResult> BestMatchSearch(string[] keywords)
+        => FromExpression(() => BestMatchSearch(keywords));
+    
+    public IQueryable<MatchSearchResult> SimpleSearch(string query, int userId)
+        => FromExpression(() => SimpleSearch(query, userId));
+
+    public IQueryable<MatchSearchResult> StructuredSearch(string? title, string? plot, string? character, string? person, int userId)
+        => FromExpression(() => StructuredSearch(title, plot, character, person, userId));
+
+    public IQueryable<MatchSearchResult> GetSimilarMedia(int id)
+        => FromExpression(() => GetSimilarMedia(id));
 }
