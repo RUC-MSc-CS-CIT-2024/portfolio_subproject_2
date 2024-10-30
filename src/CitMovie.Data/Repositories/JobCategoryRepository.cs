@@ -15,6 +15,7 @@ namespace CitMovie.Data.JobCategoryRepository
         public async Task<IEnumerable<JobCategory>> GetAllJobCategoriesAsync(int page, int pageSize)
         {
             return await _context.JobCategories
+                .AsNoTracking()
                 .Skip(page * pageSize)
                 .Take(pageSize)
                 .ToListAsync();

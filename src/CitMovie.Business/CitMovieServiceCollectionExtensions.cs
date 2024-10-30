@@ -37,6 +37,9 @@ public static class CitMovieServiceCollectionExtensions
         services.AddScoped<ICountryRepository, CountryRepository>();
         services.AddScoped<ICountryManager, CountryManager>();
 
+        services.AddScoped<IGenreRepository, GenreRepository>();
+        services.AddScoped<IGenreManager, GenreManager>();
+        
         services.AddOptions<JwtOptions>()
             .Configure<IConfiguration>((options, configuration) =>
             {
