@@ -1,6 +1,8 @@
 using CitMovie.Business.Managers;
 using CitMovie.Data.FollowRepository;
 using CitMovie.Data.JobCategoryRepository;
+using CitMovie.Business.Managers;
+using CitMovie.Data.Repositories;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -32,6 +34,8 @@ public static class CitMovieServiceCollectionExtensions
         services.AddScoped<IJobCategoryRepository, JobCategoryRepository>();
         services.AddScoped<IJobCategoryManager, JobCategoryManager>();
 
+        services.AddScoped<ICountryRepository, CountryRepository>();
+        services.AddScoped<ICountryManager, CountryManager>();
 
         services.AddOptions<JwtOptions>()
             .Configure<IConfiguration>((options, configuration) =>
