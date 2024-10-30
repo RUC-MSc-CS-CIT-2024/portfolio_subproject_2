@@ -1,8 +1,3 @@
-using CitMovie.Business.Managers;
-using CitMovie.Data.FollowRepository;
-using CitMovie.Data.JobCategoryRepository;
-using CitMovie.Business.Managers;
-using CitMovie.Data.Repositories;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -18,30 +13,23 @@ public static class CitMovieServiceCollectionExtensions
 
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IMediaRepository, MediaRepository>();
+        services.AddScoped<ITitleTypeRepository, TitleTypeRepository>();
+        services.AddScoped<ILanguageRepository, LanguageRepository>();
+        services.AddScoped<IJobCategoryRepository, JobCategoryRepository>();
+        services.AddScoped<ICountryRepository, CountryRepository>();
+        services.AddScoped<IGenreRepository, GenreRepository>();
+        services.AddScoped<IFollowRepository, FollowRepository>();
 
         services.AddScoped<IUserManager, UserManager>();
         services.AddScoped<ILoginManager, LoginManager>();
         services.AddScoped<IMediaManager, MediaManager>();
-        
-
-        services.AddScoped<ITitleTypeRepository, TitleTypeRepository>();
         services.AddScoped<ITitleTypeManager, TitleTypeManager>();
-
-        services.AddScoped<ILanguageRepository, LanguageRepository>();
-        services.AddScoped<LanguageManager>();
-
-        services.AddScoped<IFollowRepository, FollowRepository>();
-        services.AddScoped<FollowManager>();
-
-        services.AddScoped<IJobCategoryRepository, JobCategoryRepository>();
+        services.AddScoped<ILanguageManager, LanguageManager>();
         services.AddScoped<IJobCategoryManager, JobCategoryManager>();
-
-        services.AddScoped<ICountryRepository, CountryRepository>();
         services.AddScoped<ICountryManager, CountryManager>();
-
-        services.AddScoped<IGenreRepository, GenreRepository>();
         services.AddScoped<IGenreManager, GenreManager>();
-        
+        services.AddScoped<IFollowManager, FollowManager>();
+
         services.AddOptions<JwtOptions>()
             .Configure<IConfiguration>((options, configuration) =>
             {

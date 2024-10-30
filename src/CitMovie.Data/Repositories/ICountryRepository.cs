@@ -1,4 +1,4 @@
-namespace CitMovie.Data.Repositories;
+namespace CitMovie.Data;
 
 public interface ICountryRepository
 {

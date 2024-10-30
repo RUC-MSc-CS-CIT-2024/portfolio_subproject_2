@@ -9,10 +9,10 @@ public class TitleTypeManager : ITitleTypeManager
         _repository = repository;
     }
     
-    public async Task<IEnumerable<TitleTypeInfoDto>> GetTytleTypesAsync(int pageNumber, int pageSize)
+    public async Task<IEnumerable<TitleTypeInfoResult>> GetTytleTypesAsync(int pageNumber, int pageSize)
     {
         var titleTypes = await _repository.GetTitleTypesAsync(pageNumber, pageSize);
-        return titleTypes.Select(t => new TitleTypeInfoDto
+        return titleTypes.Select(t => new TitleTypeInfoResult
         {
             TitleTypeId = t.TitleTypeId,
             Name = t.Name

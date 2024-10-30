@@ -3,13 +3,14 @@ using CitMovie.Models.DTOs;
 namespace CitMovie.Api;
 
 [ApiController]
+[Authorize(Policy = "user_scope")]
 [Route("api/users/{userId}/following")]
 public class FollowController : ControllerBase
 {
     private readonly LinkGenerator _linkGenerator;
-    private readonly FollowManager _followManager;
+    private readonly IFollowManager _followManager;
 
-    public FollowController(LinkGenerator linkGenerator, FollowManager followManager)
+    public FollowController(LinkGenerator linkGenerator, IFollowManager followManager)
     {
         _linkGenerator = linkGenerator;
         _followManager = followManager;
@@ -33,7 +34,7 @@ public class FollowController : ControllerBase
 
 
     [HttpPost]
-    public async Task<ActionResult<FollowDto>> CreateFollow(int userId, [FromBody] CreateFollowDto createFollowDto)
+    public async Task<ActionResult<FollowResult>> CreateFollow(int userId, [FromBody] CreateFollowResult createFollowDto)
     {
         var follow = await _followManager.CreateFollowAsync(userId, createFollowDto.PersonId);
         return CreatedAtAction(nameof(GetFollowings), new { userId }, follow);

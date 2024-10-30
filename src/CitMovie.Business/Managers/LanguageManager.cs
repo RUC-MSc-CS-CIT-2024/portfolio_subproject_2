@@ -12,10 +12,10 @@ public class LanguageManager : ILanguageManager
         _repository = languageRepository;
     }
     
-    public async Task<IEnumerable<LanguageDetailsDto>> GetLanguagesAsync(int pageNumber, int pageSize)
+    public async Task<IEnumerable<LanguageDetailsResult>> GetLanguagesAsync(int pageNumber, int pageSize)
     {
         var languages = await _repository.GetLanguagesAsync(pageNumber, pageSize);
-        return languages.Select(l => new LanguageDetailsDto
+        return languages.Select(l => new LanguageDetailsResult
         {
             LanguageId = l.LanguageId,
             Name = l.Name,

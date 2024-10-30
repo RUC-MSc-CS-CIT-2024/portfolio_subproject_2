@@ -1,6 +1,6 @@
 namespace CitMovie.Models.DTOs;
 
-public class FollowDto
+public class FollowResult
 {
     public int FollowingId { get; set; }
     public int PersonId { get; set; }

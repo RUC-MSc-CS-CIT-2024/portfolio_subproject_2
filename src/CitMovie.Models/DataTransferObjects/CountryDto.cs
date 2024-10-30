@@ -1,8 +1,6 @@
-using System;
-
 namespace CitMovie.Models.DTOs;
 
-public class CountryDto
+public class CountryResult
 {
     public int CountryId { get; set; }
     public string? ImdbCountryCode { get; set; }
