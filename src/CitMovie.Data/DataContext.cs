@@ -30,15 +30,17 @@ public class DataContext : DbContext
     public DbSet<Title> Titles { get; set; }
     public DbSet<TitleAttribute> TitleAttributes { get; set; }
     public DbSet<TitleType> TitleTypes { get; set; }
-    
-    public DataContext(string connectionString) {
+
+    public DataContext(string connectionString)
+    {
         _connectionString = connectionString;
     }
-    
+
     [ActivatorUtilitiesConstructor]
-    public DataContext(DbContextOptions<DataContext> options) 
+    public DataContext(DbContextOptions<DataContext> options)
         : base(options) { }
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
         if (!optionsBuilder.IsConfigured && _connectionString != null)
             optionsBuilder.UseNpgsql(_connectionString);
     }

@@ -1,4 +1,7 @@
 using CitMovie.Business.Managers;
+using CitMovie.Data.FollowRepository;
+using CitMovie.Data.JobCategoryRepository;
+using CitMovie.Business.Managers;
 using CitMovie.Data.Repositories;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,19 +20,26 @@ public static class CitMovieServiceCollectionExtensions
 
         services.AddScoped<IUserManager, UserManager>();
         services.AddScoped<ILoginManager, LoginManager>();
-        
+
 
         services.AddScoped<ITitleTypeRepository, TitleTypeRepository>();
         services.AddScoped<ITitleTypeManager, TitleTypeManager>();
 
         services.AddScoped<ILanguageRepository, LanguageRepository>();
         services.AddScoped<LanguageManager>();
-          
+
+        services.AddScoped<IFollowRepository, FollowRepository>();
+        services.AddScoped<FollowManager>();
+
+        services.AddScoped<IJobCategoryRepository, JobCategoryRepository>();
+        services.AddScoped<IJobCategoryManager, JobCategoryManager>();
+
         services.AddScoped<ICountryRepository, CountryRepository>();
         services.AddScoped<ICountryManager, CountryManager>();
 
         services.AddOptions<JwtOptions>()
-            .Configure<IConfiguration>((options, configuration) => {
+            .Configure<IConfiguration>((options, configuration) =>
+            {
                 configuration.Bind("JwtOptions", options);
 
                 // Override with environment variables

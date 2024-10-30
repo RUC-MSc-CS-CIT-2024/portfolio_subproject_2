@@ -40,5 +40,4 @@ public class Media
     public List<Collection> Collections { get; } = [];
     public List<Country> Countries { get; } = [];
     public List<Genre> Genres { get; } = [];
-
 }
