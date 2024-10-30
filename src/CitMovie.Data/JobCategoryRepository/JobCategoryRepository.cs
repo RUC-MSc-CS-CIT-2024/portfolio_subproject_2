@@ -12,7 +12,7 @@ namespace CitMovie.Data.JobCategoryRepository
             _context = context;
         }
 
-        public async Task<IList<JobCategory>> GetAllJobCategoriesAsync(int page, int pageSize)
+        public async Task<IEnumerable<JobCategory>> GetAllJobCategoriesAsync(int page, int pageSize)
         {
             return await _context.JobCategories
                 .Skip(page * pageSize)

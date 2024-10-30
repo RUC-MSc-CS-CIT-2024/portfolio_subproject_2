@@ -12,7 +12,7 @@ namespace CitMovie.Business
             _jobCategoryRepository = jobCategoryRepository;
         }
 
-        public async Task<IList<JobCategoryDto>> GetAllJobCategoriesAsync(int page, int pageSize)
+        public async Task<IEnumerable<JobCategoryDto>> GetAllJobCategoriesAsync(int page, int pageSize)
         {
             var jobCategories = await _jobCategoryRepository.GetAllJobCategoriesAsync(page, pageSize);
             return jobCategories.Select(jc => new JobCategoryDto
