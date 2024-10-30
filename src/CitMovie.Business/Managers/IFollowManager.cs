@@ -1,7 +1,4 @@
-using CitMovie.Models.DTOs;
-
 namespace CitMovie.Business;
-
 public interface IFollowManager
 {
     Task<IEnumerable<FollowResult>> GetFollowingsAsync(int userId, int page, int pageSize);

@@ -1,8 +1,3 @@
-namespace CitMovie.Models.Dto
-{
-    public class JobCategoryResult
-    {
-        public int JobCategoryId { get; set; }
-        public string Name { get; set; }
-    }
-}
+namespace CitMovie.Models.DataTransferObjects;
+
+public record JobCategoryResult(int JobCategoryId, string Name);

@@ -1,5 +1,3 @@
-using CitMovie.Models.Dto;
-
 namespace CitMovie.Business;
 
 public interface IJobCategoryManager

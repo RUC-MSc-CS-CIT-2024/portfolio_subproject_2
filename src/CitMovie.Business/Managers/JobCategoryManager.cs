@@ -1,5 +1,3 @@
-using CitMovie.Models.Dto;
-
 namespace CitMovie.Business;
 
 public class JobCategoryManager : IJobCategoryManager
@@ -13,11 +11,7 @@ public class JobCategoryManager : IJobCategoryManager
     public async Task<IEnumerable<JobCategoryResult>> GetAllJobCategoriesAsync(int page, int pageSize)
     {
         var jobCategories = await _jobCategoryRepository.GetAllJobCategoriesAsync(page, pageSize);
-        return jobCategories.Select(jc => new JobCategoryResult
-        {
-            JobCategoryId = jc.JobCategoryId,
-            Name = jc.Name
-        }).ToList();
+        return jobCategories.Select(jc => new JobCategoryResult(jc.JobCategoryId, jc.Name)).ToList();
     }
 
     public async Task<int> GetTotalJobCategoriesCountAsync()

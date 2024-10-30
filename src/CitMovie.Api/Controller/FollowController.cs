@@ -1,5 +1,3 @@
-using CitMovie.Models.DTOs;
-
 namespace CitMovie.Api;
 
 [ApiController]
@@ -34,9 +32,9 @@ public class FollowController : ControllerBase
 
 
     [HttpPost]
-    public async Task<ActionResult<FollowResult>> CreateFollow(int userId, [FromBody] CreateFollowResult createFollowDto)
+    public async Task<ActionResult<FollowResult>> CreateFollow(int userId, [FromBody] FollowCreateRequest followCreateRequest)
     {
-        var follow = await _followManager.CreateFollowAsync(userId, createFollowDto.PersonId);
+        var follow = await _followManager.CreateFollowAsync(userId, followCreateRequest.PersonId);
         return CreatedAtAction(nameof(GetFollowings), new { userId }, follow);
     }
 

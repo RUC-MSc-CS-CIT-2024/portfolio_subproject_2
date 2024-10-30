@@ -1,7 +1,3 @@
-namespace CitMovie.Models.DTOs;
+namespace CitMovie.Models.DataTransferObjects;
 
-public class GenreResult
-{
-    public int GenreId { get; set; }
-    public string Name { get; set; }
-}
+public record GenreResult(int GenreId, string Name);

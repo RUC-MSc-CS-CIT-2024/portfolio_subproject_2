@@ -1,4 +1,3 @@
-using CitMovie.Models.DTOs;
 namespace CitMovie.Business;
 
 public class FollowManager : IFollowManager
@@ -13,12 +12,7 @@ public class FollowManager : IFollowManager
     public async Task<IEnumerable<FollowResult>> GetFollowingsAsync(int userId, int page, int pageSize)
     {
         var followings = await _followRepository.GetFollowingsAsync(userId, page, pageSize);
-        return followings.Select(f => new FollowResult
-        {
-            PersonId = f.PersonId,
-            FollowingId = f.FollowingId,
-            FollowedSince = f.FollowedSince
-        }).ToList();
+        return followings.Select(f => new FollowResult(f.FollowingId, f.PersonId, f.FollowedSince)).ToList();
     }
 
     public async Task<FollowResult> CreateFollowAsync(int userId, int personId)
@@ -32,12 +26,7 @@ public class FollowManager : IFollowManager
 
         await _followRepository.CreateFollowAsync(follow);
 
-        return new FollowResult
-        {
-            FollowingId = follow.FollowingId,
-            PersonId = follow.PersonId,
-            FollowedSince = follow.FollowedSince
-        };
+        return new FollowResult(follow.FollowingId, follow.PersonId, follow.FollowedSince);
     }
 
     public async Task<bool> RemoveFollowingAsync(int userId, int followingId)

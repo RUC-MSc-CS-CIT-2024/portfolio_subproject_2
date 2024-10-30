@@ -1,5 +1,3 @@
-using CitMovie.Models.Dto;
-
 namespace CitMovie.Api;
 
 [ApiController]

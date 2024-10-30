@@ -1,10 +1,3 @@
-namespace CitMovie.Models.DTOs;
+namespace CitMovie.Models.DataTransferObjects;
 
-public class CountryResult
-{
-    public int CountryId { get; set; }
-    public string? ImdbCountryCode { get; set; }
-    public string IsoCode { get; set; }
-    public string Name { get; set; }
-
-}
+public record CountryResult(int CountryId, string? ImdbCountryCode, string IsoCode, string Name);
