@@ -11,7 +11,7 @@ public class GenreManager : IGenreManager
     {
         _genreRepository = genreRepository;
     }
-    public async Task<IList<GenreDto>> GetAllGenresAsync(int page, int pageSize)
+    public async Task<IEnumerable<GenreDto>> GetAllGenresAsync(int page, int pageSize)
     {
         var genres = await _genreRepository.GetAllGenresAsync(page, pageSize);
         return genres.Select(g => new GenreDto

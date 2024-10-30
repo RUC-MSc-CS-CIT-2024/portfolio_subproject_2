@@ -10,7 +10,7 @@ public class GenreRepository : IGenreRepository
     {
         _context = context;
     }
-    public async Task<IList<Genre>> GetAllGenresAsync(int page, int pageSize)
+    public async Task<IEnumerable<Genre>> GetAllGenresAsync(int page, int pageSize)
     {
         return await _context.Genres
             .Skip(page * pageSize)
