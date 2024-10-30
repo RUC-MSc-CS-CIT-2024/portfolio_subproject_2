@@ -4,9 +4,9 @@ namespace CitMovie.Models.DomainObjects;
 public class Genre
 {
     [Key, Column("genre_id")]
-    public int GenreId { get; set; }
+    public required int GenreId { get; set; }
     [Column("name")]
-    public string Name { get; set; }
+    public required string Name { get; set; }
     
-    public List<Media> Media { get; } = [];
+    public ICollection<Media> Media { get; } = new List<Media>();
 }

@@ -1,7 +1,7 @@
 namespace CitMovie.Models.DomainObjects;
 
 [Table("collection")]
-public class Collection
+public class MediaCollection
 {
     [Key, Column("collection_id")]
     public int CollectionId { get; set; }
