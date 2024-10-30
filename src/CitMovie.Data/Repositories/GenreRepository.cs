@@ -15,11 +15,6 @@ public class GenreRepository : IGenreRepository
         return await _context.Genres
             .Skip(page * pageSize)
             .Take(pageSize)
-            .Select(g => new Genre
-            {
-                GenreId = g.GenreId,
-                Name = g.Name
-            })
             .ToListAsync();
     }
 
