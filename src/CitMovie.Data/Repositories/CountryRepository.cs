@@ -16,16 +16,8 @@ public class CountryRepository : ICountryRepository
         return await _context.Countries
             .Skip(page * pageSize)
             .Take(pageSize)
-            .Select(c => new Country
-            {
-                CountryId = c.CountryId,
-                ImdbCountryCode = c.ImdbCountryCode,
-                IsoCode = c.IsoCode,
-                Name = c.Name
-            })
             .ToListAsync();
     }
-
 
     public async Task<int> GetTotalCountriesCountAsync()
     {
