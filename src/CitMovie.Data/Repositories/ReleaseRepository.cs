@@ -72,9 +72,24 @@ public class ReleaseRepository : IReleaseRepository
         {
             await ValidateMediaAsync(mediaId);
             var result = await _context.Releases.AddAsync(release);
-            _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
             return result.Entity;
+        }
+        catch (Exception e)
+        {
+            throw new InvalidOperationException(e.Message);
+        }
+    }
 
+    public async Task<Release> UpdateReleaseForMediaAsync(int releaseId, Release release)
+    {
+        try
+        {
+            var existingRelease = await _context.Releases.FirstAsync(x => x.ReleaseId == releaseId);
+            _context.Entry(existingRelease).CurrentValues.SetValues(release);
+            
+            await _context.SaveChangesAsync();
+            return existingRelease;
         }
         catch (Exception e)
         {
