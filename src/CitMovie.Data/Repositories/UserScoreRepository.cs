@@ -14,12 +14,10 @@ public class UserScoreRepository : IUserScoreRepository
 
     public async Task<IEnumerable<UserScore>> GetUserScoresAsync(int userId, int page, int pageSize, string? mediaType, int? mediaId, string? mediaName)
     {
-        // Step 1: Retrieve user scores from FrameworkContext
         var userScoresQuery = _frameworkContext.UserScores
             .Where(us => us.UserId == userId)
             .AsQueryable();
 
-        // Step 2: Retrieve media and titles from DataContext with filters applied
         var mediaQuery = _dataContext.Media.AsQueryable();
         if (!string.IsNullOrEmpty(mediaType))
         {
@@ -38,7 +36,6 @@ public class UserScoreRepository : IUserScoreRepository
         }
         var titlesList = await titlesQuery.ToListAsync();
 
-        // Step 3: Perform the join in memory using HashSet for efficient lookups
         var mediaIds = new HashSet<int>(mediaList.Select(m => m.Id));
         var titleMediaIds = new HashSet<int>(titlesList.Select(t => t.MediaId));
 
@@ -47,7 +44,6 @@ public class UserScoreRepository : IUserScoreRepository
             .Where(us => mediaIds.Contains(us.MediaId) && (string.IsNullOrEmpty(mediaName) || titleMediaIds.Contains(us.MediaId)))
             .ToList();
 
-        // Apply pagination
         var result = filteredUserScores
             .Skip(page * pageSize)
             .Take(pageSize)
@@ -59,5 +55,11 @@ public class UserScoreRepository : IUserScoreRepository
     {
         return await _frameworkContext.UserScores
             .CountAsync(us => us.UserId == userId);
+    }
+
+    public async Task CreateUserScoreAsync(int userId, string imdbId, int score, string reviewText)
+    {
+        await _frameworkContext.Database.ExecuteSqlInterpolatedAsync(
+            $"SELECT rate({userId}, {imdbId}, {score}, {reviewText})");
     }
 }

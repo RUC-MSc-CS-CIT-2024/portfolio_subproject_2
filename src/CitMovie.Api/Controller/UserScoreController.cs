@@ -1,7 +1,7 @@
 namespace CitMovie.Api
 {
     [ApiController]
-    //[Authorize(Policy = "user_scope")]
+    [Authorize(Policy = "user_scope")]
     [Route("api/users/{userId}/scores")]
 
     public class UserScoreController : ControllerBase
@@ -41,6 +41,18 @@ namespace CitMovie.Api
             );
 
             return Ok(result);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateUserScore(int userId, [FromBody] USerscoreRequest userScoreRequest)
+        {
+            if (userScoreRequest == null)
+            {
+                return BadRequest("Invalid request data.");
+            }
+
+            await _userScoreManager.CreateUserScoreAsync(userId, userScoreRequest.ImdbId, userScoreRequest.Score, userScoreRequest.ReviewText);
+            return CreatedAtRoute(nameof(GetUserScores), new { userId }, null);
         }
 
         // HATEOAS and Pagination

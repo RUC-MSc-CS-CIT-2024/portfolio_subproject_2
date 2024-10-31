@@ -20,4 +20,9 @@ public class UserScoreManager : IUserScoreManager
         return await _userScoreRepository.GetTotalUserScoresCountAsync(userId);
     }
 
+    public async Task CreateUserScoreAsync(int userId, string imdbId, int score, string reviewText)
+    {
+        await _userScoreRepository.CreateUserScoreAsync(userId, imdbId, score, reviewText);
+    }
+
 }
