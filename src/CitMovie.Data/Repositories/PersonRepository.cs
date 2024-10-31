@@ -24,4 +24,11 @@ public class PersonRepository : IPersonRepository
     {
         return await _dataContext.People.CountAsync();
     }
+
+    public async Task<Person?> GetPersonByIdAsync(int id)
+    {
+        return await _dataContext.People
+            .AsNoTracking()
+            .FirstOrDefaultAsync(p => p.PersonId == id);
+    }
 }

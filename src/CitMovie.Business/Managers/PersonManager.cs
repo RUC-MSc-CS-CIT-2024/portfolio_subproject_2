@@ -33,4 +33,22 @@ public class PersonManager : IPersonManager
     {
         return await _personRepository.GetTotalPersonsCountAsync();
     }
+
+    public async Task<PersonResult?> GetPersonByIdAsync(int id)
+    {
+        var p = await _personRepository.GetPersonByIdAsync(id);
+        if (p == null)
+        {
+            return null;
+        }
+
+        return new PersonResult(
+            p.PersonId,
+            p.Name,
+            p.Description,
+            p.Score,
+            p.BirthDate,
+            p.DeathDate
+        );
+    }
 }

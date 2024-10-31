@@ -32,6 +32,18 @@ public class PersonController : ControllerBase
         return Ok(result);
     }
 
+    [HttpGet("{id}", Name = nameof(GetPersonById))]
+    public async Task<ActionResult<PersonResult>> GetPersonById(int id)
+    {
+        var person = await _personManager.GetPersonByIdAsync(id);
+        if (person == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(person);
+    }
+
     // HATEOAS and Pagination
     private string? GetLink(string linkName, int page, int pageSize)
     {
