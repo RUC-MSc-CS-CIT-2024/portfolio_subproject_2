@@ -100,7 +100,7 @@ public class PromotionalMediaRepository : IPromotionalMediaRepository
        try
        {
            await ReleaseIdAndMediaIdValidator(mediaId, releaseId);
-           var result = _context.PromotionalMedia.Add(model);
+           var result = await _context.PromotionalMedia.AddAsync(model);
            await _context.SaveChangesAsync();
            return result.Entity;
        }
@@ -120,7 +120,7 @@ public class PromotionalMediaRepository : IPromotionalMediaRepository
                 : throw new Exception("Invalid parameter");
     }
 
-    public async Task ReleaseIdAndMediaIdValidator(int mediaId, int? releaseId)
+    private async Task ReleaseIdAndMediaIdValidator(int mediaId, int? releaseId)
     {
         try
         {
