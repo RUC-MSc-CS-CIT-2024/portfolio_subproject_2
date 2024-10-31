@@ -26,5 +26,17 @@ public class AutoMapperProfile : Profile
 
         // Job Category
         CreateMap<JobCategory, JobCategoryResult>();
+
+        // Media
+        CreateMap<Media, MediaBasicResult>()
+            .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.PrimaryInformation!.Title.Name))
+            .ForMember(dest => dest.ReleaseDate, opt => {
+                opt.AllowNull();
+                opt.MapFrom(src => src.PrimaryInformation!.Release!.ReleaseDate);
+            })
+            .ForMember(dest => dest.PosterUri, opt => {
+                opt.AllowNull();
+                opt.MapFrom(src => src.PrimaryInformation!.PromotionalMedia!.Uri);
+            });
     }
 }

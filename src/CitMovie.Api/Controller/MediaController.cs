@@ -14,8 +14,17 @@ public class MediaController : ControllerBase
     }
 
     [HttpGet]
-    public IEnumerable<Media> Get()
+    public IActionResult Get([FromQuery] MediaQueryParameter queryParameter)
     {
-        return _mediaManager.GetAllMedia();
+        switch (queryParameter.QueryType) {
+            case MediaQueryType.Basic:
+                return Ok(_mediaManager.GetAllMedia(queryParameter.Page));
+            case MediaQueryType.ExactMatch:
+                if (queryParameter.Keywords is null)
+                    return BadRequest("Missing keyword query parameter.");
+                return Ok(_mediaManager.SearchExactMatch(queryParameter.Keywords, queryParameter.Page));
+        }
+
+        return BadRequest();
     }
 }
