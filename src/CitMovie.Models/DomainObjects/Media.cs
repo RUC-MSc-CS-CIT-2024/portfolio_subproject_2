@@ -33,6 +33,8 @@ public class Media
     // [Column("primary_release_id")]
     // public int PrimaryReleaseId { get; set; }
 
+    public MediaPrimaryInformation? PrimaryInformation { get; set; }
+
     public List<MediaProductionCompany> MediaProductionCompany { get; } = [];
     
     public List<Score> Score { get; } = [];
