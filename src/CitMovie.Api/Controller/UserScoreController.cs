@@ -44,7 +44,7 @@ namespace CitMovie.Api
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateUserScore(int userId, [FromBody] USerscoreRequest userScoreRequest)
+        public async Task<IActionResult> CreateUserScore(int userId, [FromBody] UserScoreRequest userScoreRequest)
         {
             if (userScoreRequest == null)
             {
