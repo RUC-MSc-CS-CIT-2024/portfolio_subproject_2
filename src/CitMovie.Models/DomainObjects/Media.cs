@@ -37,9 +37,9 @@ public class Media
 
     public List<MediaProductionCompany> MediaProductionCompany { get; } = [];
     
-    public List<Score> Score { get; } = [];
-    public List<Release> Release { get; } = [];
-    public List<Title> Title { get; } = [];
+    public List<Score> Scores { get; } = [];
+    public List<Release> Releases { get; } = [];
+    public List<Title> Titles { get; } = [];
     public List<RelatedMedia> RelatedMedia { get; } = [];
     public List<CastMember> CastMembers { get; } = [];
     public List<CrewMember> CrewMembers { get; } = [];
