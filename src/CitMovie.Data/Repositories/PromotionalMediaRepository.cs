@@ -15,6 +15,8 @@ public class PromotionalMediaRepository : IPromotionalMediaRepository
     {
         try
         {
+            await ReleaseIdAndMediaIdValidator(mediaId);
+            
             return await _context.PromotionalMedia
                 .Include(pm => pm.Release)
                 .Where(pm => pm.Release.MediaId == mediaId)
@@ -22,9 +24,9 @@ public class PromotionalMediaRepository : IPromotionalMediaRepository
                 .Take(pageSize)
                 .ToListAsync();
         }
-        catch
+        catch (Exception e)
         {
-            throw new InvalidOperationException("There was an error retrieving the promotional media. Check if relese id is correct.");
+            throw new InvalidOperationException(e.Message);
         }
 
     }
@@ -33,6 +35,8 @@ public class PromotionalMediaRepository : IPromotionalMediaRepository
     {
         try
         {
+            await ReleaseIdAndMediaIdValidator(mediaId, releaseId);
+            
             return await _context.PromotionalMedia
                 .Include(pm => pm.Release)
                 .Where(pm => pm.ReleaseId == releaseId)
@@ -41,9 +45,9 @@ public class PromotionalMediaRepository : IPromotionalMediaRepository
                 .Take(pageSize)
                 .ToListAsync();
         }
-        catch
+        catch (Exception e)
         {
-            throw new InvalidOperationException("There was an error retrieving the promotional media. Check if release id and media id are correct.");
+            throw new InvalidOperationException(e.Message);
         }
 
     }
@@ -96,16 +100,11 @@ public class PromotionalMediaRepository : IPromotionalMediaRepository
    {
        try
        {
-           var exists = _context.Releases.Any(pm => pm.MediaId == mediaId && pm.ReleaseId == releaseId);
-
-           if (!exists)
-           {
-               throw new Exception($"Invalid data: Release with id {releaseId} does not belong to Media with id {mediaId}");
-           }
+           await ReleaseIdAndMediaIdValidator(mediaId, releaseId);
            
-           _context.PromotionalMedia.Add(model);
+           var result = _context.PromotionalMedia.Add(model);
            await _context.SaveChangesAsync();
-           return model;
+           return result.Entity;
        }
        catch (Exception e)
        {
@@ -127,5 +126,29 @@ public class PromotionalMediaRepository : IPromotionalMediaRepository
         }
         
         throw new ArgumentException("Invalid parameter");
+    }
+
+    public async Task<bool> ReleaseIdAndMediaIdValidator(int mediaId, int releaseId)
+    {
+        var exists = await _context.Releases.AnyAsync(pm => pm.MediaId == mediaId && pm.ReleaseId == releaseId);
+
+        if (!exists)
+        {
+            throw new Exception($"Invalid data: Release with id {releaseId} does not belong to Media with id {mediaId}");
+        }
+
+        return exists;
+    }
+    
+    public async Task<bool> ReleaseIdAndMediaIdValidator(int mediaId)
+    {
+        var exists = await _context.Releases.AnyAsync(pm => pm.MediaId == mediaId);
+
+        if (!exists)
+        {
+            throw new Exception($"Invalid data: Media with id {mediaId} does not exists");
+        }
+
+        return exists;
     }
 }

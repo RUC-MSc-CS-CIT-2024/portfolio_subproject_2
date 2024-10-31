@@ -21,9 +21,9 @@ public class PromotionalMediaController : ControllerBase
             var promotionalMedia = await _manager.GetPromotionalMediaOfMediaAsync(mediaId, page, pageSize);
             var totalItems = await _manager.GetPromotionalMediaCountAsync(mediaId, "media");
 
-            var updatedItems = promotionalMedia.Select(item => new PromotionalMediaDisplayInfoDto()
+            var updatedItems = promotionalMedia.Select(item => new PromotionalMediaMinimalInfoResult()
             {
-                Id = GetUrl(item.MediaId, item.ReleaseId, item.PromotionalMediaId),
+                PromotionalMediaId = GetUrl(item.MediaId, item.ReleaseId, item.PromotionalMediaId),
                 Type = item.Type,
                 Uri = item.Uri
             });
@@ -52,9 +52,9 @@ public class PromotionalMediaController : ControllerBase
             var promotionalMedia = await  _manager.GetPromotionalMediaOfReleaseAsync(mediaId, releaseId, page, pageSize);
             var totalItems =await  _manager.GetPromotionalMediaCountAsync(releaseId, "release");
         
-            var updatedItems = promotionalMedia.Select(item => new PromotionalMediaDisplayInfoDto
+            var updatedItems = promotionalMedia.Select(item => new PromotionalMediaMinimalInfoResult
             {
-                Id = GetUrl(item.MediaId,item.ReleaseId,item.PromotionalMediaId),
+                PromotionalMediaId = GetUrl(item.MediaId,item.ReleaseId,item.PromotionalMediaId),
                 Type = item.Type,
                 Uri = item.Uri
             }).ToList();
@@ -85,9 +85,9 @@ public class PromotionalMediaController : ControllerBase
         try
         {
             var promotionalMedia = await _manager.GetPromotionalMediaByIdAsync(id, mediaId, releaseId);
-            var result = new PromotionalMediaDisplayInfoDto
+            var result = new PromotionalMediaMinimalInfoResult
             {
-                Id = GetUrl(promotionalMedia.MediaId, promotionalMedia.ReleaseId,promotionalMedia.PromotionalMediaId),
+                PromotionalMediaId = GetUrl(promotionalMedia.MediaId, promotionalMedia.ReleaseId,promotionalMedia.PromotionalMediaId),
                 Type = promotionalMedia.Type,
                 Uri = promotionalMedia.Uri
             };
@@ -113,15 +113,15 @@ public class PromotionalMediaController : ControllerBase
     }
 
     [HttpPost("releases/{releaseId}/promotional_media")]
-    public async Task<IActionResult> CreatePromotionalMedia([FromRoute]int mediaId, [FromRoute]int releaseId, [FromBody] CreatePromotionalMediaDto model)
+    public async Task<IActionResult> CreatePromotionalMedia([FromRoute]int mediaId, [FromRoute]int releaseId, [FromBody] PromotionalMediaCreateRequest model)
     {
         try
         {
             var response = await _manager.CreatePromotionalMediaAsync(mediaId, releaseId, model);
 
-            var result = new PromotionalMediaDisplayInfoDto
+            var result = new PromotionalMediaMinimalInfoResult
             {
-                Id = GetUrl(response.MediaId, response.ReleaseId, response.PromotionalMediaId),
+                PromotionalMediaId = GetUrl(response.MediaId, response.ReleaseId, response.PromotionalMediaId),
                 Type = response.Type,
                 Uri = response.Uri
             };

@@ -1,13 +1,13 @@
 namespace CitMovie.Models.DataTransferObjects;
 
-public class PromotionalMediaDisplayInfoDto
+public class PromotionalMediaMinimalInfoResult
 {
-    public string Id { get; set; }
+    public string PromotionalMediaId { get; set; }
     public string Type { get; set; }
     public string Uri { get; set; }
 }
 
-public class PromotionalMediaResultDto
+public class PromotionalMediaResult
 {
     public int PromotionalMediaId { get; set; }
     public int MediaId { get; set; }
@@ -16,7 +16,7 @@ public class PromotionalMediaResultDto
     public string Uri { get; set; }
 }
 
-public class CreatePromotionalMediaDto
+public class PromotionalMediaCreateRequest
 {
     public string Type { get; set; }
     public string Uri { get; set; }

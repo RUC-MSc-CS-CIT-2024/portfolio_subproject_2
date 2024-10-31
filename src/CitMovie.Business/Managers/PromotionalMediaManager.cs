@@ -5,54 +5,34 @@ namespace CitMovie.Business;
 public class PromotionalMediaManager : IPromotionalMediaManager
 {
     private readonly IPromotionalMediaRepository _repository;
+    private readonly IMapper _mapper;
     
-    public PromotionalMediaManager(IPromotionalMediaRepository promotionalMediaRepository)
+    public PromotionalMediaManager(IPromotionalMediaRepository promotionalMediaRepository, IMapper mapper)
     {
         _repository = promotionalMediaRepository;
+        _mapper = mapper;
     }
 
-    public async Task<IEnumerable<PromotionalMediaResultDto>> GetPromotionalMediaOfMediaAsync(int mediaId, int page, int pageSize)
+    public async Task<IEnumerable<PromotionalMediaResult>> GetPromotionalMediaOfMediaAsync(int mediaId, int page, int pageSize)
     {
         var promotionalMedia = await _repository
             .GetPromotionalMediaOfMediaAsync(mediaId, page, pageSize);
-        
-        return promotionalMedia.Select(p => new PromotionalMediaResultDto
-        {
-            PromotionalMediaId = p.PromotionalMediaId,
-            MediaId = p.Release.MediaId,
-            ReleaseId = p.ReleaseId,
-            Type = p.Type,
-            Uri = p.Uri
-        });
+        return _mapper.Map<IEnumerable<PromotionalMediaResult>>(promotionalMedia);
     }
 
-    public async Task<IEnumerable<PromotionalMediaResultDto>> GetPromotionalMediaOfReleaseAsync(int mediaId, int releaseId, int page, int pageSize)
+    public async Task<IEnumerable<PromotionalMediaResult>> GetPromotionalMediaOfReleaseAsync(int mediaId, int releaseId, int page, int pageSize)
     {
         var promotionalMedia = await _repository
             .GetPromotionalMediaOfReleaseAsync(mediaId, releaseId, page, pageSize);
 
-        return promotionalMedia.Select(p => new PromotionalMediaResultDto
-        {
-            PromotionalMediaId = p.PromotionalMediaId,
-            MediaId = p.Release.MediaId,
-            ReleaseId = p.ReleaseId,
-            Type = p.Type,
-            Uri = p.Uri
-        });
+        return _mapper.Map<IEnumerable<PromotionalMediaResult>>(promotionalMedia);
     }
 
-    public async Task<PromotionalMediaResultDto> GetPromotionalMediaByIdAsync(int id, int? mediaId, int? releaseId)
+    public async Task<PromotionalMediaResult> GetPromotionalMediaByIdAsync(int id, int? mediaId, int? releaseId)
     {
         var promotionalMedia = await _repository.GetPromotionalMediaByIdAsync(id,mediaId,releaseId);
 
-        return new PromotionalMediaResultDto
-        {
-            PromotionalMediaId = promotionalMedia.PromotionalMediaId,
-            MediaId = promotionalMedia.Release.MediaId,
-            ReleaseId = promotionalMedia.ReleaseId,
-            Type = promotionalMedia.Type,
-            Uri = promotionalMedia.Uri
-        };
+        return _mapper.Map<PromotionalMediaResult>(promotionalMedia);
     }
 
     public async Task<bool> DeletePromotionalMediaAsync(int mediaId, int releaseId, int id)
@@ -60,26 +40,16 @@ public class PromotionalMediaManager : IPromotionalMediaManager
         return await _repository.DeletePromotionalMediaAsync(mediaId, releaseId, id);
     }
 
-    public async Task<PromotionalMediaResultDto> CreatePromotionalMediaAsync(int mediaId, int releaseId, CreatePromotionalMediaDto model)
+    public async Task<PromotionalMediaResult> CreatePromotionalMediaAsync(int mediaId, int releaseId, PromotionalMediaCreateRequest model)
     {
-        var createModel = new PromotionalMedia 
-        {
-            ReleaseId = releaseId,
-            Type = model.Type,
-            Uri = model.Uri,
-        };
+        
+        var createModel = _mapper.Map<PromotionalMedia>(model);
+        createModel.ReleaseId = releaseId;
         
         var response = await _repository.CreatePromotionalMediaAsync(mediaId, releaseId, createModel);
 
-        var result = new PromotionalMediaResultDto
-        {
-            PromotionalMediaId = response.PromotionalMediaId,
-            MediaId = mediaId,
-            ReleaseId = response.ReleaseId,
-            Type = response.Type,
-            Uri = response.Uri
-        };
-        return (result);
+        return _mapper.Map<PromotionalMediaResult>(response);
+
     }
 
 
