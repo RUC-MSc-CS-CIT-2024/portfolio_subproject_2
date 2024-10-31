@@ -7,4 +7,5 @@ public interface IReleaseRepository
     Task<bool> DeleteReleaseOfMediaAsync(int mediaId, int releaseId);
     Task<Release> CreateReleaseForMediaAsync(int mediaId, Release release);
     Task<Release> UpdateReleaseForMediaAsync(int releaseId, Release release);
+    Task<int> GetReleasesCountAsync(int mediaId);
 }

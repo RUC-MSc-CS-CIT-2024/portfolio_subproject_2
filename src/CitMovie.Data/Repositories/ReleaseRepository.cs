@@ -97,6 +97,11 @@ public class ReleaseRepository : IReleaseRepository
         }
     }
 
+    public async Task<int> GetReleasesCountAsync(int mediaId)
+    {
+        return _context.Releases.Count(x => x.MediaId == mediaId);
+    }
+
     private async Task ValidateMediaAsync(int mediaId)
     {
         var exists = await _context.Media.AnyAsync(m => m.Id == mediaId);
