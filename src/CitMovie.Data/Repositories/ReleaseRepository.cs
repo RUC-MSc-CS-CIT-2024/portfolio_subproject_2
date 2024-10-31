@@ -1,3 +1,4 @@
+using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 
 namespace CitMovie.Data;
@@ -35,10 +36,45 @@ public class ReleaseRepository : IReleaseRepository
             await ValidateMediaAsync(mediaId);
             var result = await _context.Releases
                 .Where(r => r.MediaId == mediaId)
-                .Where(r => r.ReleaseId == releaseId)
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync(r => r.ReleaseId == releaseId);
             
             return result ?? throw new Exception("No release with id " + mediaId + " was found");
+        }
+        catch (Exception e)
+        {
+            throw new InvalidOperationException(e.Message);
+        }
+    }
+
+    public async Task<bool> DeleteReleaseOfMediaAsync(int mediaId, int releaseId)
+    {
+        try
+        {
+            await ValidateMediaAsync(mediaId);
+            var toDelete = _context.Releases
+                .Where(r => r.MediaId == mediaId)
+                .FirstOrDefault(r => r.ReleaseId == releaseId)
+                ?? throw new Exception("No release with id " + releaseId + " was found");
+            
+            _context.Releases.Remove(toDelete);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+        catch (Exception e)
+        {
+            throw new InvalidOperationException(e.Message);
+        }
+    }
+
+    public async Task<Release> CreateReleaseForMediaAsync(int mediaId, Release release)
+    {
+        try
+        {
+            await ValidateMediaAsync(mediaId);
+            var result = await _context.Releases.AddAsync(release);
+            _context.SaveChangesAsync();
+            return result.Entity;
+
         }
         catch (Exception e)
         {
