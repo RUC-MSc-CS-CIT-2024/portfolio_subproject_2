@@ -1,29 +1,26 @@
-using CitMovie.Models.Dto;
 using Microsoft.EntityFrameworkCore;
 
-namespace CitMovie.Data.JobCategoryRepository
+namespace CitMovie.Data;
+public class JobCategoryRepository : IJobCategoryRepository
 {
-    public class JobCategoryRepository : IJobCategoryRepository
+    private readonly DataContext _context;
+
+    public JobCategoryRepository(DataContext context)
     {
-        private readonly DataContext _context;
+        _context = context;
+    }
 
-        public JobCategoryRepository(DataContext context)
-        {
-            _context = context;
-        }
+    public async Task<IEnumerable<JobCategory>> GetAllJobCategoriesAsync(int page, int pageSize)
+    {
+        return await _context.JobCategories
+            .AsNoTracking()
+            .Skip(page * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+    }
 
-        public async Task<IEnumerable<JobCategory>> GetAllJobCategoriesAsync(int page, int pageSize)
-        {
-            return await _context.JobCategories
-                .AsNoTracking()
-                .Skip(page * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
-        }
-
-        public async Task<int> GetTotalJobCategoriesCountAsync()
-        {
-            return await _context.JobCategories.CountAsync();
-        }
+    public async Task<int> GetTotalJobCategoriesCountAsync()
+    {
+        return await _context.JobCategories.CountAsync();
     }
 }

@@ -1,8 +1,6 @@
-namespace CitMovie.Data.JobCategoryRepository
+namespace CitMovie.Data;
+public interface IJobCategoryRepository
 {
-    public interface IJobCategoryRepository
-    {
-        Task<IEnumerable<JobCategory>> GetAllJobCategoriesAsync(int page, int pageSize);
-        Task<int> GetTotalJobCategoriesCountAsync();
-    }
+    Task<IEnumerable<JobCategory>> GetAllJobCategoriesAsync(int page, int pageSize);
+    Task<int> GetTotalJobCategoriesCountAsync();
 }

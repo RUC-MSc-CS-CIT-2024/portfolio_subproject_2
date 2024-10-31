@@ -5,10 +5,10 @@ namespace CitMovie.Api;
 
 public class LanguageController : ControllerBase
 {
-    private readonly LanguageManager _languageManager;
+    private readonly ILanguageManager _languageManager;
     private readonly LinkGenerator _linkGenerator;
 
-    public LanguageController(LanguageManager languageManager, LinkGenerator linkGenerator)
+    public LanguageController(ILanguageManager languageManager, LinkGenerator linkGenerator)
     {
         _languageManager = languageManager;
         _linkGenerator = linkGenerator;

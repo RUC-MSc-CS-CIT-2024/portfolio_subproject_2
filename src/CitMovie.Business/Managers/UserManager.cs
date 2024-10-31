@@ -3,40 +3,37 @@ namespace CitMovie.Business;
 public class UserManager : IUserManager
 {
     private readonly IUserRepository _userRepository;
+    private readonly IMapper _mapper;
 
-    public UserManager(IUserRepository userRepository)
+    public UserManager(IUserRepository userRepository, IMapper mapper)
     {
         _userRepository = userRepository;
+        _mapper = mapper;
     }
 
-    public async Task<UserResponse> CreateUserAsync(UserCreateRequest userRequest)
+    public async Task<UserResult> CreateUserAsync(UserCreateRequest userRequest)
     {
-        User newUser = new User
-        {
-            Username = userRequest.Username,
-            Email = userRequest.Email,
-            Password = userRequest.Password
-        };
+        User newUser = _mapper.Map<User>(userRequest);
         User result = await _userRepository.CreateUserAsync(newUser);
 
-        return new UserResponse(result.Id, result.Username, result.Email);
+        return _mapper.Map<UserResult>(result);
     }
 
     public async Task<bool> DeleteUserAsync(int id)
         => await _userRepository.DeleteUserAsync(id);
 
-    public async Task<UserResponse> GetUserAsync(string username) {
+    public async Task<UserResult> GetUserAsync(string username) {
         User result = await _userRepository.GetUserAsync(username);
-        return new UserResponse(result.Id, result.Username, result.Email);
+        return _mapper.Map<UserResult>(result);
     }
 
-    public async Task<UserResponse> GetUserAsync(int id)
+    public async Task<UserResult> GetUserAsync(int id)
     {
         User result = await _userRepository.GetUserAsync(id);
-        return new UserResponse(result.Id, result.Username, result.Email);
+        return _mapper.Map<UserResult>(result);
     }
 
-    public async Task<UserResponse> UpdateUserAsync(int id, UserUpdateRequest userRequest)
+    public async Task<UserResult> UpdateUserAsync(int id, UserUpdateRequest userRequest)
     {
         User existingUser = await _userRepository.GetUserAsync(id);
 
@@ -49,6 +46,6 @@ public class UserManager : IUserManager
         };
 
         User result = await _userRepository.UpdateUserAsync(updatedUser);
-        return new UserResponse(result.Id, result.Username, result.Email);
+        return _mapper.Map<UserResult>(result);
     }
 }
