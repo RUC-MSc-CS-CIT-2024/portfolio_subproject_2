@@ -11,23 +11,77 @@ public class PromotionalMediaRepository : IPromotionalMediaRepository
         _context = context;
     }
 
-    public async Task<IList<PromotionalMedia>> GetPromotionalMediaAsync(int page, int pageSize)
+    public async Task<IEnumerable<PromotionalMedia>> GetPromotionalMediaOfMediaAsync(int mediaId, int page, int pageSize )
     {
-        return await _context.PromotionalMedia
-            .Skip(pageSize * page)
-            .Take(pageSize)
-            .ToListAsync();
+        try
+        {
+            return await _context.PromotionalMedia
+                .Include(pm => pm.Release)
+                .Where(pm => pm.Release.MediaId == mediaId)
+                .Skip(page * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
+        catch
+        {
+            throw new InvalidOperationException("There was an error retrieving the promotional media. Check if relese id is correct.");
+        }
+
     }
 
-    public async Task<PromotionalMedia> GetPromotionalMediaByIdAsync(int id)
+    public async Task<IList<PromotionalMedia>> GetPromotionalMediaOfReleaseAsync(int mediaId, int releaseId, int page, int pageSize)
     {
-        return await _context.PromotionalMedia.FirstAsync(p => p.PromotionalMediaId == id);
+        try
+        {
+            return await _context.PromotionalMedia
+                .Include(pm => pm.Release)
+                .Where(pm => pm.ReleaseId == releaseId)
+                .Where(pm => pm.Release.MediaId == mediaId)
+                .Skip(pageSize * page)
+                .Take(pageSize)
+                .ToListAsync();
+        }
+        catch
+        {
+            throw new InvalidOperationException("There was an error retrieving the promotional media. Check if release id and media id are correct.");
+        }
+
     }
 
-    public async Task<bool> DeletePromotionalMediaAsync(int id)
+    public async Task<PromotionalMedia> GetPromotionalMediaByIdAsync(int id, int? mediaId, int? releaseId)
+    {
+        if (!mediaId.HasValue && !releaseId.HasValue)
+        {
+            try
+            {
+                return await _context.PromotionalMedia
+                    .Include(pm => pm.Release)
+                    .FirstAsync(p => p.PromotionalMediaId == id);
+            }
+            catch { throw new InvalidOperationException("Promotional media not found"); }
+        }
+
+        try
+        {
+            return await _context.PromotionalMedia
+                .Include(pm => pm.Release)
+                .Where(pm => pm.ReleaseId == releaseId)
+                .Where(pm => pm.Release.MediaId == mediaId)
+                .FirstAsync(p => p.PromotionalMediaId == id);
+        }
+        catch { throw new InvalidOperationException("Promotional media not found, check if mediaId and releaseId values are correct." +
+                                                    "Otherwise promotional media not found"); }
+
+        
+    }
+
+    public async Task<bool> DeletePromotionalMediaAsync(int mediaId, int releaseid, int id)
     {
         try {
             PromotionalMedia PromotionalMediaToDelete = _context.PromotionalMedia
+                .Include(pm => pm.Release)
+                .Where(pm => pm.ReleaseId == releaseid)
+                .Where(pm => pm.Release.MediaId == mediaId)
                 .First(x => x.PromotionalMediaId == id);
             
             _context.PromotionalMedia.Remove(PromotionalMediaToDelete);
@@ -37,15 +91,41 @@ public class PromotionalMediaRepository : IPromotionalMediaRepository
             return false;
         }
     }
-   public async Task<PromotionalMedia> CreatePromotionalMediaAsync(PromotionalMedia model)
+    
+   public async Task<PromotionalMedia> CreatePromotionalMediaAsync(int mediaId, int releaseId,PromotionalMedia model)
    {
-       _context.PromotionalMedia.Add(model);
-       await _context.SaveChangesAsync();
-       return model;
-   }
+       try
+       {
+           var exists = _context.Releases.Any(pm => pm.MediaId == mediaId && pm.ReleaseId == releaseId);
 
-    public async Task<int> GetPromotionalMediaCountAsync()
+           if (!exists)
+           {
+               throw new Exception($"Invalid data: Release with id {releaseId} does not belong to Media with id {mediaId}");
+           }
+           
+           _context.PromotionalMedia.Add(model);
+           await _context.SaveChangesAsync();
+           return model;
+       }
+       catch (Exception e)
+       {
+           throw new InvalidOperationException(e.Message);
+       }
+   }
+   
+
+    public async Task<int> GetPromotionalMediaCountAsync(int id, string parameter)
     {
-        return await _context.PromotionalMedia.CountAsync();
+        if (parameter == "release")
+        {
+            return await _context.PromotionalMedia.CountAsync(r => r.ReleaseId == id);
+        }
+
+        if (parameter == "media")
+        {
+            return await _context.PromotionalMedia.CountAsync(r => r.Release.MediaId == id);
+        }
+        
+        throw new ArgumentException("Invalid parameter");
     }
 }

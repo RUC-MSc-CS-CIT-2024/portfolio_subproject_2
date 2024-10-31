@@ -11,52 +11,70 @@ public class PromotionalMediaManager : IPromotionalMediaManager
         _repository = promotionalMediaRepository;
     }
 
-    public async Task<IEnumerable<PromotionalMediaDto>> GetPromotionalMediaAsync(int page, int pageSize)
+    public async Task<IEnumerable<PromotionalMediaResultDto>> GetPromotionalMediaOfMediaAsync(int mediaId, int page, int pageSize)
     {
         var promotionalMedia = await _repository
-            .GetPromotionalMediaAsync(page, pageSize);
-
-        return promotionalMedia.Select(p => new PromotionalMediaDto
+            .GetPromotionalMediaOfMediaAsync(mediaId, page, pageSize);
+        
+        return promotionalMedia.Select(p => new PromotionalMediaResultDto
         {
             PromotionalMediaId = p.PromotionalMediaId,
+            MediaId = p.Release.MediaId,
             ReleaseId = p.ReleaseId,
             Type = p.Type,
             Uri = p.Uri
         });
     }
 
-    public async Task<PromotionalMediaDto> GetPromotionalMediaByIdAsync(int id)
+    public async Task<IEnumerable<PromotionalMediaResultDto>> GetPromotionalMediaOfReleaseAsync(int mediaId, int releaseId, int page, int pageSize)
     {
-        var promotionalMedia = await _repository.GetPromotionalMediaByIdAsync(id);
+        var promotionalMedia = await _repository
+            .GetPromotionalMediaOfReleaseAsync(mediaId, releaseId, page, pageSize);
 
-        return new PromotionalMediaDto
+        return promotionalMedia.Select(p => new PromotionalMediaResultDto
+        {
+            PromotionalMediaId = p.PromotionalMediaId,
+            MediaId = p.Release.MediaId,
+            ReleaseId = p.ReleaseId,
+            Type = p.Type,
+            Uri = p.Uri
+        });
+    }
+
+    public async Task<PromotionalMediaResultDto> GetPromotionalMediaByIdAsync(int id, int? mediaId, int? releaseId)
+    {
+        var promotionalMedia = await _repository.GetPromotionalMediaByIdAsync(id,mediaId,releaseId);
+
+        return new PromotionalMediaResultDto
         {
             PromotionalMediaId = promotionalMedia.PromotionalMediaId,
+            MediaId = promotionalMedia.Release.MediaId,
             ReleaseId = promotionalMedia.ReleaseId,
             Type = promotionalMedia.Type,
             Uri = promotionalMedia.Uri
         };
     }
 
-    public async Task<bool> DeletePromotionalMediaAsync(int id)
+    public async Task<bool> DeletePromotionalMediaAsync(int mediaId, int releaseId, int id)
     {
-        return await _repository.DeletePromotionalMediaAsync(id);
+        return await _repository.DeletePromotionalMediaAsync(mediaId, releaseId, id);
     }
 
-    public async Task<PromotionalMediaDto> CreatePromotionalMediaAsync(CreatePromotionalMediaDto model)
+    public async Task<PromotionalMediaResultDto> CreatePromotionalMediaAsync(int mediaId, int releaseId, CreatePromotionalMediaDto model)
     {
-        var createModel = new PromotionalMedia
+        var createModel = new PromotionalMedia 
         {
-            ReleaseId = model.ReleaseId,
+            ReleaseId = releaseId,
             Type = model.Type,
             Uri = model.Uri,
         };
         
-        var response = await _repository.CreatePromotionalMediaAsync(createModel);
+        var response = await _repository.CreatePromotionalMediaAsync(mediaId, releaseId, createModel);
 
-        var result = new PromotionalMediaDto
+        var result = new PromotionalMediaResultDto
         {
             PromotionalMediaId = response.PromotionalMediaId,
+            MediaId = mediaId,
             ReleaseId = response.ReleaseId,
             Type = response.Type,
             Uri = response.Uri
@@ -65,8 +83,8 @@ public class PromotionalMediaManager : IPromotionalMediaManager
     }
 
 
-    public async Task<int> GetPromotionalMediaCountAsync()
+    public async Task<int> GetPromotionalMediaCountAsync(int id, string parameter)
     {
-        return await _repository.GetPromotionalMediaCountAsync();
+        return await _repository.GetPromotionalMediaCountAsync(id, parameter);
     }
 }

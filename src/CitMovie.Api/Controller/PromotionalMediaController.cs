@@ -1,9 +1,7 @@
-using System.Security.Cryptography.X509Certificates;
-
 namespace CitMovie.Api;
 
 [ApiController]
-[Route("api/promotional_media")]
+[Route("media/{mediaId}/api/")]
 public class PromotionalMediaController : ControllerBase
 {
     private readonly IPromotionalMediaManager _manager;
@@ -15,43 +13,97 @@ public class PromotionalMediaController : ControllerBase
         _linkGenerator = linkGenerator;
     }
 
-    [HttpGet(Name = nameof(GetPromotionalMedia))]
-    public async Task<IActionResult> GetPromotionalMedia( int page = 0, int pageSize = 10)
-    {
-        var promotional_media = await  _manager.GetPromotionalMediaAsync(page, pageSize);
-        var total_items =await  _manager.GetPromotionalMediaCountAsync();
-
-        var result = CreatePaging(nameof(GetPromotionalMedia),page, pageSize, total_items, promotional_media);
-        
-        return Ok(result);
-    }
-
-    [HttpGet("{id}",Name = nameof(GetPromotionalMediaById))]
-    public async Task<IActionResult> GetPromotionalMediaById(int id)
+    [HttpGet("promotional_media", Name = nameof(GetPromotionalMediaofMedia))]
+    public async Task<IActionResult> GetPromotionalMediaofMedia(int mediaId, int page = 0, int pageSize = 10)
     {
         try
         {
-            var promotional_media = await _manager.GetPromotionalMediaByIdAsync(id);
-            var result = new
+            var promotionalMedia = await _manager.GetPromotionalMediaOfMediaAsync(mediaId, page, pageSize);
+            var totalItems = await _manager.GetPromotionalMediaCountAsync(mediaId, "media");
+
+            var updatedItems = promotionalMedia.Select(item => new PromotionalMediaDisplayInfoDto()
             {
-                PromotionalMediaId = GetUrl(promotional_media.PromotionalMediaId),
-                ReleaseId = promotional_media.ReleaseId, // Should return ReleaseController.GetReleasebyId
-                Type = promotional_media.Type,
-                Uri = promotional_media.Uri
+                Id = GetUrl(item.MediaId, item.ReleaseId, item.PromotionalMediaId),
+                Type = item.Type,
+                Uri = item.Uri
+            });
+
+            var result = CreatePaging(
+                nameof(GetPromotionalMediaofMedia),
+                page, 
+                pageSize, 
+                totalItems,
+                updatedItems,
+                mediaId);
+
+            return Ok(result);
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+
+    [HttpGet("releases/{releaseId}/promotional_media",Name = nameof(GetPromotionalMediaOfRelease))]
+    public async Task<IActionResult> GetPromotionalMediaOfRelease(int mediaId, int releaseId, int page = 0, int pageSize = 10)
+    {
+        try
+        {
+            var promotionalMedia = await  _manager.GetPromotionalMediaOfReleaseAsync(mediaId, releaseId, page, pageSize);
+            var totalItems =await  _manager.GetPromotionalMediaCountAsync(releaseId, "release");
+        
+            var updatedItems = promotionalMedia.Select(item => new PromotionalMediaDisplayInfoDto
+            {
+                Id = GetUrl(item.MediaId,item.ReleaseId,item.PromotionalMediaId),
+                Type = item.Type,
+                Uri = item.Uri
+            }).ToList();
+
+            var result = CreatePaging(
+                nameof(GetPromotionalMediaOfRelease),
+                page, 
+                pageSize, 
+                totalItems,
+                updatedItems,
+                mediaId,
+                releaseId
+                );
+            return Ok(result);
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+
+    }
+
+    [HttpGet("releases/{releaseId}/promotional_media/{id}",Name = nameof(GetPromotionalMediaById))]
+    [HttpGet("/promotional_media/{id}")]
+    public async Task<IActionResult> GetPromotionalMediaById( int id, int? mediaId, int? releaseId)
+    {
+
+        try
+        {
+            var promotionalMedia = await _manager.GetPromotionalMediaByIdAsync(id, mediaId, releaseId);
+            var result = new PromotionalMediaDisplayInfoDto
+            {
+                Id = GetUrl(promotionalMedia.MediaId, promotionalMedia.ReleaseId,promotionalMedia.PromotionalMediaId),
+                Type = promotionalMedia.Type,
+                Uri = promotionalMedia.Uri
             };
             return Ok(result);
         }
         catch (Exception e)
         {
-            return BadRequest("Promotional media not found");
+            return BadRequest(e.Message);
         }
     }
 
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeletePromotionalMedia(int id)
+    [HttpDelete("releases/{releaseId}/promotional_media/{id}")]
+    public async Task<IActionResult> DeletePromotionalMedia(int mediaId, int releaseId, int id)
     {
         try {
-            bool deleted = await _manager.DeletePromotionalMediaAsync(id);
+            bool deleted = await _manager.DeletePromotionalMediaAsync(mediaId, releaseId, id);
             return deleted 
                 ? NoContent() 
                 : NotFound("Promotional media not found");
@@ -60,52 +112,87 @@ public class PromotionalMediaController : ControllerBase
         }
     }
 
-    [HttpPost]
-    public async Task<IActionResult> CreatePromotionalMedia([FromBody] CreatePromotionalMediaDto model)
+    [HttpPost("releases/{releaseId}/promotional_media")]
+    public async Task<IActionResult> CreatePromotionalMedia([FromRoute]int mediaId, [FromRoute]int releaseId, [FromBody] CreatePromotionalMediaDto model)
     {
         try
         {
-            var response = await _manager.CreatePromotionalMediaAsync(model);
-            return CreatedAtAction(nameof(CreatePromotionalMedia), new { id = response.PromotionalMediaId }, response);
+            var response = await _manager.CreatePromotionalMediaAsync(mediaId, releaseId, model);
+
+            var result = new PromotionalMediaDisplayInfoDto
+            {
+                Id = GetUrl(response.MediaId, response.ReleaseId, response.PromotionalMediaId),
+                Type = response.Type,
+                Uri = response.Uri
+            };
+            return CreatedAtAction(nameof(CreatePromotionalMedia), result);
         }
         catch (Exception e)
         {
-            return BadRequest("Can not create promotional media");
+            return BadRequest(e.Message);
         }
     }
     
-    private string? GetUrl(int id)
+    private string? GetUrl(int mediaId, int releaseId, int id)
     {
         return _linkGenerator.GetUriByName(
             HttpContext,
             nameof(GetPromotionalMediaById),
-            new { id }
+            new {mediaId, releaseId, id }
         );
     }
     
-    private string? GetLink(string linkName, int page, int pageSize)
+    private string? GetLink(string linkName, int page, int pageSize, int mediaId)
     {
-        var uri = _linkGenerator.GetUriByName(
+        var uriWithoutRelease = _linkGenerator.GetUriByName(
             HttpContext,
             linkName,
-            new {page, pageSize }
+            new {mediaId, page, pageSize }
         );
-        return uri;
+        return uriWithoutRelease;
     }
     
-    private object CreatePaging<T>(string linkName, int page, int pageSize, int total, IEnumerable<T?> items)
+    private string? GetLink(string linkName, int page, int pageSize, int? releaseId, int mediaId)
+    {
+        var uriWithRelease = _linkGenerator.GetUriByName(
+            HttpContext,
+            linkName,
+            new {mediaId, releaseId, page, pageSize }
+        );
+        return uriWithRelease;
+    }
+    
+    private object CreatePaging<T>( string linkName, int page, int pageSize, int total, IEnumerable<T?> items, int mediaId, int? releaseid)
     {
         var numberOfPages = (int)Math.Ceiling(total / (double)pageSize);
 
-        var curPage = GetLink(linkName, page, pageSize);
+        var curPage = GetLink(linkName, page, pageSize, releaseid, mediaId);
 
-        var nextPage = page < numberOfPages - 1
-            ? GetLink(linkName, page + 1, pageSize)
-            : null;
+        var nextPage = page < numberOfPages - 1 ? GetLink(linkName, page + 1, pageSize, releaseid, mediaId) : null;
 
-        var prevPage = page > 0
-            ? GetLink(linkName, page - 1, pageSize)
-            : null;
+        var prevPage = page > 0 ? GetLink(linkName, page - 1, pageSize, releaseid, mediaId) : null;
+
+        var result = new
+        {
+            CurPage = curPage,
+            NextPage = nextPage,
+            PrevPage = prevPage,
+            NumberOfItems = total,
+            NumberPages = numberOfPages,
+            Items = items
+        };
+        return result;
+    }
+    
+    private object CreatePaging<T>( string linkName, int page, int pageSize, int total, IEnumerable<T?> items, int mediaId)
+    {
+        var numberOfPages = (int)Math.Ceiling(total / (double)pageSize);
+
+        var curPage = GetLink(linkName, page, pageSize, mediaId);
+
+        var nextPage = page < numberOfPages - 1 ? GetLink(linkName, page + 1, pageSize, mediaId) : null;
+
+        var prevPage = page > 0 ? GetLink(linkName, page - 1, pageSize, mediaId) : null;
 
         var result = new
         {
