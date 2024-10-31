@@ -51,4 +51,21 @@ public class PersonManager : IPersonManager
             p.DeathDate
         );
     }
+
+    public async Task<IEnumerable<MediaResult>> GetMediaByPersonIdAsync(int id, int page, int pageSize)
+    {
+        var media = await _personRepository.GetMediaByPersonIdAsync(id, page, pageSize);
+        var totalCount = await _personRepository.GetMediaByPersonIdCountAsync(id);
+        return media.Select(m => new MediaResult(
+            m.Id,
+            m.Title.FirstOrDefault()?.Name ?? string.Empty,
+            m.Genres.FirstOrDefault()?.GenreId.ToString() ?? string.Empty,
+            m.Plot
+        )).ToList();
+    }
+
+    public async Task<int> GetMediaByPersonIdCountAsync(int id)
+    {
+        return await _personRepository.GetMediaByPersonIdCountAsync(id);
+    }
 }

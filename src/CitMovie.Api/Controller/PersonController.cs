@@ -23,6 +23,7 @@ public class PersonController : ControllerBase
 
         var result = CreatePaging<PersonResult>(
             nameof(GetPersons),
+            null,
             page,
             pageSize,
             totalCount,
@@ -44,29 +45,51 @@ public class PersonController : ControllerBase
         return Ok(person);
     }
 
+
+    [HttpGet("{id}/media", Name = nameof(GetMediaByPersonId))]
+    public async Task<ActionResult<IEnumerable<MediaResult>>> GetMediaByPersonId(int id,
+          [FromQuery] int page = 0,
+          [FromQuery] int pageSize = 10)
+    {
+        var media = await _personManager.GetMediaByPersonIdAsync(id, page, pageSize);
+        var totalCount = await _personManager.GetMediaByPersonIdCountAsync(id);
+
+        var result = CreatePaging<MediaResult>(
+            nameof(GetMediaByPersonId),
+            id,
+            page,
+            pageSize,
+            totalCount,
+            media
+        );
+
+        return Ok(result);
+    }
+
+
     // HATEOAS and Pagination
-    private string? GetLink(string linkName, int page, int pageSize)
+    private string? GetLink(string linkName, int? id, int page, int pageSize)
     {
         var uri = _linkGenerator.GetUriByName(
                     HttpContext,
                     linkName,
-                    new { page, pageSize }
+                    new { id, page, pageSize }
                     );
         return uri;
     }
 
-    private object CreatePaging<T>(string linkName, int page, int pageSize, int total, IEnumerable<T?> items)
+    private object CreatePaging<T>(string linkName, int? id, int page, int pageSize, int total, IEnumerable<T?> items)
     {
         var numberOfPages = (int)Math.Ceiling(total / (double)pageSize);
 
-        var curPage = GetLink(linkName, page, pageSize);
+        var curPage = GetLink(linkName, id, page, pageSize);
 
         var nextPage = page < numberOfPages - 1
-            ? GetLink(linkName, page + 1, pageSize)
+            ? GetLink(linkName, id, page + 1, pageSize)
             : null;
 
         var prevPage = page > 0
-            ? GetLink(linkName, page - 1, pageSize)
+            ? GetLink(linkName, id, page - 1, pageSize)
             : null;
 
         var result = new

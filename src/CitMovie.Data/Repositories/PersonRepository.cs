@@ -31,4 +31,29 @@ public class PersonRepository : IPersonRepository
             .AsNoTracking()
             .FirstOrDefaultAsync(p => p.PersonId == id);
     }
+
+    public async Task<IEnumerable<Media>> GetMediaByPersonIdAsync(int id, int page, int pageSize)
+    {
+        return await _dataContext.Media
+            .AsNoTracking()
+            .Include(m => m.CrewMembers)
+            .Include(m => m.CastMembers)
+            .Include(m => m.Title)
+            .Where(m => m.CrewMembers.Any(cm => cm.PersonId == id) || m.CastMembers.Any(cm => cm.PersonId == id))
+            .OrderBy(m => m.Id)
+            .Skip(page * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+    }
+
+    public async Task<int> GetMediaByPersonIdCountAsync(int id)
+    {
+        return await _dataContext.Media
+            .AsNoTracking()
+            .Include(m => m.CrewMembers)
+            .Include(m => m.CastMembers)
+            .Include(m => m.Title)
+            .Where(m => m.CrewMembers.Any(cm => cm.PersonId == id) || m.CastMembers.Any(cm => cm.PersonId == id))
+            .CountAsync();
+    }
 }
