@@ -15,8 +15,7 @@ public class PromotionalMediaRepository : IPromotionalMediaRepository
     {
         try
         {
-            await ReleaseIdAndMediaIdValidator(mediaId);
-            
+            await ReleaseIdAndMediaIdValidator(mediaId, null);
             return await _context.PromotionalMedia
                 .Include(pm => pm.Release)
                 .Where(pm => pm.Release.MediaId == mediaId)
@@ -36,7 +35,6 @@ public class PromotionalMediaRepository : IPromotionalMediaRepository
         try
         {
             await ReleaseIdAndMediaIdValidator(mediaId, releaseId);
-            
             return await _context.PromotionalMedia
                 .Include(pm => pm.Release)
                 .Where(pm => pm.ReleaseId == releaseId)
@@ -79,16 +77,17 @@ public class PromotionalMediaRepository : IPromotionalMediaRepository
         
     }
 
-    public async Task<bool> DeletePromotionalMediaAsync(int mediaId, int releaseid, int id)
+    public async Task<bool> DeletePromotionalMediaAsync(int mediaId, int releaseId, int id)
     {
         try {
-            PromotionalMedia PromotionalMediaToDelete = _context.PromotionalMedia
+            await ReleaseIdAndMediaIdValidator(mediaId, releaseId);
+            PromotionalMedia promotionalMediaToDelete = _context.PromotionalMedia
                 .Include(pm => pm.Release)
-                .Where(pm => pm.ReleaseId == releaseid)
+                .Where(pm => pm.ReleaseId == releaseId)
                 .Where(pm => pm.Release.MediaId == mediaId)
                 .First(x => x.PromotionalMediaId == id);
             
-            _context.PromotionalMedia.Remove(PromotionalMediaToDelete);
+            _context.PromotionalMedia.Remove(promotionalMediaToDelete);
             await _context.SaveChangesAsync();
             return true;
         } catch {
@@ -101,7 +100,6 @@ public class PromotionalMediaRepository : IPromotionalMediaRepository
        try
        {
            await ReleaseIdAndMediaIdValidator(mediaId, releaseId);
-           
            var result = _context.PromotionalMedia.Add(model);
            await _context.SaveChangesAsync();
            return result.Entity;
@@ -114,41 +112,30 @@ public class PromotionalMediaRepository : IPromotionalMediaRepository
    
 
     public async Task<int> GetPromotionalMediaCountAsync(int id, string parameter)
-    {
-        if (parameter == "release")
-        {
-            return await _context.PromotionalMedia.CountAsync(r => r.ReleaseId == id);
-        }
-
-        if (parameter == "media")
-        {
-            return await _context.PromotionalMedia.CountAsync(r => r.Release.MediaId == id);
-        }
-        
-        throw new ArgumentException("Invalid parameter");
+    { 
+        return parameter == "release"
+            ? await _context.PromotionalMedia.CountAsync(r => r.ReleaseId == id)
+            : parameter == "media"
+                ? await _context.PromotionalMedia.CountAsync(r => r.Release.MediaId == id)
+                : throw new Exception("Invalid parameter");
     }
 
-    public async Task<bool> ReleaseIdAndMediaIdValidator(int mediaId, int releaseId)
+    public async Task ReleaseIdAndMediaIdValidator(int mediaId, int? releaseId)
     {
-        var exists = await _context.Releases.AnyAsync(pm => pm.MediaId == mediaId && pm.ReleaseId == releaseId);
-
-        if (!exists)
+        try
         {
-            throw new Exception($"Invalid data: Release with id {releaseId} does not belong to Media with id {mediaId}");
+            var checkPassed = releaseId.HasValue 
+                ? await _context.Releases.AnyAsync(pm => pm.MediaId == mediaId && pm.ReleaseId == releaseId)
+                : await _context.Releases.AnyAsync(pm => pm.MediaId == mediaId);
+            if (!checkPassed)
+            {
+                throw new Exception($"Media or release do not exists or check if media id and release id are correct.");
+            }
+        }
+        catch(Exception e)
+        {
+            throw new InvalidOperationException(e.Message);
         }
 
-        return exists;
-    }
-    
-    public async Task<bool> ReleaseIdAndMediaIdValidator(int mediaId)
-    {
-        var exists = await _context.Releases.AnyAsync(pm => pm.MediaId == mediaId);
-
-        if (!exists)
-        {
-            throw new Exception($"Invalid data: Media with id {mediaId} does not exists");
-        }
-
-        return exists;
     }
 }
