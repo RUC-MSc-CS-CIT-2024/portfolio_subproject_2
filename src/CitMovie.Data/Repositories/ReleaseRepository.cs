@@ -38,7 +38,7 @@ public class ReleaseRepository : IReleaseRepository
                 .Where(r => r.MediaId == mediaId)
                 .FirstOrDefaultAsync(r => r.ReleaseId == releaseId);
             
-            return result ?? throw new Exception("No release with id " + mediaId + " was found");
+            return result ?? throw new Exception("Invalid Object Data");
         }
         catch (Exception e)
         {
@@ -54,7 +54,7 @@ public class ReleaseRepository : IReleaseRepository
             var toDelete = _context.Releases
                 .Where(r => r.MediaId == mediaId)
                 .FirstOrDefault(r => r.ReleaseId == releaseId)
-                ?? throw new Exception("No release with id " + releaseId + " was found");
+                ?? throw new Exception("Invalid Object Data");
             
             _context.Releases.Remove(toDelete);
             await _context.SaveChangesAsync();
@@ -71,6 +71,7 @@ public class ReleaseRepository : IReleaseRepository
         try
         {
             await ValidateMediaAsync(mediaId);
+
             var result = await _context.Releases.AddAsync(release);
             await _context.SaveChangesAsync();
             return result.Entity;
@@ -86,8 +87,8 @@ public class ReleaseRepository : IReleaseRepository
         try
         {
             var existingRelease = await _context.Releases.FirstAsync(x => x.ReleaseId == releaseId);
-            _context.Entry(existingRelease).CurrentValues.SetValues(release);
             
+            _context.Entry(existingRelease).CurrentValues.SetValues(release);
             await _context.SaveChangesAsync();
             return existingRelease;
         }
@@ -96,6 +97,7 @@ public class ReleaseRepository : IReleaseRepository
             throw new InvalidOperationException(e.Message);
         }
     }
+    
 
     public async Task<int> GetReleasesCountAsync(int mediaId)
     {
@@ -107,7 +109,7 @@ public class ReleaseRepository : IReleaseRepository
         var exists = await _context.Media.AnyAsync(m => m.Id == mediaId);
         if (!exists)
         {
-            throw new Exception($"Media with id {mediaId} does not exist");
+            throw new Exception($"Invalid Object Data");
         }
     }
 }

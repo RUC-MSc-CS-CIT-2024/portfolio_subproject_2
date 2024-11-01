@@ -28,7 +28,14 @@ public class AutoMapperProfile : Profile
         CreateMap<JobCategory, JobCategoryResult>();
         
         //Release
+        CreateMap<ReleaseCreateRequest, Release>()
+            .ForMember(dest => dest.Country, opt => opt.Ignore());
         CreateMap<Release, ReleaseResult>()
-            .ForMember(m => m.Title, opt => opt.MapFrom(src => src.Title.Name.Where(src.Title.Name == "Primary title")));
+            .ForMember(m => m.Title, 
+                opt => opt.MapFrom(src => src.Title.Name))
+            .ForMember(m => m.Country, 
+                opt => opt.MapFrom(src => src.Country.Name))
+            .ForMember(m => m.SpokenLanguages, 
+                opt => opt.MapFrom(src => src.SpokenLanguages.Select(sl => sl.Name)));
     }
 }
