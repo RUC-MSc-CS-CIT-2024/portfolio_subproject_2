@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace CitMovie.Business;
 
@@ -18,11 +19,17 @@ public class MediaManager : IMediaManager {
         return _mediaRepository.GetAllMedia(page.Number, page.Number);
     }
 
-    public IEnumerable<MediaBasicResult> SearchExactMatch(string[] keywords, PageQueryParameter page)
+    public IEnumerable<MediaBasicResult> Search(MediaQueryParameter query, int? userId)
     {
-        IEnumerable<Media> result = _mediaRepository.SearchExactMatch(keywords, page.Number, page.Count);
-        Console.WriteLine(JsonSerializer.Serialize(result, new JsonSerializerOptions() {
-            ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles}));
+        PageQueryParameter pageQuery = query.Page;
+        IEnumerable<Media> result = query.QueryType switch {
+            MediaQueryType.ExactMatch => _mediaRepository.SearchExactMatch(query.Keywords ?? [], pageQuery.Number, pageQuery.Count),
+            MediaQueryType.BestMatch => _mediaRepository.SearchBestMatch(query.Keywords ?? [], pageQuery.Number, pageQuery.Count),
+            MediaQueryType.Simple => _mediaRepository.SearchSimple(query.Query ?? "", userId ?? -1, pageQuery.Number, pageQuery.Count),
+            MediaQueryType.Structured => _mediaRepository.SearchStructured(query.Title, query.Plot, query.Character, query.PersonName, userId ?? -1, pageQuery.Number, pageQuery.Count),
+            _ => []
+        };
+        
         return _mapper.Map<IEnumerable<MediaBasicResult>>(result);
     }
 }

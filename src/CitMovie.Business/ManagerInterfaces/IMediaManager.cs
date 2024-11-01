@@ -2,5 +2,5 @@ namespace CitMovie.Business;
 
 public interface IMediaManager {
     IEnumerable<Media> GetAllMedia(PageQueryParameter page);
-    IEnumerable<MediaBasicResult> SearchExactMatch(string[] keywords, PageQueryParameter page);
+    IEnumerable<MediaBasicResult> Search(MediaQueryParameter queryParameter, int? userId);
 }

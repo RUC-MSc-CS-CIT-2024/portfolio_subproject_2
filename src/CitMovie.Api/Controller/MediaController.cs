@@ -1,3 +1,4 @@
+using System.Text.Json;
 using CitMovie.Models.DomainObjects;
 
 namespace CitMovie.Api;
@@ -16,15 +17,19 @@ public class MediaController : ControllerBase
     [HttpGet]
     public IActionResult Get([FromQuery] MediaQueryParameter queryParameter)
     {
-        switch (queryParameter.QueryType) {
-            case MediaQueryType.Basic:
-                return Ok(_mediaManager.GetAllMedia(queryParameter.Page));
-            case MediaQueryType.ExactMatch:
-                if (queryParameter.Keywords is null)
-                    return BadRequest("Missing keyword query parameter.");
-                return Ok(_mediaManager.SearchExactMatch(queryParameter.Keywords, queryParameter.Page));
-        }
+        if (queryParameter.QueryType == MediaQueryType.Basic) 
+            return Ok(_mediaManager.GetAllMedia(queryParameter.Page));
 
-        return BadRequest();
+        string? userIdString = User.Claims.FirstOrDefault(x => x.Type == "user_id")?.Value;
+        int? userId = null;
+        if (int.TryParse(userIdString, out int parseResult))
+            userId = parseResult;
+
+        return Ok(_mediaManager.Search(queryParameter, userId));
+    }
+
+    [HttpGet("{id}")]
+    public IActionResult Get(int id) {
+        throw new NotImplementedException();
     }
 }
