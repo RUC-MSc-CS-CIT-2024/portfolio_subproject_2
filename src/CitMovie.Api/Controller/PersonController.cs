@@ -30,6 +30,11 @@ public class PersonController : ControllerBase
             persons
         );
 
+        foreach (var person in persons)
+        {
+            AddPersonLinks(person);
+        }
+
         return Ok(result);
     }
 
@@ -42,19 +47,7 @@ public class PersonController : ControllerBase
             return NotFound();
         }
 
-        person.Links.Add(new Link
-        {
-            Href = HttpContext != null ? _linkGenerator.GetUriByName(HttpContext, nameof(GetPersonById), new { id = person.Id }) : string.Empty,
-            Rel = "self",
-            Method = "GET"
-        });
-
-        person.Links.Add(new Link
-        {
-            Href = HttpContext != null ? _linkGenerator.GetUriByName(HttpContext, nameof(GetFrequentCoActors), new { id = person.Id }) : string.Empty,
-            Rel = "frequent-coactors",
-            Method = "GET"
-        });
+        AddPersonLinks(person);
 
         return Ok(person);
     }
@@ -92,16 +85,7 @@ public class PersonController : ControllerBase
 
         foreach (var ca in coActor)
         {
-            var personId = await _personManager.GetPersonIdByImdbIdAsync(ca.Id);
-            if (personId.HasValue)
-            {
-                ca.Links.Add(new Link
-                {
-                    Href = HttpContext != null ? _linkGenerator.GetUriByName(HttpContext!, nameof(GetPersonById), new { id = personId }) : string.Empty,
-                    Rel = "self",
-                    Method = "GET"
-                });
-            }
+            await AddCoActorLinks(ca);
         }
 
         var result = CreatePaging<CoActorResult>(
@@ -153,5 +137,38 @@ public class PersonController : ControllerBase
         };
         return result;
     }
+
+    private void AddPersonLinks(PersonResult person)
+    {
+        person.Links.Add(new Link
+        {
+            Href = HttpContext != null ? _linkGenerator.GetUriByName(HttpContext, nameof(GetPersonById), new { id = person.Id }) : string.Empty,
+            Rel = "self",
+            Method = "GET"
+        });
+
+        person.Links.Add(new Link
+        {
+            Href = HttpContext != null ? _linkGenerator.GetUriByName(HttpContext, nameof(GetFrequentCoActors), new { id = person.Id }) : string.Empty,
+            Rel = "frequent-coactors",
+            Method = "GET"
+        });
+    }
+
+    private async Task AddCoActorLinks(CoActorResult coActor)
+    {
+        var personId = await _personManager.GetPersonIdByImdbIdAsync(coActor.Id);
+        if (personId.HasValue)
+        {
+            coActor.Links.Add(new Link
+            {
+                Href = HttpContext != null ? _linkGenerator.GetUriByName(HttpContext, nameof(GetPersonById), new { id = personId }) : string.Empty,
+                Rel = "self",
+                Method = "GET"
+            });
+        }
+    }
+
+
 }
 
