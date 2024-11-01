@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace CitMovie.Data.Repositories;
+namespace CitMovie.Data;
 
 public class CountryRepository : ICountryRepository
 {

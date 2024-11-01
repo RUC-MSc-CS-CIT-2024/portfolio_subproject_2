@@ -1,26 +1,25 @@
-using CitMovie.Data.FollowRepository;
-using CitMovie.Models.DTOs;
-
 namespace CitMovie.Business;
 
-public class FollowManager
+public class FollowManager : IFollowManager
 {
     private readonly IFollowRepository _followRepository;
+    private readonly IMapper _mapper;
 
-    public FollowManager(IFollowRepository followRepository)
+    public FollowManager(IFollowRepository followRepository, IMapper mapper)
     {
         _followRepository = followRepository;
+        _mapper = mapper;
     }
 
-    public async Task<IEnumerable<FollowDto>> GetFollowingsAsync(int userId, int page, int pageSize)
+    public async Task<IEnumerable<FollowResult>> GetFollowingsAsync(int userId, int page, int pageSize)
     {
-        return await _followRepository.GetFollowingsAsync(userId, page, pageSize);
+        var followings = await _followRepository.GetFollowingsAsync(userId, page, pageSize);
+        return _mapper.Map<IEnumerable<FollowResult>>(followings);
     }
 
-    public async Task<FollowDto> CreateFollowAsync(int userId, int personId)
+    public async Task<FollowResult> CreateFollowAsync(int userId, int personId)
     {
-
-        var follow = new Follow
+        Follow follow = new()
         {
             UserId = userId,
             PersonId = personId,
@@ -28,13 +27,7 @@ public class FollowManager
         };
 
         await _followRepository.CreateFollowAsync(follow);
-
-        return new FollowDto
-        {
-            FollowingId = follow.FollowingId,
-            PersonId = follow.PersonId,
-            FollowedSince = follow.FollowedSince
-        };
+        return _mapper.Map<FollowResult>(follow);
     }
 
     public async Task<bool> RemoveFollowingAsync(int userId, int followingId)

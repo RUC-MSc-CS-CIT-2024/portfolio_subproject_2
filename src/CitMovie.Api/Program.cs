@@ -1,9 +1,7 @@
-using System.Net;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Json.Serialization;
 using CitMovie.Data;
-using CitMovie.Data.FollowRepository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -12,14 +10,17 @@ using Microsoft.OpenApi.Models;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(options => {
-    options.AddSecurityDefinition("basic", new OpenApiSecurityScheme() {
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition("basic", new OpenApiSecurityScheme()
+    {
         Type = SecuritySchemeType.Http,
         In = ParameterLocation.Header,
         Scheme = "Basic",
         Name = "Basic login"
     });
-    options.AddSecurityDefinition("bearer", new OpenApiSecurityScheme() {
+    options.AddSecurityDefinition("bearer", new OpenApiSecurityScheme()
+    {
         Type = SecuritySchemeType.Http,
         Scheme = "bearer",
         BearerFormat = "JWT",
@@ -28,8 +29,8 @@ builder.Services.AddSwaggerGen(options => {
 
     options.AddSecurityRequirement(new OpenApiSecurityRequirement() {
         {
-            new OpenApiSecurityScheme() { 
-                Reference = new() { Type = ReferenceType.SecurityScheme, Id = "basic" } 
+            new OpenApiSecurityScheme() {
+                Reference = new() { Type = ReferenceType.SecurityScheme, Id = "basic" }
             },
             []
         },
@@ -45,17 +46,15 @@ builder.Services.AddSwaggerGen(options => {
 builder.Services.AddDbContext<FrameworkContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("PostgresConnection")));
 builder.Services.AddDbContext<DataContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("PostgresConnection")));;
+    options.UseNpgsql(builder.Configuration.GetConnectionString("PostgresConnection")));
 
 
 builder.Services
     .AddControllers()
-    .AddJsonOptions(options =>{
+    .AddJsonOptions(options =>
+    {
         options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
     });
-builder.Services.AddScoped<IFollowRepository, FollowRepository>();
-builder.Services.AddScoped<FollowService>();
-
 
 builder.Services.AddCitMovieServices();
 
@@ -68,13 +67,16 @@ builder.Services.AddHttpsRedirection(options =>
 
 
 builder.Services
-    .AddAuthentication(options => {
+    .AddAuthentication(options =>
+    {
         options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
         options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
     })
-    .AddJwtBearer(options => {
+    .AddJwtBearer(options =>
+    {
         JwtOptions jwtSettings = builder.Configuration.GetSection("JwtOptions").Get<JwtOptions>()
-            ?? new JwtOptions() {
+            ?? new JwtOptions()
+            {
                 Issuer = builder.Configuration.GetValue<string>("JWT_ISSUER") ?? throw new Exception("JWT Issuer not found"),
                 Audience = builder.Configuration.GetValue<string>("JWT_AUDIENCE") ?? throw new Exception("JWT Audience not found"),
                 SigningKey = builder.Configuration.GetValue<string>("JWT_SIGNING_KEY") ?? throw new Exception("JWT Signing Key not found")
@@ -95,10 +97,13 @@ builder.Services
         };
     });
 
-builder.Services.AddAuthorization(options => {
-    options.AddPolicy("user_scope", policy => {
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("user_scope", policy =>
+    {
         policy.RequireClaim("user_id");
-        policy.RequireAssertion(context => {
+        policy.RequireAssertion(context =>
+        {
             string? userId = (context.Resource as HttpContext)?.Request.RouteValues["userId"]?.ToString();
             return userId != null && context.User.FindFirstValue("user_id") == userId;
         });
@@ -112,7 +117,9 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-} else {
+}
+else
+{
     app.UseHsts();
 }
 

@@ -16,7 +16,7 @@ public class UserController : ControllerBase {
     [HttpGet("{userId}")]
     public async Task<ActionResult> GetUser(int userId) {
         try {
-            UserResponse user = await _userManager.GetUserAsync(userId);
+            UserResult user = await _userManager.GetUserAsync(userId);
             return Ok(user);
         } catch (Exception ex) {
             _logger.LogInformation(ex, "Get user failed");
@@ -27,7 +27,7 @@ public class UserController : ControllerBase {
     [HttpPost]
     public async Task<ActionResult> CreateUser([FromBody] UserCreateRequest user) {
         try {
-            UserResponse newUser = await _userManager.CreateUserAsync(user);
+            UserResult newUser = await _userManager.CreateUserAsync(user);
             return CreatedAtAction(nameof(GetUser), new { id = newUser.Id }, newUser);
         } catch (Exception ex) {
             _logger.LogInformation(ex, "Create user failed");
@@ -39,7 +39,7 @@ public class UserController : ControllerBase {
     [HttpPatch("{userId}")]
     public async Task<ActionResult> UpdateUser(int userId, [FromBody] UserUpdateRequest user) {
         try {
-            UserResponse updatedUser = await _userManager.UpdateUserAsync(userId, user);
+            UserResult updatedUser = await _userManager.UpdateUserAsync(userId, user);
             return Ok(updatedUser);
         } catch (Exception ex) {
             _logger.LogInformation(ex, "Update user failed");

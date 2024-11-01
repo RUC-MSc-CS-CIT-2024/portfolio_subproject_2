@@ -1,5 +1,3 @@
-using CitMovie.Models.DomainObjects;
-
 namespace CitMovie.Data;
 
 public interface ILanguageRepository
