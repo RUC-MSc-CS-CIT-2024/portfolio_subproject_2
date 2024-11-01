@@ -7,5 +7,8 @@ public interface IPersonRepository
     Task<Person?> GetPersonByIdAsync(int id);
     Task<IEnumerable<Media>> GetMediaByPersonIdAsync(int id, int page, int pageSize);
     Task<int> GetMediaByPersonIdCountAsync(int id);
-
+    Task<string> GetActorNameByIdAsync(int id);
+    Task<int?> GetPersonIdByImdbIdAsync(string imdbId);
+    Task<IEnumerable<CoActor>> GetFrequentCoActorsAsync(string actorName, int page, int pageSize);
+    Task<int> GetFrequentCoActorsCountAsync(string actorName);
 }

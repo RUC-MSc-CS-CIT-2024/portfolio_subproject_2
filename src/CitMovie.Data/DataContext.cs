@@ -28,6 +28,7 @@ public class DataContext : DbContext
     public DbSet<Title> Titles { get; set; }
     public DbSet<TitleAttribute> TitleAttributes { get; set; }
     public DbSet<TitleType> TitleTypes { get; set; }
+    public DbSet<CoActor> CoActors { get; set; } 
 
     public DataContext(string connectionString)
     {

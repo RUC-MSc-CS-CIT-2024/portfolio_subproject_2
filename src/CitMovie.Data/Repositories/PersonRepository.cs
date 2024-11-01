@@ -56,4 +56,53 @@ public class PersonRepository : IPersonRepository
             .Where(m => m.CrewMembers.Any(cm => cm.PersonId == id) || m.CastMembers.Any(cm => cm.PersonId == id))
             .CountAsync();
     }
+
+    public async Task<string> GetActorNameByIdAsync(int id)
+    {
+        var coActor = await _dataContext.People
+            .AsNoTracking()
+            .Where(a => a.PersonId == id)
+            .Select(a => a.Name)
+            .FirstOrDefaultAsync();
+
+        return coActor;
+    }
+    public async Task<int?> GetPersonIdByImdbIdAsync(string imdbId)
+    {
+        var personId = await _dataContext.People
+            .Where(p => p.ImdbId == imdbId)
+            .Select(p => p.PersonId)
+            .FirstOrDefaultAsync();
+
+        return personId;
+    }
+
+
+
+    public async Task<IEnumerable<CoActor>> GetFrequentCoActorsAsync(string actorName, int page, int pageSize)
+    {
+        var coActors = await _dataContext.CoActors
+            .FromSqlInterpolated($@"
+            SELECT *
+            FROM get_frequent_coplaying_actors({actorName})
+            ")
+            .AsNoTracking()
+            .Skip(page * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        return coActors;
+    }
+
+    public async Task<int> GetFrequentCoActorsCountAsync(string actorName)
+    {
+        var count = await _dataContext.CoActors
+            .FromSqlInterpolated($@"
+            SELECT coactor_imdb_id
+            FROM get_frequent_coplaying_actors({actorName})")
+            .AsNoTracking()
+            .CountAsync();
+
+        return count;
+    }
 }

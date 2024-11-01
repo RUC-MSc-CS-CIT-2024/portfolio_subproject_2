@@ -42,6 +42,20 @@ public class PersonController : ControllerBase
             return NotFound();
         }
 
+        person.Links.Add(new Link
+        {
+            Href = HttpContext != null ? _linkGenerator.GetUriByName(HttpContext, nameof(GetPersonById), new { id = person.Id }) : string.Empty,
+            Rel = "self",
+            Method = "GET"
+        });
+
+        person.Links.Add(new Link
+        {
+            Href = HttpContext != null ? _linkGenerator.GetUriByName(HttpContext, nameof(GetFrequentCoActors), new { id = person.Id }) : string.Empty,
+            Rel = "frequent-coactors",
+            Method = "GET"
+        });
+
         return Ok(person);
     }
 
@@ -61,6 +75,42 @@ public class PersonController : ControllerBase
             pageSize,
             totalCount,
             media
+        );
+
+        return Ok(result);
+    }
+
+    [HttpGet("{id}/coactors", Name = nameof(GetFrequentCoActors))]
+    public async Task<ActionResult<IEnumerable<CoActorResult>>> GetFrequentCoActors(
+      int id,
+      [FromQuery] int page = 0,
+      [FromQuery] int pageSize = 10)
+    {
+        var actorName = await _personManager.GetActorNameByIdAsync(id);
+        var coActor = await _personManager.GetFrequentCoActorsAsync(actorName, page, pageSize);
+        var totalCount = await _personManager.GetFrequentCoActorsCountAsync(id);
+
+        foreach (var ca in coActor)
+        {
+            var personId = await _personManager.GetPersonIdByImdbIdAsync(ca.Id);
+            if (personId.HasValue)
+            {
+                ca.Links.Add(new Link
+                {
+                    Href = HttpContext != null ? _linkGenerator.GetUriByName(HttpContext!, nameof(GetPersonById), new { id = personId }) : string.Empty,
+                    Rel = "self",
+                    Method = "GET"
+                });
+            }
+        }
+
+        var result = CreatePaging<CoActorResult>(
+            nameof(GetFrequentCoActors),
+            id,
+            page,
+            pageSize,
+            totalCount,
+            coActor
         );
 
         return Ok(result);

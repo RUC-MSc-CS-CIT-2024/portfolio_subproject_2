@@ -22,6 +22,7 @@ public class PersonManager : IPersonManager
             p.Name,
             p.Description,
             p.Score,
+            p.NameRating,
             p.BirthDate,
             p.DeathDate
         )).ToList();
@@ -47,6 +48,7 @@ public class PersonManager : IPersonManager
             p.Name,
             p.Description,
             p.Score,
+            p.NameRating,
             p.BirthDate,
             p.DeathDate
         );
@@ -59,8 +61,11 @@ public class PersonManager : IPersonManager
         return media.Select(m => new MediaResult(
             m.Id,
             m.Title.FirstOrDefault()?.Name ?? string.Empty,
-            m.Genres.FirstOrDefault()?.GenreId.ToString() ?? string.Empty,
-            m.Plot
+            m.Type,
+            m.Genres.FirstOrDefault()?.Name ?? string.Empty,
+            m.Plot,
+            m.Awards,
+            m.BoxOffice ?? 0
         )).ToList();
     }
 
@@ -68,4 +73,32 @@ public class PersonManager : IPersonManager
     {
         return await _personRepository.GetMediaByPersonIdCountAsync(id);
     }
+
+    public async Task<string> GetActorNameByIdAsync(int id)
+    {
+        return await _personRepository.GetActorNameByIdAsync(id);
+    }
+
+    public async Task<int?> GetPersonIdByImdbIdAsync(string imdbId)
+    {
+        return await _personRepository.GetPersonIdByImdbIdAsync(imdbId);
+    }
+
+    public async Task<IEnumerable<CoActorResult>> GetFrequentCoActorsAsync(string actorName, int page, int pageSize)
+    {
+        var coActors = await _personRepository.GetFrequentCoActorsAsync(actorName, page, pageSize);
+        return coActors.Select(ca => new CoActorResult(
+            ca.CoActorImdbId,
+            ca.CoActorName,
+            ca.Frequency
+        )).ToList();
+    }
+
+    public async Task<int> GetFrequentCoActorsCountAsync(int id)
+    {
+        var actorName = await GetActorNameByIdAsync(id);
+        return await _personRepository.GetFrequentCoActorsCountAsync(actorName);
+    }
+
+
 }
