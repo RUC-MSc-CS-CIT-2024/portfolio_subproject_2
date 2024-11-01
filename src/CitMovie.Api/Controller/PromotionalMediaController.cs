@@ -1,7 +1,7 @@
 namespace CitMovie.Api;
 
 [ApiController]
-[Route("media/{mediaId}/api/")]
+[Route("api/media/{mediaId}/releases/{releaseId}/promotional_media")]
 public class PromotionalMediaController : ControllerBase
 {
     private readonly IPromotionalMediaManager _manager;
@@ -13,7 +13,7 @@ public class PromotionalMediaController : ControllerBase
         _linkGenerator = linkGenerator;
     }
 
-    [HttpGet("promotional_media", Name = nameof(GetPromotionalMediaofMedia))]
+    [HttpGet("/api/media/{mediaId}/promotional_media", Name = nameof(GetPromotionalMediaofMedia))]
     public async Task<IActionResult> GetPromotionalMediaofMedia(int mediaId, int page = 0, int pageSize = 10)
     {
         try
@@ -44,7 +44,7 @@ public class PromotionalMediaController : ControllerBase
         }
     }
 
-    [HttpGet("releases/{releaseId}/promotional_media",Name = nameof(GetPromotionalMediaOfRelease))]
+    [HttpGet(Name = nameof(GetPromotionalMediaOfRelease))]
     public async Task<IActionResult> GetPromotionalMediaOfRelease(int mediaId, int releaseId, int page = 0, int pageSize = 10)
     {
         try
@@ -77,7 +77,7 @@ public class PromotionalMediaController : ControllerBase
 
     }
 
-    [HttpGet("releases/{releaseId}/promotional_media/{id}",Name = nameof(GetPromotionalMediaById))]
+    [HttpGet("{id}",Name = nameof(GetPromotionalMediaById))]
     [HttpGet("/promotional_media/{id}")]
     public async Task<IActionResult> GetPromotionalMediaById( int id, int? mediaId, int? releaseId)
     {
@@ -99,7 +99,7 @@ public class PromotionalMediaController : ControllerBase
         }
     }
 
-    [HttpDelete("releases/{releaseId}/promotional_media/{id}")]
+    [HttpDelete("{id}")]
     public async Task<IActionResult> DeletePromotionalMedia(int mediaId, int releaseId, int id)
     {
         try {
@@ -112,7 +112,7 @@ public class PromotionalMediaController : ControllerBase
         }
     }
 
-    [HttpPost("releases/{releaseId}/promotional_media")]
+    [HttpPost]
     public async Task<IActionResult> CreatePromotionalMedia([FromRoute]int mediaId, [FromRoute]int releaseId, [FromBody] PromotionalMediaCreateRequest model)
     {
         try
