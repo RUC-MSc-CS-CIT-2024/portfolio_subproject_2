@@ -26,5 +26,9 @@ public class AutoMapperProfile : Profile
 
         // Job Category
         CreateMap<JobCategory, JobCategoryResult>();
+        
+        //Release
+        CreateMap<Release, ReleaseResult>()
+            .ForMember(m => m.Title, opt => opt.MapFrom(src => src.Title.Name.Where(src.Title.Name == "Primary title")));
     }
 }
