@@ -1,3 +1,5 @@
+using CitMovie.Models;
+
 namespace CitMovie.Api;
 
 [ApiController]

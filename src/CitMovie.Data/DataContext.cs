@@ -28,7 +28,7 @@ public class DataContext : DbContext
     public DbSet<Title> Titles { get; set; }
     public DbSet<TitleAttribute> TitleAttributes { get; set; }
     public DbSet<TitleType> TitleTypes { get; set; }
-    public DbSet<CoActor> CoActors { get; set; } 
+    public DbSet<CoActor> CoActors { get; set; }
 
     public DataContext(string connectionString)
     {
@@ -48,12 +48,21 @@ public class DataContext : DbContext
     {
         modelBuilder.Entity<MediaProductionCompany>()
             .HasKey(od => new { od.MediaId, od.ProductionCompanyId });
-        
-        modelBuilder.Entity<Media>().UseTptMappingStrategy();    
+
+        modelBuilder.Entity<Media>().UseTptMappingStrategy();
 
         modelBuilder.Entity<Media>()
             .HasMany(x => x.RelatedMedia)
             .WithOne(x => x.Primary)
             .HasForeignKey(x => x.PrimaryId);
+
+        modelBuilder.Entity<Media>()
+        .HasMany(e => e.Genres)
+        .WithMany(e => e.Media)
+        .UsingEntity<Dictionary<string, object>>(
+            "media_genre",
+            j => j.HasOne<Genre>().WithMany().HasForeignKey("genre_id"),
+            j => j.HasOne<Media>().WithMany().HasForeignKey("media_id")
+        );
     }
 }

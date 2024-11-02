@@ -34,13 +34,16 @@ public class PersonRepository : IPersonRepository
 
     public async Task<IEnumerable<Media>> GetMediaByPersonIdAsync(int id, int page, int pageSize)
     {
-        return await _dataContext.Media
+        var mediaQuery = _dataContext.Media
             .AsNoTracking()
             .Include(m => m.CrewMembers)
             .Include(m => m.CastMembers)
             .Include(m => m.Title)
+            .Include(m => m.Genres)
             .Where(m => m.CrewMembers.Any(cm => cm.PersonId == id) || m.CastMembers.Any(cm => cm.PersonId == id))
-            .OrderBy(m => m.Id)
+            .OrderBy(m => m.Id);
+
+        return await mediaQuery
             .Skip(page * pageSize)
             .Take(pageSize)
             .ToListAsync();

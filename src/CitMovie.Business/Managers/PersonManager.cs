@@ -58,11 +58,12 @@ public class PersonManager : IPersonManager
     {
         var media = await _personRepository.GetMediaByPersonIdAsync(id, page, pageSize);
         var totalCount = await _personRepository.GetMediaByPersonIdCountAsync(id);
+
         return media.Select(m => new MediaResult(
             m.Id,
             m.Title.FirstOrDefault()?.Name ?? string.Empty,
             m.Type,
-            m.Genres.FirstOrDefault()?.Name ?? string.Empty,
+            m.Genres.Select(g => g.Name),
             m.Plot,
             m.Awards,
             m.BoxOffice ?? 0
