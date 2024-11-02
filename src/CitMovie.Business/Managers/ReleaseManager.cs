@@ -48,10 +48,13 @@ public class ReleaseManager : IReleaseManager
         return _mapper.Map<ReleaseResult>(resultObject);
     }
 
-    public async Task<ReleaseResult> UpdateReleaseForMediaAsync(int releaseId, ReleaseUpdateRequest release)
+    public async Task<ReleaseResult> UpdateReleaseForMediaAsync(int mediaId, int releaseId, ReleaseUpdateRequest release)
     {
         var createObject = _mapper.Map<Release>(release);
-        var resultObject = await _releaseRepository.UpdateReleaseForMediaAsync(releaseId, createObject);
+        createObject.ReleaseId = releaseId;
+        createObject.SpokenLanguages = await _languageRepository.GetLanguagesAsync(release.SpokenLanguages);
+
+        var resultObject = await _releaseRepository.UpdateReleaseForMediaAsync(mediaId, releaseId, createObject);
         return _mapper.Map<ReleaseResult>(resultObject);
     }
 

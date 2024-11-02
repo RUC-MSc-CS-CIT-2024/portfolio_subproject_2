@@ -53,21 +53,27 @@ public class ReleaseRepository : IReleaseRepository
 
         var result = await _context.Releases.AddAsync(release);
         await _context.SaveChangesAsync();
-        return await _context.Releases
-            .Include(x => x.Country)
-            .Include(x => x.SpokenLanguages)
-            .FirstAsync(x => x.ReleaseId == result.Entity.ReleaseId);
+        return await GetReleaseByIdAsync(result.Entity.ReleaseId);
     }
 
-    public async Task<Release> UpdateReleaseForMediaAsync(int releaseId, Release release)
+    public async Task<Release> UpdateReleaseForMediaAsync(int mediaId, int releaseId, Release release)
     {
-        var existingRelease = await _context.Releases.FirstAsync(x => x.ReleaseId == releaseId);
+        await ValidateMediaAsync(mediaId);
+
+        var existingRelease = await GetReleaseByIdAsync(releaseId);
         
         _context.Entry(existingRelease).CurrentValues.SetValues(release);
         await _context.SaveChangesAsync();
-        return existingRelease;
+        return await GetReleaseByIdAsync(releaseId);
     }
-    
+
+    public async Task<Release> GetReleaseByIdAsync(int releaseId)
+    {
+        return await _context.Releases
+            .Include(x => x.Country)
+            .Include(x => x.SpokenLanguages)
+            .FirstAsync(x => x.ReleaseId == releaseId);;
+    }
 
     public async Task<int> GetReleasesCountAsync(int mediaId)
     {

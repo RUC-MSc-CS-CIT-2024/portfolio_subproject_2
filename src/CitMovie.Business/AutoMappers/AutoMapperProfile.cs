@@ -28,6 +28,8 @@ public class AutoMapperProfile : Profile
         CreateMap<JobCategory, JobCategoryResult>();
         
         //Release
+        CreateMap<ReleaseUpdateRequest, Release>()
+            .ForMember(dest => dest.SpokenLanguages, opt => opt.Ignore());
         CreateMap<ReleaseCreateRequest, Release>()
             .ForMember(dest => dest.SpokenLanguages, opt => opt.Ignore());
         CreateMap<Release, ReleaseResult>()

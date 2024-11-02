@@ -79,6 +79,20 @@ public class ReleaseController : ControllerBase
         }
     }
     
+    [HttpPatch("{id}")]
+    public async Task<IActionResult> UpdateReleaseForMediaAsync(int mediaId, int id, ReleaseUpdateRequest request)
+    {
+        try
+        {
+            var result = await _releaseManager.UpdateReleaseForMediaAsync(mediaId, id, request);
+            return Ok(result);
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+    
     private string? GetLink(string linkName,int mediaId, int page, int pageSize)
     {
         var uri = _linkGenerator.GetUriByName(

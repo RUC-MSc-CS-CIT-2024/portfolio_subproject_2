@@ -24,11 +24,6 @@ public class LanguageRepository : ILanguageRepository
             .Take(pageSize)
             .ToListAsync();
     }
-
-    public async Task<int> GetTotalFollowingsCountAsync()
-    {
-        return await _context.Languages.CountAsync();
-    }
     
     public async Task<List<Language>> GetLanguagesAsync(IEnumerable<int> languageIds)
     {
@@ -36,6 +31,13 @@ public class LanguageRepository : ILanguageRepository
             .Where(l => languageIds.Contains(l.LanguageId))
             .ToListAsync();
     }
+    
+    public async Task<int> GetTotalFollowingsCountAsync()
+    {
+        return await _context.Languages.CountAsync();
+    }
+    
+
     
 }
 
