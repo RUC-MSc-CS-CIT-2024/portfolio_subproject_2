@@ -12,45 +12,40 @@ public class UserScoreRepository : IUserScoreRepository
         _dataContext = dataContext;
     }
 
+
     public async Task<IEnumerable<UserScore>> GetUserScoresAsync(int userId, int page, int pageSize, string? mediaType, int? mediaId, string? mediaName)
     {
         var userScoresQuery = _frameworkContext.UserScores
-            .Where(us => us.UserId == userId)
-            .AsQueryable();
+            .Where(us => us.UserId == userId);
 
         var mediaQuery = _dataContext.Media.AsQueryable();
         if (!string.IsNullOrEmpty(mediaType))
         {
             mediaQuery = mediaQuery.Where(m => m.Type == mediaType);
         }
-        if (mediaId > 0)
+        if (mediaId.HasValue && mediaId > 0)
         {
             mediaQuery = mediaQuery.Where(m => m.Id == mediaId);
         }
-        var mediaList = await mediaQuery.ToListAsync();
 
         var titlesQuery = _dataContext.Titles.AsQueryable();
         if (!string.IsNullOrEmpty(mediaName))
         {
             titlesQuery = titlesQuery.Where(t => t.Name.Contains(mediaName));
         }
-        var titlesList = await titlesQuery.ToListAsync();
 
-        var mediaIds = new HashSet<int>(mediaList.Select(m => m.Id));
-        var titleMediaIds = new HashSet<int>(titlesList.Select(t => t.MediaId));
-
-        var userScoresList = await userScoresQuery.ToListAsync();
-        var filteredUserScores = userScoresList
+        var mediaIds = new HashSet<int>(await mediaQuery.Select(m => m.Id).ToListAsync());
+        var titleMediaIds = new HashSet<int>(await titlesQuery.Select(t => t.MediaId).ToListAsync());
+        
+        var filteredUserScores = await userScoresQuery
             .Where(us => mediaIds.Contains(us.MediaId) && (string.IsNullOrEmpty(mediaName) || titleMediaIds.Contains(us.MediaId)))
-            .ToList();
-
-        var result = filteredUserScores
             .Skip(page * pageSize)
             .Take(pageSize)
-            .ToList();
+            .ToListAsync();
 
-        return result;
+        return filteredUserScores;
     }
+
     public async Task<int> GetTotalUserScoresCountAsync(int userId)
     {
         return await _frameworkContext.UserScores
