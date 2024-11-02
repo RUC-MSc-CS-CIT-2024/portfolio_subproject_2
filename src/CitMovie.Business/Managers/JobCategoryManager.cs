@@ -3,15 +3,18 @@ namespace CitMovie.Business;
 public class JobCategoryManager : IJobCategoryManager
 {
     private readonly IJobCategoryRepository _jobCategoryRepository;
-    public JobCategoryManager(IJobCategoryRepository jobCategoryRepository)
+    private readonly IMapper _mapper;
+
+    public JobCategoryManager(IJobCategoryRepository jobCategoryRepository, IMapper mapper)
     {
         _jobCategoryRepository = jobCategoryRepository;
+        _mapper = mapper;
     }
 
     public async Task<IEnumerable<JobCategoryResult>> GetAllJobCategoriesAsync(int page, int pageSize)
     {
         var jobCategories = await _jobCategoryRepository.GetAllJobCategoriesAsync(page, pageSize);
-        return jobCategories.Select(jc => new JobCategoryResult(jc.JobCategoryId, jc.Name)).ToList();
+        return _mapper.Map<IEnumerable<JobCategoryResult>>(jobCategories);
     }
 
     public async Task<int> GetTotalJobCategoriesCountAsync()

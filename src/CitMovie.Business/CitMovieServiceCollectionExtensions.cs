@@ -9,6 +9,8 @@ public static class CitMovieServiceCollectionExtensions
     {
         ArgumentNullException.ThrowIfNull(services);
 
+        services.AddAutoMapper(typeof(AutoMapperProfile));
+
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 
         services.AddScoped<IUserRepository, UserRepository>();

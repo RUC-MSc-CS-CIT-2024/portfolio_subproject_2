@@ -3,22 +3,18 @@ namespace CitMovie.Business;
 public class CountryManager : ICountryManager
 {
     private readonly ICountryRepository _countryRepository;
+    private readonly IMapper _mapper;
 
-
-    public CountryManager(ICountryRepository countryRepository)
+    public CountryManager(ICountryRepository countryRepository, IMapper mapper)
     {
         _countryRepository = countryRepository;
+        _mapper = mapper;
     }
 
     public async Task<IEnumerable<CountryResult>> GetAllCountriesAsync(int page, int pageSize)
     {
         var countries = await _countryRepository.GetAllCountriesAsync(page, pageSize);
-        return countries.Select(c => new CountryResult(
-            c.CountryId,
-            c.ImdbCountryCode,
-            c.IsoCode,
-            c.Name
-        )).ToList();
+        return _mapper.Map<IEnumerable<CountryResult>>(countries);
     }
 
     public async Task<int> GetTotalCountriesCountAsync()

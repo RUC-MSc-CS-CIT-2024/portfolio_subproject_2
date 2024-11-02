@@ -3,23 +3,20 @@ namespace CitMovie.Business;
 public class UserManager : IUserManager
 {
     private readonly IUserRepository _userRepository;
+    private readonly IMapper _mapper;
 
-    public UserManager(IUserRepository userRepository)
+    public UserManager(IUserRepository userRepository, IMapper mapper)
     {
         _userRepository = userRepository;
+        _mapper = mapper;
     }
 
     public async Task<UserResult> CreateUserAsync(UserCreateRequest userRequest)
     {
-        User newUser = new User
-        {
-            Username = userRequest.Username,
-            Email = userRequest.Email,
-            Password = userRequest.Password
-        };
+        User newUser = _mapper.Map<User>(userRequest);
         User result = await _userRepository.CreateUserAsync(newUser);
 
-        return new UserResult(result.Id, result.Username, result.Email);
+        return _mapper.Map<UserResult>(result);
     }
 
     public async Task<bool> DeleteUserAsync(int id)
@@ -27,13 +24,13 @@ public class UserManager : IUserManager
 
     public async Task<UserResult> GetUserAsync(string username) {
         User result = await _userRepository.GetUserAsync(username);
-        return new UserResult(result.Id, result.Username, result.Email);
+        return _mapper.Map<UserResult>(result);
     }
 
     public async Task<UserResult> GetUserAsync(int id)
     {
         User result = await _userRepository.GetUserAsync(id);
-        return new UserResult(result.Id, result.Username, result.Email);
+        return _mapper.Map<UserResult>(result);
     }
 
     public async Task<UserResult> UpdateUserAsync(int id, UserUpdateRequest userRequest)
@@ -49,6 +46,6 @@ public class UserManager : IUserManager
         };
 
         User result = await _userRepository.UpdateUserAsync(updatedUser);
-        return new UserResult(result.Id, result.Username, result.Email);
+        return _mapper.Map<UserResult>(result);
     }
 }
