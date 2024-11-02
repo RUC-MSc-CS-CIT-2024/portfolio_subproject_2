@@ -29,7 +29,7 @@ public class AutoMapperProfile : Profile
         
         //Release
         CreateMap<ReleaseCreateRequest, Release>()
-            .ForMember(dest => dest.Country, opt => opt.Ignore());
+            .ForMember(dest => dest.SpokenLanguages, opt => opt.Ignore());
         CreateMap<Release, ReleaseResult>()
             .ForMember(m => m.Title, 
                 opt => opt.MapFrom(src => src.Title.Name))

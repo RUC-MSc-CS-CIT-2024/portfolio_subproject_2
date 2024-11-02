@@ -41,6 +41,9 @@ public class ReleaseManager : IReleaseManager
     public async Task<ReleaseResult> CreateReleaseForMediaAsync(int mediaId, ReleaseCreateRequest release)
     {
         var createObject = _mapper.Map<Release>(release);
+        createObject.MediaId = mediaId;
+        createObject.SpokenLanguages = await _languageRepository.GetLanguagesAsync(release.SpokenLanguages);
+
         var resultObject = await _releaseRepository.CreateReleaseForMediaAsync(mediaId, createObject);
         return _mapper.Map<ReleaseResult>(resultObject);
     }
