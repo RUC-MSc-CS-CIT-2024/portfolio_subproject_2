@@ -38,10 +38,7 @@ public class ReleaseRepository : IReleaseRepository
     public async Task<bool> DeleteReleaseOfMediaAsync(int mediaId, int releaseId)
     {
         await ValidateMediaAsync(mediaId);
-        var toDelete = await _context.Releases
-            .Where(r => r.MediaId == mediaId)
-            .FirstAsync(r => r.ReleaseId == releaseId);
-        
+        var toDelete = await GetReleaseByIdAsync(releaseId);
         _context.Releases.Remove(toDelete);
         await _context.SaveChangesAsync();
         return true;
