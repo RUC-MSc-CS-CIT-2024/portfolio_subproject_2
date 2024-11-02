@@ -3,10 +3,12 @@ namespace CitMovie.Business;
 public class PersonManager : IPersonManager
 {
     private readonly IPersonRepository _personRepository;
+    private readonly IMapper _mapper;
 
-    public PersonManager(IPersonRepository personRepository)
+    public PersonManager(IPersonRepository personRepository, IMapper mapper)
     {
         _personRepository = personRepository;
+        _mapper = mapper;
     }
 
 
@@ -14,19 +16,7 @@ public class PersonManager : IPersonManager
 
     {
         var persons = await _personRepository.GetPersonsAsync(page, pageSize);
-        var totalCount = await _personRepository.GetTotalPersonsCountAsync();
-
-        var PersonResults = persons.Select(p => new PersonResult
-        (
-            p.PersonId,
-            p.Name,
-            p.Description,
-            p.Score,
-            p.NameRating,
-            p.BirthDate,
-            p.DeathDate
-        )).ToList();
-
+        var PersonResults = _mapper.Map<IEnumerable<PersonResult>>(persons);
         return PersonResults;
     }
 
@@ -37,37 +27,19 @@ public class PersonManager : IPersonManager
 
     public async Task<PersonResult?> GetPersonByIdAsync(int id)
     {
-        var p = await _personRepository.GetPersonByIdAsync(id);
-        if (p == null)
+        var person = await _personRepository.GetPersonByIdAsync(id);
+        if (person == null)
         {
             return null;
         }
+        return _mapper.Map<PersonResult>(person);
 
-        return new PersonResult(
-            p.PersonId,
-            p.Name,
-            p.Description,
-            p.Score,
-            p.NameRating,
-            p.BirthDate,
-            p.DeathDate
-        );
     }
 
     public async Task<IEnumerable<MediaResult>> GetMediaByPersonIdAsync(int id, int page, int pageSize)
     {
         var media = await _personRepository.GetMediaByPersonIdAsync(id, page, pageSize);
-        var totalCount = await _personRepository.GetMediaByPersonIdCountAsync(id);
-
-        return media.Select(m => new MediaResult(
-            m.Id,
-            m.Title.FirstOrDefault()?.Name ?? string.Empty,
-            m.Type,
-            m.Genres.Select(g => g.Name),
-            m.Plot,
-            m.Awards,
-            m.BoxOffice ?? 0
-        )).ToList();
+        return _mapper.Map<IEnumerable<MediaResult>>(media);
     }
 
     public async Task<int> GetMediaByPersonIdCountAsync(int id)
@@ -88,11 +60,7 @@ public class PersonManager : IPersonManager
     public async Task<IEnumerable<CoActorResult>> GetFrequentCoActorsAsync(string actorName, int page, int pageSize)
     {
         var coActors = await _personRepository.GetFrequentCoActorsAsync(actorName, page, pageSize);
-        return coActors.Select(ca => new CoActorResult(
-            ca.CoActorImdbId,
-            ca.CoActorName,
-            ca.Frequency
-        )).ToList();
+        return _mapper.Map<IEnumerable<CoActorResult>>(coActors);
     }
 
     public async Task<int> GetFrequentCoActorsCountAsync(int id)
@@ -100,6 +68,4 @@ public class PersonManager : IPersonManager
         var actorName = await GetActorNameByIdAsync(id);
         return await _personRepository.GetFrequentCoActorsCountAsync(actorName);
     }
-
-
 }
