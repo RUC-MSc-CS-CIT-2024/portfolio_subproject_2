@@ -3,21 +3,23 @@ namespace CitMovie.Business;
 public class FollowManager : IFollowManager
 {
     private readonly IFollowRepository _followRepository;
+    private readonly IMapper _mapper;
 
-    public FollowManager(IFollowRepository followRepository)
+    public FollowManager(IFollowRepository followRepository, IMapper mapper)
     {
         _followRepository = followRepository;
+        _mapper = mapper;
     }
 
     public async Task<IEnumerable<FollowResult>> GetFollowingsAsync(int userId, int page, int pageSize)
     {
         var followings = await _followRepository.GetFollowingsAsync(userId, page, pageSize);
-        return followings.Select(f => new FollowResult(f.FollowingId, f.PersonId, f.FollowedSince)).ToList();
+        return _mapper.Map<IEnumerable<FollowResult>>(followings);
     }
 
     public async Task<FollowResult> CreateFollowAsync(int userId, int personId)
     {
-        var follow = new Follow
+        Follow follow = new()
         {
             UserId = userId,
             PersonId = personId,
@@ -25,8 +27,7 @@ public class FollowManager : IFollowManager
         };
 
         await _followRepository.CreateFollowAsync(follow);
-
-        return new FollowResult(follow.FollowingId, follow.PersonId, follow.FollowedSince);
+        return _mapper.Map<FollowResult>(follow);
     }
 
     public async Task<bool> RemoveFollowingAsync(int userId, int followingId)
