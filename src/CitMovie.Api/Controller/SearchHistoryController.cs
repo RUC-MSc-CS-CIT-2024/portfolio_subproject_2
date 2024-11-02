@@ -88,7 +88,7 @@ public class SearchHistoryController : ControllerBase
         {
             searchHistoryResult.Links.Add(new Link
             {
-                Href = HttpContext != null ? _linkGenerator.GetUriByName(HttpContext, "GetUser", new { userId = searchHistoryResult.UserId }) : string.Empty,
+                Href = HttpContext != null ? _linkGenerator.GetUriByName(HttpContext, nameof(UserController.GetUser), new { userId = searchHistoryResult.UserId }) : string.Empty,
                 Rel = "user",
                 Method = "GET"
             });
