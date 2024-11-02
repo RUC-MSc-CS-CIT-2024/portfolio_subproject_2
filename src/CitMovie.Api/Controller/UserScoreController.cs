@@ -44,14 +44,14 @@ namespace CitMovie.Api
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateUserScore(int userId, [FromBody] UserScoreRequest userScoreRequest)
+        public async Task<IActionResult> CreateUserScore(int userId, [FromBody] UserScoreCreateRequest userScoreCreateRequest)
         {
-            if (userScoreRequest == null)
+            if (userScoreCreateRequest == null)
             {
                 return BadRequest("Invalid request data.");
             }
 
-            await _userScoreManager.CreateUserScoreAsync(userId, userScoreRequest.ImdbId, userScoreRequest.Score, userScoreRequest.ReviewText);
+            await _userScoreManager.CreateUserScoreAsync(userId, userScoreCreateRequest.ImdbId, userScoreCreateRequest.Score, userScoreCreateRequest.ReviewText);
             return CreatedAtRoute(nameof(GetUserScores), new { userId }, null);
         }
 

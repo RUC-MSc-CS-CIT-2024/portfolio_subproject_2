@@ -1,4 +1,17 @@
-namespace CitMovie.Models.DataTransferObjects;
+namespace CitMovie.Models.DataTransferObjects
+{
+    public record UserScoreResult
+    {
+        public int UserId { get; set; }
+        public int MediaId { get; set; }
+        public int Score { get; set; }
+        public string? ReviewText { get; set; }
+    }
 
-public record UserScoreResult(int UserId, int MediaId, int Score, string? ReviewText);
-public record UserScoreRequest(string ImdbId, int Score, string ReviewText);
+    public record UserScoreCreateRequest
+    {
+        public string ImdbId { get; set; }
+        public int Score { get; set; }
+        public string? ReviewText { get; set; }
+    }
+}

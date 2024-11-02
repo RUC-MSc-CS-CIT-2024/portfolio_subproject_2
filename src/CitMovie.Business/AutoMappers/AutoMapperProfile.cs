@@ -26,5 +26,9 @@ public class AutoMapperProfile : Profile
 
         // Job Category
         CreateMap<JobCategory, JobCategoryResult>();
+
+        // User Score
+        CreateMap<UserScore, UserScoreResult>()
+            .ForMember(dest => dest.Score, opt => opt.MapFrom(src => src.ScoreValue));
     }
 }
