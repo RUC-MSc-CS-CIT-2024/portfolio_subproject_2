@@ -26,5 +26,9 @@ public class AutoMapperProfile : Profile
 
         // Job Category
         CreateMap<JobCategory, JobCategoryResult>();
+
+        // Search History
+        CreateMap<SearchHistory, SearchHistoryResult>()
+            .ForMember(dest => dest.SearchText, opt => opt.MapFrom(src => src.Query));
     }
 }
