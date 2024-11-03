@@ -5,7 +5,7 @@ public class Release
     [Key, Column("release_id")]
     public int ReleaseId { get; set; }
     [Column("rated")]
-    public string Rated { get; set; }
+    public string? Rated { get; set; }
     [Column("type")]
     public string Type { get; set; }
     [Column("country_id")]
