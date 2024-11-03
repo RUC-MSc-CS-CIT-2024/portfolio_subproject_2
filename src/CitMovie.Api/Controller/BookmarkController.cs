@@ -1,7 +1,3 @@
-using CitMovie.Business.Managers;
-using CitMovie.Models.DTOs;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
 namespace CitMovie.Api;
