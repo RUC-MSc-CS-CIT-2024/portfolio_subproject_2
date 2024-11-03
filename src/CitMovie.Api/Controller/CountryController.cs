@@ -5,12 +5,13 @@ namespace CitMovie.Api;
 public class CountryController : ControllerBase
 {
     private readonly ICountryManager _countryManager;
-    private readonly LinkGenerator _linkGenerator;
+    private readonly PagingHelper _pagingHelper;
 
-    public CountryController(ICountryManager countryManager, LinkGenerator linkGenerator)
+
+    public CountryController(ICountryManager countryManager, PagingHelper pagingHelper)
     {
         _countryManager = countryManager;
-        _linkGenerator = linkGenerator;
+        _pagingHelper = pagingHelper;
     }
 
     [HttpGet(Name = nameof(GetAllCountries))]
@@ -19,52 +20,8 @@ public class CountryController : ControllerBase
         var totalItems = await _countryManager.GetTotalCountriesCountAsync();
         var countries = await _countryManager.GetAllCountriesAsync(page, pageSize);
 
-        var result = CreatePaging(
-            nameof(GetAllCountries),
-            page,
-            pageSize,
-            totalItems,
-            countries
-        );
+        var result = _pagingHelper.CreatePaging(nameof(GetAllCountries), page, pageSize, totalItems, countries);
 
         return Ok(result);
-    }
-
-
-    // HATEOAS and Pagination
-    private string? GetLink(string linkName, int page, int pageSize)
-    {
-        var uri = _linkGenerator.GetUriByName(
-                    HttpContext,
-                    linkName,
-                    new { page, pageSize }
-                    );
-        return uri;
-    }
-
-    private object CreatePaging<T>(string linkName, int page, int pageSize, int total, IEnumerable<T?> items)
-    {
-        var numberOfPages = (int)Math.Ceiling(total / (double)pageSize);
-
-        var curPage = GetLink(linkName, page, pageSize);
-
-        var nextPage = page < numberOfPages - 1
-            ? GetLink(linkName, page + 1, pageSize)
-            : null;
-
-        var prevPage = page > 0
-            ? GetLink(linkName, page - 1, pageSize)
-            : null;
-
-        var result = new
-        {
-            CurPage = curPage,
-            NextPage = nextPage,
-            PrevPage = prevPage,
-            NumberOfItems = total,
-            NumberPages = numberOfPages,
-            Items = items
-        };
-        return result;
     }
 }

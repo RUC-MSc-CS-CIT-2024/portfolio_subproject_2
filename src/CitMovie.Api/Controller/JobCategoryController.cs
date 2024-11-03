@@ -5,12 +5,12 @@ namespace CitMovie.Api;
 public class JobCategoryController : ControllerBase
 {
     private readonly IJobCategoryManager _jobCategoryManager;
-    private readonly LinkGenerator _linkGenerator;
+    private readonly PagingHelper _pagingHelper;
 
-    public JobCategoryController(IJobCategoryManager jobCategoryManager, LinkGenerator linkGenerator)
+    public JobCategoryController(IJobCategoryManager jobCategoryManager, PagingHelper pagingHelper)
     {
         _jobCategoryManager = jobCategoryManager;
-        _linkGenerator = linkGenerator;
+        _pagingHelper = pagingHelper;
     }
 
     [HttpGet(Name = nameof(GetAllJobCategories))]
@@ -19,52 +19,8 @@ public class JobCategoryController : ControllerBase
         var totalItems = await _jobCategoryManager.GetTotalJobCategoriesCountAsync();
         var jobCategories = await _jobCategoryManager.GetAllJobCategoriesAsync(page, pageSize);
 
-        var result = CreatePaging(
-            nameof(GetAllJobCategories),
-            page,
-            pageSize,
-            totalItems,
-            jobCategories
-        );
+        var result = _pagingHelper.CreatePaging(nameof(GetAllJobCategories), page, pageSize, totalItems, jobCategories);
 
         return Ok(result);
-    }
-
-
-    // HATEOAS and Pagination
-    private string? GetLink(string linkName, int page, int pageSize)
-    {
-        var uri = _linkGenerator.GetUriByName(
-                    HttpContext,
-                    linkName,
-                    new { page, pageSize }
-                    );
-        return uri;
-    }
-
-    private object CreatePaging<T>(string linkName, int page, int pageSize, int total, IEnumerable<T?> items)
-    {
-        var numberOfPages = (int)Math.Ceiling(total / (double)pageSize);
-
-        var curPage = GetLink(linkName, page, pageSize);
-
-        var nextPage = page < numberOfPages - 1
-            ? GetLink(linkName, page + 1, pageSize)
-            : null;
-
-        var prevPage = page > 0
-            ? GetLink(linkName, page - 1, pageSize)
-            : null;
-
-        var result = new
-        {
-            CurPage = curPage,
-            NextPage = nextPage,
-            PrevPage = prevPage,
-            NumberOfItems = total,
-            NumberPages = numberOfPages,
-            Items = items
-        };
-        return result;
     }
 }
