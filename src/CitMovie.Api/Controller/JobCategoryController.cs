@@ -1,41 +1,47 @@
 namespace CitMovie.Api;
 
 [ApiController]
-[Route("api/languages")]
-
-public class LanguageController : ControllerBase
+[Route("api/job_categories")]
+public class JobCategoryController : ControllerBase
 {
-    private readonly ILanguageManager _languageManager;
+    private readonly IJobCategoryManager _jobCategoryManager;
     private readonly LinkGenerator _linkGenerator;
 
-    public LanguageController(ILanguageManager languageManager, LinkGenerator linkGenerator)
+    public JobCategoryController(IJobCategoryManager jobCategoryManager, LinkGenerator linkGenerator)
     {
-        _languageManager = languageManager;
+        _jobCategoryManager = jobCategoryManager;
         _linkGenerator = linkGenerator;
     }
 
-    [HttpGet(Name = nameof(GetLanguages))]
-    public async Task<IActionResult> GetLanguages( int page = 0, int pageSize = 10)
+    [HttpGet(Name = nameof(GetAllJobCategories))]
+    public async Task<ActionResult<IEnumerable<JobCategoryResult>>> GetAllJobCategories(int page = 0, int pageSize = 10)
     {
-        
-        var languages = await _languageManager.GetLanguagesAsync(page, pageSize);
-        var total_items = await _languageManager.GetTotalLanguageCountAsync();
-        
-        var result = CreatePaging(nameof(GetLanguages),page, pageSize, total_items, languages);
-        
+        var totalItems = await _jobCategoryManager.GetTotalJobCategoriesCountAsync();
+        var jobCategories = await _jobCategoryManager.GetAllJobCategoriesAsync(page, pageSize);
+
+        var result = CreatePaging(
+            nameof(GetAllJobCategories),
+            page,
+            pageSize,
+            totalItems,
+            jobCategories
+        );
+
         return Ok(result);
-    }    
-    
+    }
+
+
+    // HATEOAS and Pagination
     private string? GetLink(string linkName, int page, int pageSize)
     {
         var uri = _linkGenerator.GetUriByName(
-            HttpContext,
-            linkName,
-            new {page, pageSize }
-        );
+                    HttpContext,
+                    linkName,
+                    new { page, pageSize }
+                    );
         return uri;
     }
-    
+
     private object CreatePaging<T>(string linkName, int page, int pageSize, int total, IEnumerable<T?> items)
     {
         var numberOfPages = (int)Math.Ceiling(total / (double)pageSize);
@@ -61,5 +67,4 @@ public class LanguageController : ControllerBase
         };
         return result;
     }
-    
 }

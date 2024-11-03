@@ -1,27 +1,24 @@
-using CitMovie.Business;
-using CitMovie.Models.DTOs;
-using Microsoft.AspNetCore.Mvc;
-
 namespace CitMovie.Api;
 
 [ApiController]
+[Authorize(Policy = "user_scope")]
 [Route("api/users/{userId}/following")]
 public class FollowController : ControllerBase
 {
     private readonly LinkGenerator _linkGenerator;
-    private readonly FollowService _followService;
+    private readonly IFollowManager _followManager;
 
-    public FollowController(LinkGenerator linkGenerator, FollowService followService)
+    public FollowController(LinkGenerator linkGenerator, IFollowManager followManager)
     {
         _linkGenerator = linkGenerator;
-        _followService = followService;
+        _followManager = followManager;
     }
 
     [HttpGet(Name = nameof(GetFollowings))]
     public async Task<IActionResult> GetFollowings(int userId, int page = 0, int pageSize = 10)
     {
-        var followings = await _followService.GetFollowingsAsync(userId, page, pageSize);
-        var totalItems = await _followService.GetTotalFollowingsCountAsync(userId);
+        var followings = await _followManager.GetFollowingsAsync(userId, page, pageSize);
+        var totalItems = await _followManager.GetTotalFollowingsCountAsync(userId);
 
         object result = CreatePaging(
             nameof(GetFollowings),
@@ -35,16 +32,16 @@ public class FollowController : ControllerBase
 
 
     [HttpPost]
-    public async Task<ActionResult<FollowDto>> CreateFollow(int userId, [FromBody] CreateFollowDto createFollowDto)
+    public async Task<ActionResult<FollowResult>> CreateFollow(int userId, [FromBody] FollowCreateRequest followCreateRequest)
     {
-        var follow = await _followService.CreateFollowAsync(userId, createFollowDto.PersonId);
+        var follow = await _followManager.CreateFollowAsync(userId, followCreateRequest.PersonId);
         return CreatedAtAction(nameof(GetFollowings), new { userId }, follow);
     }
 
     [HttpDelete("{followingId}")]
     public async Task<IActionResult> RemoveFollowing(int userId, int followingId)
     {
-        var result = await _followService.RemoveFollowingAsync(userId, followingId);
+        var result = await _followManager.RemoveFollowingAsync(userId, followingId);
         if (!result)
             return NotFound();
 
