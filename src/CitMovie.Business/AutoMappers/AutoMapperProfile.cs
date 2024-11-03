@@ -36,6 +36,9 @@ public class AutoMapperProfile : Profile
         // Search History
         CreateMap<SearchHistory, SearchHistoryResult>()
             .ForMember(dest => dest.SearchText, opt => opt.MapFrom(src => src.Query));
+        
+        // TitleAttribute
+        CreateMap<TitleAttribute, TitleAttributeResult>();
 
     }
 }

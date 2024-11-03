@@ -54,5 +54,13 @@ public class DataContext : DbContext
             .HasMany(x => x.RelatedMedia)
             .WithOne(x => x.Primary)
             .HasForeignKey(x => x.PrimaryId);
+        
+        modelBuilder.Entity<TitleAttribute>()
+            .HasMany(r => r.Titles)
+            .WithMany(l => l.TitleAttributes)
+            .UsingEntity<Dictionary<string, object>>(
+                "title_title_attribute",
+                r => r.HasOne<Title>().WithMany().HasForeignKey("title_attribute_id"),
+                l => l.HasOne<TitleAttribute>().WithMany().HasForeignKey("title_id"));
     }
 }
