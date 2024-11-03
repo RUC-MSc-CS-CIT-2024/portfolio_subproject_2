@@ -7,12 +7,12 @@ namespace CitMovie.Api;
 public class PersonController : ControllerBase
 {
     private readonly IPersonManager _personManager;
-    private readonly LinkGenerator _linkGenerator;
+    private readonly PagingHelper _pagingHelper;
 
-    public PersonController(IPersonManager personManager, LinkGenerator linkGenerator)
+    public PersonController(IPersonManager personManager, PagingHelper pagingHelper)
     {
         _personManager = personManager;
-        _linkGenerator = linkGenerator;
+        _pagingHelper = pagingHelper;
     }
 
     [HttpGet(Name = nameof(GetPersons))]
@@ -23,9 +23,8 @@ public class PersonController : ControllerBase
         var persons = await _personManager.GetPersonsAsync(page, pageSize);
         var totalCount = await _personManager.GetTotalPersonsCountAsync();
 
-        var result = CreatePaging<PersonResult>(
+        var result = _pagingHelper.CreatePaging(
             nameof(GetPersons),
-            null,
             page,
             pageSize,
             totalCount,
@@ -54,7 +53,6 @@ public class PersonController : ControllerBase
         return Ok(person);
     }
 
-
     [HttpGet("{id}/media", Name = nameof(GetMediaByPersonId))]
     public async Task<ActionResult<IEnumerable<MediaResult>>> GetMediaByPersonId(int id,
           [FromQuery] int page = 0,
@@ -63,13 +61,13 @@ public class PersonController : ControllerBase
         var media = await _personManager.GetMediaByPersonIdAsync(id, page, pageSize);
         var totalCount = await _personManager.GetMediaByPersonIdCountAsync(id);
 
-        var result = CreatePaging<MediaResult>(
+        var result = _pagingHelper.CreatePaging(
             nameof(GetMediaByPersonId),
-            id,
             page,
             pageSize,
             totalCount,
-            media
+            media,
+            new { id }
         );
 
         return Ok(result);
@@ -90,68 +88,30 @@ public class PersonController : ControllerBase
             await AddCoActorLinks(ca);
         }
 
-        var result = CreatePaging<CoActorResult>(
+        var result = _pagingHelper.CreatePaging(
             nameof(GetFrequentCoActors),
-            id,
             page,
             pageSize,
             totalCount,
-            coActor
+            coActor,
+            new { id }
         );
 
         return Ok(result);
-    }
-
-
-    // HATEOAS and Pagination
-    private string? GetLink(string linkName, int? id, int page, int pageSize)
-    {
-        var uri = _linkGenerator.GetUriByName(
-                    HttpContext,
-                    linkName,
-                    new { id, page, pageSize }
-                    );
-        return uri;
-    }
-
-    private object CreatePaging<T>(string linkName, int? id, int page, int pageSize, int total, IEnumerable<T?> items)
-    {
-        var numberOfPages = (int)Math.Ceiling(total / (double)pageSize);
-
-        var curPage = GetLink(linkName, id, page, pageSize);
-
-        var nextPage = page < numberOfPages - 1
-            ? GetLink(linkName, id, page + 1, pageSize)
-            : null;
-
-        var prevPage = page > 0
-            ? GetLink(linkName, id, page - 1, pageSize)
-            : null;
-
-        var result = new
-        {
-            CurPage = curPage,
-            NextPage = nextPage,
-            PrevPage = prevPage,
-            NumberOfItems = total,
-            NumberPages = numberOfPages,
-            Items = items
-        };
-        return result;
     }
 
     private void AddPersonLinks(PersonResult person)
     {
         person.Links.Add(new Link
         {
-            Href = HttpContext != null ? _linkGenerator.GetUriByName(HttpContext, nameof(GetPersonById), new { id = person.Id }) : string.Empty,
+            Href = _pagingHelper.GetResourceLink(nameof(GetPersonById), new { id = person.Id }) ?? string.Empty,
             Rel = "self",
             Method = "GET"
         });
 
         person.Links.Add(new Link
         {
-            Href = HttpContext != null ? _linkGenerator.GetUriByName(HttpContext, nameof(GetFrequentCoActors), new { id = person.Id }) : string.Empty,
+            Href = _pagingHelper.GetResourceLink(nameof(GetFrequentCoActors), new { id = person.Id }) ?? string.Empty,
             Rel = "frequent-coactors",
             Method = "GET"
         });
@@ -164,13 +124,10 @@ public class PersonController : ControllerBase
         {
             coActor.Links.Add(new Link
             {
-                Href = HttpContext != null ? _linkGenerator.GetUriByName(HttpContext, nameof(GetPersonById), new { id = personId }) : string.Empty,
+                Href = _pagingHelper.GetResourceLink(nameof(GetPersonById), new { id = personId }) ?? string.Empty,
                 Rel = "self",
                 Method = "GET"
             });
         }
     }
-
-
 }
-
