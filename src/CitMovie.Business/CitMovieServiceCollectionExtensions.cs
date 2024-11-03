@@ -21,6 +21,7 @@ public static class CitMovieServiceCollectionExtensions
         services.AddScoped<ICountryRepository, CountryRepository>();
         services.AddScoped<IGenreRepository, GenreRepository>();
         services.AddScoped<IFollowRepository, FollowRepository>();
+        services.AddScoped<IPromotionalMediaRepository, PromotionalMediaRepository>();
         services.AddScoped<ISearchHistoryRepository, SearchHistoryRepository>();
         services.AddScoped<IBookmarkRepository, BookmarkRepository>();
         services.AddScoped<IPersonRepository, PersonRepository>();
@@ -29,6 +30,7 @@ public static class CitMovieServiceCollectionExtensions
         services.AddScoped<ILoginManager, LoginManager>();
         services.AddScoped<IMediaManager, MediaManager>();
         services.AddScoped<ITitleTypeManager, TitleTypeManager>();
+        services.AddScoped<IPromotionalMediaManager, PromotionalMediaManager>();
         services.AddScoped<ILanguageManager, LanguageManager>();
         services.AddScoped<IJobCategoryManager, JobCategoryManager>();
         services.AddScoped<ICountryManager, CountryManager>();
