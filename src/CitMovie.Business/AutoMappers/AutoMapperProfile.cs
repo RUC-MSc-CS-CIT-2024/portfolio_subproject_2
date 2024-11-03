@@ -20,7 +20,7 @@ public class AutoMapperProfile : Profile
 
         // Genre
         CreateMap<Genre, GenreResult>();
-        
+
         // TitleType
         CreateMap<TitleType, TitleTypeResult>();
 
@@ -49,6 +49,18 @@ public class AutoMapperProfile : Profile
         // Search History
         CreateMap<SearchHistory, SearchHistoryResult>()
             .ForMember(dest => dest.SearchText, opt => opt.MapFrom(src => src.Query));
+            
+        // Person
+        CreateMap<Person, PersonResult>()
+          .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.PersonId));
+        CreateMap<Media, PersonResult.MediaResult>()
+            .ForMember(dest => dest.Genres, opt => opt.MapFrom(src => src.Genres.Select(g => g.Name)))
+            .ForMember(dest => dest.MediaId, opt => opt.MapFrom(src => src.Id))
+            .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Plot))
+            .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.Title.FirstOrDefault().Name));
+        CreateMap<CoActor, CoActorResult>()
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.CoActorImdbId))
+            .ForMember(dest => dest.ActorName, opt => opt.MapFrom(src => src.CoActorName));
         
         // TitleAttribute
         CreateMap<TitleAttribute, TitleAttributeResult>();
