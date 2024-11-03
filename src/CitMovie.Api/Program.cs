@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using System.Text;
 using System.Text.Json.Serialization;
+using CitMovie.Api;
 using CitMovie.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -55,6 +56,9 @@ builder.Services
     {
         options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
     });
+
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<PagingHelper>();
 
 builder.Services.AddCitMovieServices();
 
