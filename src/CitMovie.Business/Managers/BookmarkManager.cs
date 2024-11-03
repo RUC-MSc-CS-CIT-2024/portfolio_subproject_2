@@ -1,10 +1,3 @@
-using CitMovie.Data.Repositories;
-using CitMovie.Models.DomainObjects;
-using CitMovie.Models.DTOs;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
 namespace CitMovie.Business;
 public class BookmarkManager : IBookmarkManager
 {

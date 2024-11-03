@@ -70,4 +70,9 @@ public class PagingHelper
         }
         return existingRouteValues;
     }
+
+    public string? GetResourceLink(string routeName, object routeValues)
+    {
+        return GetLink(routeName, routeValues);
+    }
 }
