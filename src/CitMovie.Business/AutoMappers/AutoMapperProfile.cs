@@ -27,6 +27,19 @@ public class AutoMapperProfile : Profile
         // Job Category
         CreateMap<JobCategory, JobCategoryResult>();
         
+        //Release
+        CreateMap<ReleaseUpdateRequest, Release>()
+            .ForMember(dest => dest.SpokenLanguages, opt => opt.Ignore());
+        CreateMap<ReleaseCreateRequest, Release>()
+            .ForMember(dest => dest.SpokenLanguages, opt => opt.Ignore());
+        CreateMap<Release, ReleaseResult>()
+            .ForMember(m => m.Title, 
+                opt => opt.MapFrom(src => src.Title.Name))
+            .ForMember(m => m.Country, 
+                opt => opt.MapFrom(src => src.Country.Name))
+            .ForMember(m => m.SpokenLanguages, 
+                opt => opt.MapFrom(src => src.SpokenLanguages.Select(sl => sl.Name)));
+                
         //Promotional Media
         CreateMap<PromotionalMediaCreateRequest, PromotionalMedia>();
         CreateMap<PromotionalMedia, PromotionalMediaResult>()
@@ -40,5 +53,9 @@ public class AutoMapperProfile : Profile
         // TitleAttribute
         CreateMap<TitleAttribute, TitleAttributeResult>();
 
+
+        // User Score
+        CreateMap<UserScore, UserScoreResult>()
+            .ForMember(dest => dest.Score, opt => opt.MapFrom(src => src.ScoreValue));
     }
 }

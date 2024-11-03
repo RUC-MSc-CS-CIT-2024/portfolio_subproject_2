@@ -9,7 +9,7 @@ public class FrameworkContext : DbContext
     private readonly string? _connectionString;
 
     public DbSet<Bookmark> Bookmarks { get; set; }
-    public DbSet<Completed> Completeds { get; set; }
+    public DbSet<Completed> Completed { get; set; }
     public DbSet<Follow> Follows { get; set; }
     public DbSet<User> Users { get; set; }
     public DbSet<UserScore> UserScores { get; set; }
