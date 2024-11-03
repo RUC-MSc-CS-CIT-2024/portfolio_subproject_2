@@ -1,5 +1,3 @@
-using System.Text.Json;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace CitMovie.Business;
 
@@ -13,10 +11,30 @@ public class MediaManager : IMediaManager {
         _mapper = mapper;
     }
 
-    
-    public IEnumerable<Media> GetAllMedia(PageQueryParameter page)
+    public MediaResult? Get(int id)
     {
-        return _mediaRepository.GetAllMedia(page.Number, page.Number);
+        Media? media = _mediaRepository.GetDetailed(id);
+        if (media is null)
+            return null;
+        return _mapper.Map<MediaResult>(media);
+    }
+
+    public IEnumerable<MediaBasicResult> GetAllMedia(PageQueryParameter page)
+    {
+        IEnumerable<Media> result = _mediaRepository.GetAll(page.Number, page.Number);
+        return _mapper.Map<IEnumerable<MediaBasicResult>>(result);
+    }
+
+    public IEnumerable<MediaBasicResult> GetRelated(int id, PageQueryParameter page)
+    {
+        IEnumerable<Media> result = _mediaRepository.GetRelated(id, page.Number, page.Count);
+        return _mapper.Map<IEnumerable<MediaBasicResult>>(result); 
+    }
+
+    public IEnumerable<MediaBasicResult> GetSimilar(int id, PageQueryParameter page)
+    {
+        IEnumerable<Media> result = _mediaRepository.GetSimilar(id, page.Number, page.Count);
+        return _mapper.Map<IEnumerable<MediaBasicResult>>(result);
     }
 
     public IEnumerable<MediaBasicResult> Search(MediaQueryParameter query, int? userId)

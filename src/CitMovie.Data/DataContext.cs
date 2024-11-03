@@ -59,12 +59,26 @@ public class DataContext : DbContext
             .HasName("exact_match_titles");
         modelBuilder.HasDbFunction(() => BestMatchSearch(default!))
             .HasName("best_match_titles");
-        modelBuilder.HasDbFunction(() => SimpleSearch(default!, default!))
+        modelBuilder.HasDbFunction(() => SimpleSearch(default!, default))
             .HasName("simple_search");
-        modelBuilder.HasDbFunction(() => StructuredSearch(default!, default!, default!, default!, default!))
+        modelBuilder.HasDbFunction(() => StructuredSearch(default, default!, default!, default!, default))
             .HasName("structured_string_search");
-        modelBuilder.HasDbFunction(() => GetSimilarMedia(default!))
+        modelBuilder.HasDbFunction(() => GetSimilarMedia(default))
             .HasName("get_similar_movies");
+
+        modelBuilder.Entity<Media>()
+            .HasMany(e => e.Genres)
+            .WithMany(e => e.Media)
+            .UsingEntity("media_genre", 
+                l => l.HasOne(typeof(Genre)).WithMany().HasForeignKey("genre_id"),
+                r => r.HasOne(typeof(Media)).WithMany().HasForeignKey("media_id"));
+
+        modelBuilder.Entity<Media>()
+            .HasMany(e => e.Countries)
+            .WithMany(e => e.Media)
+            .UsingEntity("media_production_country", 
+                l => l.HasOne(typeof(Country)).WithMany().HasForeignKey("country_id"),
+                r => r.HasOne(typeof(Media)).WithMany().HasForeignKey("media_id"));
     }
 
     public IQueryable<MatchSearchResult> ExactMatchSearch(string[] keywords)
