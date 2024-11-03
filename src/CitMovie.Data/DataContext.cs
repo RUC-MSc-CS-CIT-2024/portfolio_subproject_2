@@ -54,5 +54,13 @@ public class DataContext : DbContext
             .HasMany(x => x.RelatedMedia)
             .WithOne(x => x.Primary)
             .HasForeignKey(x => x.PrimaryId);
+        
+        modelBuilder.Entity<Release>()
+            .HasMany(r => r.SpokenLanguages)
+            .WithMany(l => l.Releases)
+            .UsingEntity<Dictionary<string, object>>(
+                "spoken_language",
+                r => r.HasOne<Language>().WithMany().HasForeignKey("language_id"),
+                l => l.HasOne<Release>().WithMany().HasForeignKey("release_id"));
     }
 }
