@@ -1,11 +1,13 @@
 using CitMovie.Business.Managers;
+using CitMovie.Models.DTOs;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-
 
 namespace CitMovie.Api.Controllers;
 
 [ApiController]
-[Route("api/bookmarks")]
+[Route("api/users/{userId}/bookmarks")]
 [Authorize(Policy = "user_scope")]
 public class BookmarkController : ControllerBase
 {
@@ -17,53 +19,75 @@ public class BookmarkController : ControllerBase
     private int GetUserId() =>
         int.Parse(User.FindFirstValue("user_id") ?? throw new UnauthorizedAccessException("User ID not found"));
 
-
     [HttpPost]
-    public async Task<IActionResult> CreateBookmark([FromBody] CreateBookmarkDto createBookmarkDto)
+    public async Task<IActionResult> CreateBookmark(int userId, [FromBody] CreateBookmarkDto createBookmarkDto)
     {
+        if (userId != GetUserId())
+            return Forbid();
+
         if (createBookmarkDto == null)
             return BadRequest("Bookmark data is required.");
 
-        createBookmarkDto.UserId = GetUserId();
+        createBookmarkDto.UserId = userId;
         var createdBookmark = await _bookmarkManager.CreateBookmarkAsync(createBookmarkDto);
-        return CreatedAtAction(nameof(GetBookmark), new { id = createdBookmark.BookmarkId }, createdBookmark);
+        return CreatedAtAction(nameof(GetBookmark), new { userId, id = createdBookmark.BookmarkId }, createdBookmark);
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetBookmark(int id)
+    public async Task<IActionResult> GetBookmark(int userId, int id)
     {
+        if (userId != GetUserId())
+            return Forbid();
+
         var bookmark = await _bookmarkManager.GetBookmarkAsync(id);
-        return bookmark == null || bookmark.UserId != GetUserId() ? Unauthorized() : Ok(bookmark);
+        if (bookmark == null) 
+            return NotFound();
+
+        return bookmark.UserId != userId ? Forbid() : Ok(bookmark);
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetUserBookmarks()
+    public async Task<IActionResult> GetUserBookmarks(int userId)
     {
-        var userId = GetUserId();
+        if (userId != GetUserId())
+            return Forbid();
+
         var bookmarks = await _bookmarkManager.GetUserBookmarksAsync(userId);
         return Ok(bookmarks);
     }
 
-    [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateBookmark(int id, [FromBody] string? note)
+    [HttpPatch("{id}")]
+    public async Task<IActionResult> UpdateBookmark(int userId, int id, [FromBody] string? note)
     {
+        if (userId != GetUserId())
+            return Forbid();
+
         if (note == null)
             return BadRequest("Note content is required.");
 
         var bookmark = await _bookmarkManager.GetBookmarkAsync(id);
-        if (bookmark == null || bookmark.UserId != GetUserId())
-            return Unauthorized();
+        if (bookmark == null)
+            return NotFound();
+
+        if (bookmark.UserId != userId)
+            return Forbid();
 
         var updatedBookmark = await _bookmarkManager.UpdateBookmarkAsync(id, note);
         return updatedBookmark == null ? NotFound() : Ok(updatedBookmark);
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteBookmark(int id)
+    public async Task<IActionResult> DeleteBookmark(int userId, int id)
     {
+        if (userId != GetUserId())
+            return Forbid();
+
         var bookmark = await _bookmarkManager.GetBookmarkAsync(id);
-        if (bookmark == null || bookmark.UserId != GetUserId())
-            return Unauthorized();
+        if (bookmark == null) 
+            return NotFound();
+
+        if (bookmark.UserId != userId)
+            return Forbid();
 
         var deleted = await _bookmarkManager.DeleteBookmarkAsync(id);
         return deleted ? NoContent() : NotFound();
