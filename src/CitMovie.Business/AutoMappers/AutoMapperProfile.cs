@@ -32,5 +32,10 @@ public class AutoMapperProfile : Profile
         CreateMap<PromotionalMedia, PromotionalMediaResult>()
             .ForMember(dest => dest.MediaId, 
                 opt => opt.MapFrom(src => src.Release.MediaId));
+
+        // Search History
+        CreateMap<SearchHistory, SearchHistoryResult>()
+            .ForMember(dest => dest.SearchText, opt => opt.MapFrom(src => src.Query));
+
     }
 }

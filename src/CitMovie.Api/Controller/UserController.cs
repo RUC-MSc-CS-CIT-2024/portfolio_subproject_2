@@ -13,7 +13,7 @@ public class UserController : ControllerBase {
     }
 
     [Authorize(Policy = "user_scope")]
-    [HttpGet("{userId}")]
+    [HttpGet("{userId}", Name = nameof(GetUser))]
     public async Task<ActionResult> GetUser(int userId) {
         try {
             UserResult user = await _userManager.GetUserAsync(userId);
