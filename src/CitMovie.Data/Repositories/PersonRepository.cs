@@ -80,15 +80,9 @@ public class PersonRepository : IPersonRepository
         return personId;
     }
 
-
-
     public async Task<IEnumerable<CoActor>> GetFrequentCoActorsAsync(string actorName, int page, int pageSize)
     {
-        var coActors = await _dataContext.CoActors
-            .FromSqlInterpolated($@"
-            SELECT *
-            FROM get_frequent_coplaying_actors({actorName})
-            ")
+        var coActors = await _dataContext.GetFrequentCoActors(actorName)
             .AsNoTracking()
             .Skip(page * pageSize)
             .Take(pageSize)
@@ -99,10 +93,7 @@ public class PersonRepository : IPersonRepository
 
     public async Task<int> GetFrequentCoActorsCountAsync(string actorName)
     {
-        var count = await _dataContext.CoActors
-            .FromSqlInterpolated($@"
-            SELECT coactor_imdb_id
-            FROM get_frequent_coplaying_actors({actorName})")
+        var count = await _dataContext.GetFrequentCoActors(actorName)
             .AsNoTracking()
             .CountAsync();
 

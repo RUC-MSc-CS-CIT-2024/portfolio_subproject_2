@@ -64,5 +64,10 @@ public class DataContext : DbContext
             j => j.HasOne<Genre>().WithMany().HasForeignKey("genre_id"),
             j => j.HasOne<Media>().WithMany().HasForeignKey("media_id")
         );
+
+        modelBuilder.HasDbFunction(() => GetFrequentCoActors(default!))
+             .HasName("get_frequent_coplaying_actors");
     }
+    public IQueryable<CoActor> GetFrequentCoActors(string actorName)
+        => FromExpression(() => GetFrequentCoActors(actorName));
 }
