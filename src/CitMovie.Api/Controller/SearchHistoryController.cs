@@ -9,13 +9,13 @@ public class SearchHistoryController : ControllerBase
 {
     private readonly ISearchHistoryManager _searchHistoryManager;
     private readonly IUserManager _userManager;
-    private readonly LinkGenerator _linkGenerator;
+    private readonly PagingHelper _pagingHelper;
 
-    public SearchHistoryController(ISearchHistoryManager searchHistoryManager, IUserManager userManager, LinkGenerator linkGenerator)
+    public SearchHistoryController(ISearchHistoryManager searchHistoryManager, IUserManager userManager, PagingHelper pagingHelper)
     {
         _searchHistoryManager = searchHistoryManager;
         _userManager = userManager;
-        _linkGenerator = linkGenerator;
+        _pagingHelper = pagingHelper;
     }
 
     [HttpGet(Name = nameof(GetUserSearchHistories))]
@@ -29,7 +29,7 @@ public class SearchHistoryController : ControllerBase
             await AddSearchHistoryUserLink(searchHistory);
         }
 
-        var result = CreatePaging(nameof(GetUserSearchHistories), userId, page, pageSize, total_items, searchHistories);
+        var result = _pagingHelper.CreatePaging(nameof(GetUserSearchHistories), page, pageSize, total_items, searchHistories, new { userId });
 
         return Ok(result);
     }
@@ -45,42 +45,6 @@ public class SearchHistoryController : ControllerBase
         return NotFound();
     }
 
-
-    private string? GetLink(string linkName, int userId, int page, int pageSize)
-    {
-        var uri = _linkGenerator.GetUriByName(
-            HttpContext,
-            linkName,
-            new { userId, page, pageSize }
-        );
-        return uri;
-    }
-
-    private object CreatePaging<T>(string linkName, int userId, int page, int pageSize, int total, IEnumerable<T?> items)
-    {
-        var numberOfPages = (int)Math.Ceiling(total / (double)pageSize);
-
-        var curPage = GetLink(linkName, userId, page, pageSize);
-
-        var nextPage = page < numberOfPages - 1
-            ? GetLink(linkName, userId, page + 1, pageSize)
-            : null;
-
-        var prevPage = page > 0
-            ? GetLink(linkName, userId, page - 1, pageSize)
-            : null;
-
-        return new
-        {
-            curPage,
-            nextPage,
-            prevPage,
-            numberOfPages,
-            total,
-            items
-        };
-    }
-
     private async Task AddSearchHistoryUserLink(SearchHistoryResult searchHistoryResult)
     {
         var user = await _userManager.GetUserAsync(searchHistoryResult.UserId);
@@ -88,7 +52,7 @@ public class SearchHistoryController : ControllerBase
         {
             searchHistoryResult.Links.Add(new Link
             {
-                Href = HttpContext != null ? _linkGenerator.GetUriByName(HttpContext, nameof(UserController.GetUser), new { userId = searchHistoryResult.UserId }) : string.Empty,
+                Href = _pagingHelper.GetResourceLink(nameof(UserController.GetUser), new { userId = searchHistoryResult.UserId }) ?? string.Empty,
                 Rel = "user",
                 Method = "GET"
             });
