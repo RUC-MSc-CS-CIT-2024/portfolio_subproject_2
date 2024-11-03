@@ -10,24 +10,35 @@ public class MediaBasicResult {
     public string? PosterUri { get; set; }
 }
 
-public record MediaResult(
-    int Id,
-    string Type,
-    string Title,
-    DateTime? ReleaseDate,
-    string? Rated,
-    string? PosterUri,
-    string? Plot,
-    int? RuntimeMinutes,
-    int? BoxOffice,
-    int? Budget,
-    IEnumerable<GenreResult> Genres,
-    IEnumerable<ScoreResult> Scores,
-    IEnumerable<MediaProductionCompanyResult> ProductionCompanies,
-    IEnumerable<CountryResult> ProductionCountries);
+public record MediaResult {
+    public required int Id { get; set; }
+    public required string Type { get; set; }
+    public required string Title { get; set; }
+    public DateTime? ReleaseDate { get; set; }
+    public string? Rated { get; set; }
+    public string? PosterUri { get; set; }
+    public string? Plot { get; set; }
+    public int? RuntimeMinutes { get; set; }
+    public int? BoxOffice { get; set; }
+    public int? Budget { get; set; }
+    public string? AwardText { get; set; }
+    public List<GenreResult> Genres { get; set; } = [];
+    public List<ScoreResult> Scores { get; set; } = [];
+    public List<MediaProductionCompanyResult> ProductionCompanies { get; set; } = [];
+    public List<CountryResult> ProductionCountries { get; set; } = [];
 
-public record ScoreResult(string Source, string Value, int VoteCount);
-public record MediaProductionCompanyResult(int Id, string Name);
+    public class ScoreResult {
+        public required string Source { get; set; }
+        public required string Value { get; set; }
+        public int? VoteCount { get; set; }
+    }
+
+    public class MediaProductionCompanyResult {
+        public required int Id { get; set; }
+        public required string Name { get; set; }
+    }
+}
+
 
 [JsonConverter(typeof(JsonStringEnumConverter<MediaQueryType>))]
 public enum MediaQueryType {
