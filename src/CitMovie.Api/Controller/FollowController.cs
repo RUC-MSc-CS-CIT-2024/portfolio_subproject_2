@@ -5,13 +5,13 @@ namespace CitMovie.Api;
 [Route("api/users/{userId}/following")]
 public class FollowController : ControllerBase
 {
-    private readonly LinkGenerator _linkGenerator;
     private readonly IFollowManager _followManager;
+    private readonly PagingHelper _pagingHelper;
 
-    public FollowController(LinkGenerator linkGenerator, IFollowManager followManager)
+    public FollowController(IFollowManager followManager, PagingHelper pagingHelper)
     {
-        _linkGenerator = linkGenerator;
         _followManager = followManager;
+        _pagingHelper = pagingHelper;
     }
 
     [HttpGet(Name = nameof(GetFollowings))]
@@ -20,13 +20,7 @@ public class FollowController : ControllerBase
         var followings = await _followManager.GetFollowingsAsync(userId, page, pageSize);
         var totalItems = await _followManager.GetTotalFollowingsCountAsync(userId);
 
-        object result = CreatePaging(
-            nameof(GetFollowings),
-            userId,
-            page,
-            pageSize,
-            totalItems,
-            followings);
+        var result = _pagingHelper.CreatePaging(nameof(GetFollowings), page, pageSize, totalItems, followings, new { userId });
         return Ok(result);
     }
 
@@ -46,53 +40,5 @@ public class FollowController : ControllerBase
             return NotFound();
 
         return NoContent();
-    }
-
-
-    // HATEOS And Pagingination
-    private string? GetLink(string linkName, int userId, int page, int pageSize)
-    {
-        var uri = _linkGenerator.GetUriByName(
-                    HttpContext,
-                    linkName,
-                    new { userId, page, pageSize }
-                    );
-        return uri;
-    }
-
-    private string? GetUrl(int userId, int followingId)
-    {
-        return _linkGenerator.GetUriByName(
-            HttpContext,
-            nameof(GetFollowings),
-            new { userId, followingId }
-        );
-    }
-
-
-    private object CreatePaging<T>(string linkName, int userId, int page, int pageSize, int total, IEnumerable<T?> items)
-    {
-        var numberOfPages = (int)Math.Ceiling(total / (double)pageSize);
-
-        var curPage = GetLink(linkName, userId, page, pageSize);
-
-        var nextPage = page < numberOfPages - 1
-            ? GetLink(linkName, userId, page + 1, pageSize)
-            : null;
-
-        var prevPage = page > 0
-            ? GetLink(linkName, userId, page - 1, pageSize)
-            : null;
-
-        var result = new
-        {
-            CurPage = curPage,
-            NextPage = nextPage,
-            PrevPage = prevPage,
-            NumberOfItems = total,
-            NumberPages = numberOfPages,
-            Items = items
-        };
-        return result;
     }
 }

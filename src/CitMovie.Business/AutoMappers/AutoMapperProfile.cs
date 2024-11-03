@@ -20,7 +20,7 @@ public class AutoMapperProfile : Profile
 
         // Genre
         CreateMap<Genre, GenreResult>();
-        
+
         // TitleType
         CreateMap<TitleType, TitleTypeResult>();
 
@@ -61,5 +61,47 @@ public class AutoMapperProfile : Profile
 
         CreateMap<Score, MediaResult.ScoreResult>();
         CreateMap<ProductionCompany, MediaResult.MediaProductionCompanyResult>();
+        
+        //Release
+        CreateMap<ReleaseUpdateRequest, Release>()
+            .ForMember(dest => dest.SpokenLanguages, opt => opt.Ignore());
+        CreateMap<ReleaseCreateRequest, Release>()
+            .ForMember(dest => dest.SpokenLanguages, opt => opt.Ignore());
+        CreateMap<Release, ReleaseResult>()
+            .ForMember(m => m.Title, 
+                opt => opt.MapFrom(src => src.Title.Name))
+            .ForMember(m => m.Country, 
+                opt => opt.MapFrom(src => src.Country.Name))
+            .ForMember(m => m.SpokenLanguages, 
+                opt => opt.MapFrom(src => src.SpokenLanguages.Select(sl => sl.Name)));
+                
+        //Promotional Media
+        CreateMap<PromotionalMediaCreateRequest, PromotionalMedia>();
+        CreateMap<PromotionalMedia, PromotionalMediaResult>()
+            .ForMember(dest => dest.MediaId, 
+                opt => opt.MapFrom(src => src.Release.MediaId));
+
+        // Search History
+        CreateMap<SearchHistory, SearchHistoryResult>()
+            .ForMember(dest => dest.SearchText, opt => opt.MapFrom(src => src.Query));
+            
+        // Person
+        CreateMap<Person, PersonResult>()
+          .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.PersonId));
+        CreateMap<Media, PersonResult.MediaResult>()
+            .ForMember(dest => dest.Genres, opt => opt.MapFrom(src => src.Genres.Select(g => g.Name)))
+            .ForMember(dest => dest.MediaId, opt => opt.MapFrom(src => src.Id))
+            .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Plot))
+            .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.Title.FirstOrDefault().Name));
+        CreateMap<CoActor, CoActorResult>()
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.CoActorImdbId))
+            .ForMember(dest => dest.ActorName, opt => opt.MapFrom(src => src.CoActorName));
+        
+        // TitleAttribute
+        CreateMap<TitleAttribute, TitleAttributeResult>();
+
+        // User Score
+        CreateMap<UserScore, UserScoreResult>()
+            .ForMember(dest => dest.Score, opt => opt.MapFrom(src => src.ScoreValue));
     }
 }

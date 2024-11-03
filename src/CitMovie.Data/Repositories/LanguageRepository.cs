@@ -17,17 +17,27 @@ public class LanguageRepository : ILanguageRepository
             .FirstAsync(l => l.LanguageId == languageId);
     }
 
-    public async Task<IList<Language>> GetLanguagesAsync(int page, int pageSize)
+    public async Task<List<Language>> GetLanguagesAsync(int page, int pageSize)
     {
         return await _context.Languages
             .Skip(pageSize * page)
             .Take(pageSize)
             .ToListAsync();
     }
-
+    
+    public async Task<List<Language>> GetLanguagesAsync(IEnumerable<int> languageIds)
+    {
+        return await _context.Languages
+            .Where(l => languageIds.Contains(l.LanguageId))
+            .ToListAsync();
+    }
+    
     public async Task<int> GetTotalFollowingsCountAsync()
     {
         return await _context.Languages.CountAsync();
     }
+    
+
+    
 }
 
