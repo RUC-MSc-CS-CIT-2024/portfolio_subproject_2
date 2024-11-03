@@ -21,10 +21,13 @@ public static class CitMovieServiceCollectionExtensions
         services.AddScoped<ICountryRepository, CountryRepository>();
         services.AddScoped<IGenreRepository, GenreRepository>();
         services.AddScoped<IFollowRepository, FollowRepository>();
+        services.AddScoped<IReleaseRepository, ReleaseRepository>();
         services.AddScoped<IPromotionalMediaRepository, PromotionalMediaRepository>();
         services.AddScoped<ISearchHistoryRepository, SearchHistoryRepository>();
         services.AddScoped<IBookmarkRepository, BookmarkRepository>();
         services.AddScoped<IUserScoreRepository, UserScoreRepository>();
+        services.AddScoped<ICompletedRepository, CompletedRepository>();
+
 
         services.AddScoped<IUserManager, UserManager>();
         services.AddScoped<ILoginManager, LoginManager>();
@@ -36,9 +39,11 @@ public static class CitMovieServiceCollectionExtensions
         services.AddScoped<ICountryManager, CountryManager>();
         services.AddScoped<IGenreManager, GenreManager>();
         services.AddScoped<IFollowManager, FollowManager>();
+        services.AddScoped<IReleaseManager, ReleaseManager>();
         services.AddScoped<ISearchHistoryManager, SearchHistoryManager>();
         services.AddScoped<IBookmarkManager, BookmarkManager>();
         services.AddScoped<IUserScoreManager, UserScoreManager>();
+        services.AddScoped<ICompletedManager, CompletedManager>();
 
         services.AddOptions<JwtOptions>()
             .Configure<IConfiguration>((options, configuration) =>
