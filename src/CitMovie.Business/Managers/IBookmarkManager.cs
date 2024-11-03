@@ -1,7 +1,3 @@
-using CitMovie.Models.DTOs;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-
 namespace CitMovie.Business;
 public interface IBookmarkManager
 {
