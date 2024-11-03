@@ -1,12 +1,10 @@
-using CitMovie.Models.DTOs;
+namespace CitMovie.Business;
 
-namespace CitMovie.Business.Managers
+public interface ICompletedManager
 {
-    public interface ICompletedManager
-    {
-        Task<CompletedDto> AddCompletedAsync(CreateCompletedDto completedDto);
-        Task<CompletedDto?> GetCompletedAsync(int completedId);
-        Task<IEnumerable<CompletedDto>> GetUserCompletedAsync(int userId);
-        Task<bool> DeleteCompletedAsync(int completedId);
-    }
+    Task<CompletedDto> CreateCompletedAsync(CreateCompletedDto createCompletedDto);
+    Task<CompletedDto?> GetCompletedAsync(int completedId);
+    Task<IEnumerable<CompletedDto>> GetUserCompletedItemsAsync(int userId, int page, int pageSize);
+    Task<CompletedDto?> UpdateCompletedAsync(int completedId, UpdateCompletedDto updateCompletedDto);
+    Task<bool> DeleteCompletedAsync(int completedId);
 }
