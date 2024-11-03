@@ -39,5 +39,16 @@ public class AutoMapperProfile : Profile
                 opt => opt.MapFrom(src => src.Country.Name))
             .ForMember(m => m.SpokenLanguages, 
                 opt => opt.MapFrom(src => src.SpokenLanguages.Select(sl => sl.Name)));
+                
+        //Promotional Media
+        CreateMap<PromotionalMediaCreateRequest, PromotionalMedia>();
+        CreateMap<PromotionalMedia, PromotionalMediaResult>()
+            .ForMember(dest => dest.MediaId, 
+                opt => opt.MapFrom(src => src.Release.MediaId));
+
+        // Search History
+        CreateMap<SearchHistory, SearchHistoryResult>()
+            .ForMember(dest => dest.SearchText, opt => opt.MapFrom(src => src.Query));
+
     }
 }
