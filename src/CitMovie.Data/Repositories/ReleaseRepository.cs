@@ -60,6 +60,14 @@ public class ReleaseRepository : IReleaseRepository
         var existingRelease = await GetReleaseByIdAsync(releaseId);
         
         _context.Entry(existingRelease).CurrentValues.SetValues(release);
+        
+        existingRelease.SpokenLanguages.Clear();
+        
+        foreach (var language in release.SpokenLanguages)
+        {
+            existingRelease.SpokenLanguages.Add(language);
+        }
+
         await _context.SaveChangesAsync();
         return await GetReleaseByIdAsync(releaseId);
     }
@@ -67,6 +75,7 @@ public class ReleaseRepository : IReleaseRepository
     public async Task<Release> GetReleaseByIdAsync(int releaseId)
     {
         return await _context.Releases
+            .Include(x => x.Title)
             .Include(x => x.Country)
             .Include(x => x.SpokenLanguages)
             .FirstAsync(x => x.ReleaseId == releaseId);;

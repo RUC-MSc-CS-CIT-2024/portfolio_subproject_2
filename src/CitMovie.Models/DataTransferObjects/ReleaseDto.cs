@@ -31,5 +31,5 @@ public class ReleaseUpdateRequest
     public string? Type { get; set; }
     public IEnumerable<int>? SpokenLanguages { get; set; }
     public int? CountryId { get; set; }
-    //public int? TitleId { get; set; }
+    public int? TitleId { get; set; }
 }
