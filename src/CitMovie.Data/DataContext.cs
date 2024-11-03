@@ -67,6 +67,22 @@ public class DataContext : DbContext
 
         modelBuilder.HasDbFunction(() => GetFrequentCoActors(default!))
              .HasName("get_frequent_coplaying_actors");
+        
+        modelBuilder.Entity<TitleAttribute>()
+            .HasMany(r => r.Titles)
+            .WithMany(l => l.TitleAttributes)
+            .UsingEntity<Dictionary<string, object>>(
+                "title_title_attribute",
+                r => r.HasOne<Title>().WithMany().HasForeignKey("title_attribute_id"),
+                l => l.HasOne<TitleAttribute>().WithMany().HasForeignKey("title_id"));
+
+        modelBuilder.Entity<Release>()
+            .HasMany(r => r.SpokenLanguages)
+            .WithMany(l => l.Releases)
+            .UsingEntity<Dictionary<string, object>>(
+                "spoken_language",
+                r => r.HasOne<Language>().WithMany().HasForeignKey("language_id"),
+                l => l.HasOne<Release>().WithMany().HasForeignKey("release_id"));
     }
     public IQueryable<CoActor> GetFrequentCoActors(string actorName)
         => FromExpression(() => GetFrequentCoActors(actorName));

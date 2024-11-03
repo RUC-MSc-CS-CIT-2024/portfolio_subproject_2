@@ -13,67 +13,41 @@ public class PromotionalMediaRepository : IPromotionalMediaRepository
 
     public async Task<IEnumerable<PromotionalMedia>> GetPromotionalMediaOfMediaAsync(int mediaId, int page, int pageSize )
     {
-        try
-        {
-            await ReleaseIdAndMediaIdValidator(mediaId, null);
-            return await _context.PromotionalMedia
-                .Include(pm => pm.Release)
-                .Where(pm => pm.Release.MediaId == mediaId)
-                .Skip(page * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
-        }
-        catch (Exception e)
-        {
-            throw new InvalidOperationException(e.Message);
-        }
-
+        await ReleaseIdAndMediaIdValidator(mediaId, null);
+        return await _context.PromotionalMedia
+            .Include(pm => pm.Release)
+            .Where(pm => pm.Release.MediaId == mediaId)
+            .Skip(page * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
     }
 
     public async Task<IList<PromotionalMedia>> GetPromotionalMediaOfReleaseAsync(int mediaId, int releaseId, int page, int pageSize)
     {
-        try
-        {
-            await ReleaseIdAndMediaIdValidator(mediaId, releaseId);
-            return await _context.PromotionalMedia
-                .Include(pm => pm.Release)
-                .Where(pm => pm.ReleaseId == releaseId)
-                .Where(pm => pm.Release.MediaId == mediaId)
-                .Skip(pageSize * page)
-                .Take(pageSize)
-                .ToListAsync();
-        }
-        catch (Exception e)
-        {
-            throw new InvalidOperationException(e.Message);
-        }
-
+        await ReleaseIdAndMediaIdValidator(mediaId, releaseId);
+        return await _context.PromotionalMedia
+            .Include(pm => pm.Release)
+            .Where(pm => pm.ReleaseId == releaseId)
+            .Where(pm => pm.Release.MediaId == mediaId)
+            .Skip(pageSize * page)
+            .Take(pageSize)
+            .ToListAsync();
     }
 
     public async Task<PromotionalMedia> GetPromotionalMediaByIdAsync(int id, int? mediaId, int? releaseId)
     {
         if (!mediaId.HasValue && !releaseId.HasValue)
         {
-            try
-            {
-                return await _context.PromotionalMedia
-                    .Include(pm => pm.Release)
-                    .FirstAsync(p => p.PromotionalMediaId == id);
-            }
-            catch { throw new InvalidOperationException("Promotional media not found"); }
-        }
-
-        try
-        {
             return await _context.PromotionalMedia
                 .Include(pm => pm.Release)
-                .Where(pm => pm.ReleaseId == releaseId)
-                .Where(pm => pm.Release.MediaId == mediaId)
                 .FirstAsync(p => p.PromotionalMediaId == id);
         }
-        catch { throw new InvalidOperationException("Promotional media not found, check if mediaId and releaseId values are correct." +
-                                                    "Otherwise promotional media not found"); }
-
+        
+        return await _context.PromotionalMedia
+            .Include(pm => pm.Release)
+            .Where(pm => pm.ReleaseId == releaseId)
+            .Where(pm => pm.Release.MediaId == mediaId)
+            .FirstAsync(p => p.PromotionalMediaId == id);
         
     }
 
@@ -97,17 +71,10 @@ public class PromotionalMediaRepository : IPromotionalMediaRepository
     
    public async Task<PromotionalMedia> CreatePromotionalMediaAsync(int mediaId, int releaseId,PromotionalMedia model)
    {
-       try
-       {
-           await ReleaseIdAndMediaIdValidator(mediaId, releaseId);
-           var result = await _context.PromotionalMedia.AddAsync(model);
-           await _context.SaveChangesAsync();
-           return result.Entity;
-       }
-       catch (Exception e)
-       {
-           throw new InvalidOperationException(e.Message);
-       }
+       await ReleaseIdAndMediaIdValidator(mediaId, releaseId);
+       var result = await _context.PromotionalMedia.AddAsync(model);
+       await _context.SaveChangesAsync();
+       return result.Entity;
    }
    
 
@@ -122,20 +89,12 @@ public class PromotionalMediaRepository : IPromotionalMediaRepository
 
     private async Task ReleaseIdAndMediaIdValidator(int mediaId, int? releaseId)
     {
-        try
+        var checkPassed = releaseId.HasValue 
+            ? await _context.Releases.AnyAsync(pm => pm.MediaId == mediaId && pm.ReleaseId == releaseId)
+            : await _context.Releases.AnyAsync(pm => pm.MediaId == mediaId);
+        if (!checkPassed)
         {
-            var checkPassed = releaseId.HasValue 
-                ? await _context.Releases.AnyAsync(pm => pm.MediaId == mediaId && pm.ReleaseId == releaseId)
-                : await _context.Releases.AnyAsync(pm => pm.MediaId == mediaId);
-            if (!checkPassed)
-            {
-                throw new Exception($"Media or release do not exists or check if media id and release id are correct.");
-            }
+            throw new Exception($"Media or release do not exists or check if media id and release id are correct.");
         }
-        catch(Exception e)
-        {
-            throw new InvalidOperationException(e.Message);
-        }
-
     }
 }
