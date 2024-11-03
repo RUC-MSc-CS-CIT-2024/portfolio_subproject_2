@@ -21,6 +21,10 @@ public static class CitMovieServiceCollectionExtensions
         services.AddScoped<ICountryRepository, CountryRepository>();
         services.AddScoped<IGenreRepository, GenreRepository>();
         services.AddScoped<IFollowRepository, FollowRepository>();
+      
+        // Bookmark Management
+        services.AddScoped<IBookmarkRepository, BookmarkRepository>();
+        services.AddScoped<IBookmarkManager, BookmarkManager>();
 
         services.AddScoped<IUserManager, UserManager>();
         services.AddScoped<ILoginManager, LoginManager>();
