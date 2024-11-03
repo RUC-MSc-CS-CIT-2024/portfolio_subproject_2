@@ -3,10 +3,7 @@ using CitMovie.Business.Managers;
 using CitMovie.Data;
 using CitMovie.Models.DataTransferObjects;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using System.Threading.Tasks;
-using Xunit;
 
 public class BookmarkControllerIntegrationTests
 {

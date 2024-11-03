@@ -1,69 +1,63 @@
-using CitMovie.Models.DomainObjects;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace CitMovie.Data.Repositories
+namespace CitMovie.Data;
+public class BookmarkRepository : IBookmarkRepository
 {
-    public class BookmarkRepository : IBookmarkRepository
+    private readonly FrameworkContext _context;
+
+    public BookmarkRepository(FrameworkContext context) =>
+        _context = context;
+
+    public async Task<Bookmark> AddBookmarkAsync(Bookmark bookmark)
     {
-        private readonly FrameworkContext _context;
+        _context.Bookmarks.Add(bookmark);
+        await _context.SaveChangesAsync();
+        return bookmark;
+    }
 
-        public BookmarkRepository(FrameworkContext context) =>
-            _context = context;
+    public async Task<Bookmark> GetBookmarkByIdAsync(int bookmarkId) =>
+        await _context.Bookmarks
+            .AsNoTracking()
+            .Where(b => b.BookmarkId == bookmarkId)
+            .FirstOrDefaultAsync();
 
-        public async Task<Bookmark> AddBookmarkAsync(Bookmark bookmark)
+    public async Task<IEnumerable<Bookmark>> GetUserBookmarksAsync(int userId) =>
+        await _context.Bookmarks
+            .AsNoTracking()
+            .Where(b => b.UserId == userId)
+            .ToListAsync();
+
+    public async Task<Bookmark> UpdateBookmarkAsync(Bookmark bookmark)
+    {
+        var existingBookmark = await _context.Bookmarks
+            .Where(b => b.BookmarkId == bookmark.BookmarkId)
+            .FirstOrDefaultAsync();
+
+        if (existingBookmark != null && existingBookmark.Note != bookmark.Note)
         {
-            _context.Bookmarks.Add(bookmark);
+            _context.Entry(existingBookmark).CurrentValues.SetValues(bookmark);
             await _context.SaveChangesAsync();
-            return bookmark;
         }
+        return existingBookmark;
+    }
 
-        public async Task<Bookmark> GetBookmarkByIdAsync(int bookmarkId) =>
-            await _context.Bookmarks
-                .AsNoTracking()
+    public async Task<bool> DeleteBookmarkAsync(int bookmarkId)
+    {
+        try
+        {
+            var bookmark = await _context.Bookmarks
                 .Where(b => b.BookmarkId == bookmarkId)
                 .FirstOrDefaultAsync();
 
-        public async Task<IEnumerable<Bookmark>> GetUserBookmarksAsync(int userId) =>
-            await _context.Bookmarks
-                .AsNoTracking()
-                .Where(b => b.UserId == userId)
-                .ToListAsync();
+            if (bookmark == null) return false;
 
-        public async Task<Bookmark> UpdateBookmarkAsync(Bookmark bookmark)
-        {
-            var existingBookmark = await _context.Bookmarks
-                .Where(b => b.BookmarkId == bookmark.BookmarkId)
-                .FirstOrDefaultAsync();
-
-            if (existingBookmark != null && existingBookmark.Note != bookmark.Note)
-            {
-                _context.Entry(existingBookmark).CurrentValues.SetValues(bookmark);
-                await _context.SaveChangesAsync();
-            }
-            return existingBookmark;
+            _context.Bookmarks.Remove(bookmark);
+            await _context.SaveChangesAsync();
+            return true;
         }
-
-        public async Task<bool> DeleteBookmarkAsync(int bookmarkId)
+        catch
         {
-            try
-            {
-                var bookmark = await _context.Bookmarks
-                    .Where(b => b.BookmarkId == bookmarkId)
-                    .FirstOrDefaultAsync();
-
-                if (bookmark == null) return false;
-
-                _context.Bookmarks.Remove(bookmark);
-                await _context.SaveChangesAsync();
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
+            return false;
         }
     }
 }
