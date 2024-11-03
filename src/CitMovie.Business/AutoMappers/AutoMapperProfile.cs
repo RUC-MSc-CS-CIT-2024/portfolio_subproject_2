@@ -40,7 +40,7 @@ public class AutoMapperProfile : Profile
         // Person
         CreateMap<Person, PersonResult>()
           .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.PersonId));
-        CreateMap<Media, MediaResult>()
+        CreateMap<Media, PersonResult.MediaResult>()
             .ForMember(dest => dest.Genres, opt => opt.MapFrom(src => src.Genres.Select(g => g.Name)))
             .ForMember(dest => dest.MediaId, opt => opt.MapFrom(src => src.Id))
             .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Plot))

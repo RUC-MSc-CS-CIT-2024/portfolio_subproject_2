@@ -54,7 +54,7 @@ public class PersonController : ControllerBase
     }
 
     [HttpGet("{id}/media", Name = nameof(GetMediaByPersonId))]
-    public async Task<ActionResult<IEnumerable<MediaResult>>> GetMediaByPersonId(int id,
+    public async Task<ActionResult<IEnumerable<PersonResult.MediaResult>>> GetMediaByPersonId(int id,
           [FromQuery] int page = 0,
           [FromQuery] int pageSize = 10)
     {

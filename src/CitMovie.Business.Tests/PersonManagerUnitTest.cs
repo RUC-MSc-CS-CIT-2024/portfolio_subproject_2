@@ -83,14 +83,14 @@ public class PersonManagerTest
         // Arrange
         var media = new List<Media>();
         A.CallTo(() => _personRepository.GetMediaByPersonIdAsync(1, 1, 10)).Returns(media);
-        A.CallTo(() => _mapper.Map<IEnumerable<MediaResult>>(media)).Returns(new List<MediaResult>());
+        A.CallTo(() => _mapper.Map<IEnumerable<PersonResult.MediaResult>>(media)).Returns(new List<PersonResult.MediaResult>());
 
         // Act
         var result = await _personManager.GetMediaByPersonIdAsync(1, 1, 10);
 
         // Assert
         A.CallTo(() => _personRepository.GetMediaByPersonIdAsync(1, 1, 10)).MustHaveHappenedOnceExactly();
-        A.CallTo(() => _mapper.Map<IEnumerable<MediaResult>>(media)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => _mapper.Map<IEnumerable<PersonResult.MediaResult>>(media)).MustHaveHappenedOnceExactly();
     }
 
     [Fact]
