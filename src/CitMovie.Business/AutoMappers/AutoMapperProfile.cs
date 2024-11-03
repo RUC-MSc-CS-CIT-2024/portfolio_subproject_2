@@ -50,5 +50,9 @@ public class AutoMapperProfile : Profile
         CreateMap<SearchHistory, SearchHistoryResult>()
             .ForMember(dest => dest.SearchText, opt => opt.MapFrom(src => src.Query));
 
+
+        // User Score
+        CreateMap<UserScore, UserScoreResult>()
+            .ForMember(dest => dest.Score, opt => opt.MapFrom(src => src.ScoreValue));
     }
 }
