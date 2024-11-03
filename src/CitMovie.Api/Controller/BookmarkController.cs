@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
-namespace CitMovie.Api.Controllers;
+namespace CitMovie.Api;
 
 [ApiController]
 [Route("api/users/{userId}/bookmarks")]
