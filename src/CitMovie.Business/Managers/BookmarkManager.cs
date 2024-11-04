@@ -61,8 +61,8 @@ public class BookmarkManager : IBookmarkManager
     public async Task<BookmarkDto> GetBookmarkAsync(int bookmarkId) =>
         await TransformToBookmarkDto(await _bookmarkRepository.GetBookmarkByIdAsync(bookmarkId));
 
-    public async Task<IEnumerable<BookmarkDto>> GetUserBookmarksAsync(int userId) =>
-        (await _bookmarkRepository.GetUserBookmarksAsync(userId))
+    public async Task<IEnumerable<BookmarkDto>> GetUserBookmarksAsync(int userId, int page, int pageSize) =>
+        (await _bookmarkRepository.GetUserBookmarksAsync(userId, page, pageSize))
             .Select(b => new BookmarkDto
             {
                 BookmarkId = b.BookmarkId,
@@ -83,5 +83,10 @@ public class BookmarkManager : IBookmarkManager
             MediaId = bookmark.MediaId,
             Note = bookmark.Note
         };
+    }
+
+    public async Task<int> GetTotalUserBookmarksCountAsync(int userId)
+    {
+        return await _bookmarkRepository.GetTotalUserBookmarksCountAsync(userId);
     }
 }

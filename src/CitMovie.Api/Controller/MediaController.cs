@@ -22,7 +22,7 @@ public class MediaController : ControllerBase
         return Ok(_mediaManager.Search(queryParameter, GetUserId()));
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("{id}", Name = nameof(Get))]
     public IActionResult Get(int id) {
         MediaResult? m = _mediaManager.Get(id);
         if (m is null)
