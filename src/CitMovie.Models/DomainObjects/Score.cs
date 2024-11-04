@@ -3,7 +3,7 @@ namespace CitMovie.Models.DomainObjects;
 [Table("score")]
 public class Score
 {
-    [Key, Column("socre_id")]
+    [Key, Column("score_id")]
     public int SocreId { get; set; }
     [Column("source")]
     public string Source { get; set; }
