@@ -4,7 +4,7 @@ namespace CitMovie.Models.DomainObjects;
 public class Title
 {
     [Key, Column("title_id")]
-    public int TitleId { get; set; }
+    public int Id { get; set; }
 
     [Column("name")]
     public required string Name { get; set; }

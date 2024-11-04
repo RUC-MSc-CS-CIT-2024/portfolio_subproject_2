@@ -92,7 +92,7 @@ public class AutoMapperProfile : Profile
             .ForMember(dest => dest.Genres, opt => opt.MapFrom(src => src.Genres.Select(g => g.Name)))
             .ForMember(dest => dest.MediaId, opt => opt.MapFrom(src => src.Id))
             .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Plot))
-            .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.Title.FirstOrDefault().Name));
+            .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.Titles.FirstOrDefault().Name));
         CreateMap<CoActor, CoActorResult>()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.CoActorImdbId))
             .ForMember(dest => dest.ActorName, opt => opt.MapFrom(src => src.CoActorName));
@@ -103,5 +103,11 @@ public class AutoMapperProfile : Profile
         // User Score
         CreateMap<UserScore, UserScoreResult>()
             .ForMember(dest => dest.Score, opt => opt.MapFrom(src => src.ScoreValue));
+
+        // Title
+        CreateMap<Title, TitleResult>()
+            .ForMember(dest => dest.Types, opt => opt.MapFrom(src => src.TitleTypes))
+            .ForMember(dest => dest.Attributes, opt => opt.MapFrom(src => src.TitleAttributes));
+        CreateMap<TitleCreateRequest, Title>();
     }
 }
