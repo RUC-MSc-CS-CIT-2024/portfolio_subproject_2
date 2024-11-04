@@ -7,4 +7,5 @@ public interface ICompletedRepository
     Task<IEnumerable<Completed>> GetUserCompletedItemsAsync(int userId, int page, int pageSize);
     Task<Completed> UpdateCompletedAsync(Completed completed);
     Task<bool> DeleteCompletedAsync(int completedId);
+    Task<int> GetTotalUserCompletedCountAsync(int userId);
 }
