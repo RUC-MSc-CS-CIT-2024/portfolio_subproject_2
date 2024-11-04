@@ -1,5 +1,3 @@
-using Microsoft.EntityFrameworkCore;
-
 namespace CitMovie.Data;
 
 public class TitleAttributeRepository : ITitleAttributeRepository
@@ -31,4 +29,10 @@ public class TitleAttributeRepository : ITitleAttributeRepository
     {
         return await _context.TitleAttributes.CountAsync();
     }
+
+    public Task<List<TitleAttribute>> GetMultipleByIdsAsync(IEnumerable<int> ids)
+        => _context.TitleAttributes
+            .AsNoTracking()
+            .Where(x => ids.Contains(x.TitleAttributeId))
+            .ToListAsync();
 }

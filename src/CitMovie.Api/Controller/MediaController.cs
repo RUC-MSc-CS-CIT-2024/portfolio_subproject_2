@@ -1,6 +1,3 @@
-using System.Text.Json;
-using CitMovie.Models.DomainObjects;
-
 namespace CitMovie.Api;
 
 [ApiController]
