@@ -7,11 +7,13 @@ namespace CitMovie.Api;
 public class PersonController : ControllerBase
 {
     private readonly IPersonManager _personManager;
+    private readonly IMediaManager _mediaManager;
     private readonly PagingHelper _pagingHelper;
 
-    public PersonController(IPersonManager personManager, PagingHelper pagingHelper)
+    public PersonController(IPersonManager personManager, IMediaManager mediaManager, PagingHelper pagingHelper)
     {
         _personManager = personManager;
+        _mediaManager = mediaManager;
         _pagingHelper = pagingHelper;
     }
 
@@ -70,6 +72,11 @@ public class PersonController : ControllerBase
             new { id }
         );
 
+        foreach (var m in media)
+        {
+            await AddMediaLinks(m);
+        }
+
         return Ok(result);
     }
 
@@ -125,6 +132,20 @@ public class PersonController : ControllerBase
             coActor.Links.Add(new Link
             {
                 Href = _pagingHelper.GetResourceLink(nameof(GetPersonById), new { id = personId }) ?? string.Empty,
+                Rel = "self",
+                Method = "GET"
+            });
+        }
+    }
+
+    private async Task AddMediaLinks(PersonResult.MediaResult media)
+    {
+        var m = _mediaManager.Get(media.MediaId);
+        if (media != null)
+        {
+            media.Links.Add(new Link
+            {
+                Href = _pagingHelper.GetResourceLink(nameof(MediaController.Get), new { id = media.MediaId }) ?? string.Empty,
                 Rel = "self",
                 Method = "GET"
             });

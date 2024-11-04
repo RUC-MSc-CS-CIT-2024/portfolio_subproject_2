@@ -26,6 +26,7 @@ public record MediaResult {
     public List<ScoreResult> Scores { get; set; } = [];
     public List<MediaProductionCompanyResult> ProductionCompanies { get; set; } = [];
     public List<CountryResult> ProductionCountries { get; set; } = [];
+    public List<Link> Links { get; set; } = new List<Link>();
 
     public class ScoreResult {
         public required string Source { get; set; }
