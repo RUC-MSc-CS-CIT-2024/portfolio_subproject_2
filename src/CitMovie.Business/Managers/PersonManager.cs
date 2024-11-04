@@ -47,7 +47,7 @@ public class PersonManager : IPersonManager
         return await _personRepository.GetMediaByPersonIdCountAsync(id);
     }
 
-    public async Task<string> GetActorNameByIdAsync(int id)
+    public async Task<string?> GetActorNameByIdAsync(int id)
     {
         return await _personRepository.GetActorNameByIdAsync(id);
     }

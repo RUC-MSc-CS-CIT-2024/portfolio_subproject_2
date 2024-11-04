@@ -1,5 +1,3 @@
-using Microsoft.EntityFrameworkCore;
-
 namespace CitMovie.Data;
 
 public class PersonRepository : IPersonRepository
@@ -38,7 +36,7 @@ public class PersonRepository : IPersonRepository
             .AsNoTracking()
             .Include(m => m.CrewMembers)
             .Include(m => m.CastMembers)
-            .Include(m => m.Title)
+            .Include(m => m.Titles)
             .Include(m => m.Genres)
             .Where(m => m.CrewMembers.Any(cm => cm.PersonId == id) || m.CastMembers.Any(cm => cm.PersonId == id))
             .OrderBy(m => m.Id);
@@ -55,12 +53,12 @@ public class PersonRepository : IPersonRepository
             .AsNoTracking()
             .Include(m => m.CrewMembers)
             .Include(m => m.CastMembers)
-            .Include(m => m.Title)
+            .Include(m => m.Titles)
             .Where(m => m.CrewMembers.Any(cm => cm.PersonId == id) || m.CastMembers.Any(cm => cm.PersonId == id))
             .CountAsync();
     }
 
-    public async Task<string> GetActorNameByIdAsync(int id)
+    public async Task<string?> GetActorNameByIdAsync(int id)
     {
         var coActor = await _dataContext.People
             .AsNoTracking()
