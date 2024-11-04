@@ -1,4 +1,15 @@
 namespace CitMovie.Models.DataTransferObjects;
 
-public record FollowResult(int FollowingId, int PersonId, DateTime FollowedSince);
-public record FollowCreateRequest(int UserId, int PersonId);
+public class FollowResult
+{
+    public int FollowingId { get; set; }
+    public int PersonId { get; set; }
+    public DateTime FollowedSince { get; set; }
+    public List<Link> Links { get; set; } = new List<Link>();
+};
+
+public class FollowCreateRequest
+{
+    public int UserId { get; set; }
+    public int PersonId { get; set; }
+}
