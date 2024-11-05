@@ -1,4 +1,5 @@
 using CitMovie.Models;
+using CitMovie.Models.DomainObjects;
 
 namespace CitMovie.Api;
 
@@ -18,37 +19,32 @@ public class MediaController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> Get([FromQuery] MediaQueryParameter queryParameter)
+    public IActionResult Get([FromQuery] MediaQueryParameter queryParameter)
     {
+        IEnumerable<MediaBasicResult> mediaResult;
         if (queryParameter.QueryType == MediaQueryType.Basic)
-        {
-            var mediaList = _mediaManager.GetAllMedia(queryParameter.Page);
-            foreach (var media in mediaList)
-            {
-                await AddMediaBasicLinks(media, queryParameter.Page);
-            }
-            return Ok(mediaList);
-        }
+            mediaResult = _mediaManager.GetAllMedia(queryParameter.Page);
+        else
+            mediaResult = _mediaManager.Search(queryParameter, GetUserId());
 
-        var searchResults = _mediaManager.Search(queryParameter, GetUserId());
-        foreach (var media in searchResults)
-        {
-            await AddMediaBasicLinks(media, queryParameter.Page);
-        }
+        foreach (var media in mediaResult)
+            media.Links = GenerateLinks(media.Id);
 
-        return Ok(searchResults);
+        return Ok(mediaResult);
     }
 
     [HttpGet("{id}", Name = nameof(Get))]
-    public async Task<IActionResult> Get(int id)
-    {
-        MediaResult? m = _mediaManager.Get(id);
-        if (m is null)
+    public IActionResult Get(int id) {
+        try {
+            MediaResult m = _mediaManager.Get(id);
+            m.Links = GenerateLinks(id);
+            return Ok(m);
+        } catch (KeyNotFoundException) {
             return NotFound();
-
-        await AddMediaLinks(m, new PageQueryParameter { Number = 1, Count = 10 });
-
-        return Ok(m);
+        } catch (Exception e) {
+            _logger.LogError(e, "Unexpected error occured");
+            return StatusCode(StatusCodes.Status500InternalServerError);
+        }
     }
 
     [HttpGet("{id}/similar_media", Name = nameof(GetSimilar))]
@@ -56,11 +52,9 @@ public class MediaController : ControllerBase
     {
         try
         {
-            var similarMedia = _mediaManager.GetSimilar(id, pageQuery);
+            IEnumerable<MediaBasicResult> similarMedia = _mediaManager.GetSimilar(id, pageQuery);
             foreach (var media in similarMedia)
-            {
-                await AddMediaBasicLinks(media, pageQuery);
-            }
+                media.Links = GenerateLinks(media.Id);
 
             var totalItems = await _mediaManager.GetTotalSimilarMediaCountAsync(id);
             var result = _pagingHelper.CreatePaging(nameof(GetSimilar), pageQuery.Number, pageQuery.Count, totalItems, similarMedia, new { id });
@@ -83,13 +77,11 @@ public class MediaController : ControllerBase
     {
         try
         {
-            var relatedMedia = _mediaManager.GetRelated(id, pageQuery);
+            IEnumerable<MediaBasicResult> relatedMedia = _mediaManager.GetRelated(id, pageQuery);
             foreach (var media in relatedMedia)
-            {
-                await AddMediaBasicLinks(media, pageQuery);
-            }
+                media.Links = GenerateLinks(media.Id);
 
-            var totalItems = await _mediaManager.GetTotalRelatedMediaCountAsync(id);
+            int totalItems = await _mediaManager.GetTotalRelatedMediaCountAsync(id);
             var result = _pagingHelper.CreatePaging(nameof(GetRelated), pageQuery.Number, pageQuery.Count, totalItems, relatedMedia, new { id });
 
             return Ok(result);
@@ -106,9 +98,28 @@ public class MediaController : ControllerBase
     }
 
     [HttpGet("{id}/crew")]
-    public IActionResult GetCrew(int id)
-    {
-        throw new NotImplementedException();
+    public async Task<ActionResult> GetCrew(int id, [FromQuery] PageQueryParameter pageQuery) {
+        
+        try {
+            return Ok(await _mediaManager.GetCrewAsync(id, pageQuery));
+        } catch (KeyNotFoundException) {
+            return NotFound();
+        } catch (Exception e) {
+            _logger.LogError(e, "Unexpected error occured");
+            return StatusCode(StatusCodes.Status500InternalServerError);
+        }
+    }
+
+    [HttpGet("{id}/cast")]
+    public async Task<IActionResult> GetCast(int id, [FromQuery] PageQueryParameter pageQuery) {
+        try {
+            return Ok(await _mediaManager.GetCastAsync(id, pageQuery));
+        } catch (KeyNotFoundException) {
+            return NotFound();
+        } catch (Exception e) {
+            _logger.LogError(e, "Unexpected error occured");
+            return StatusCode(StatusCodes.Status500InternalServerError);
+        }
     }
 
     private int? GetUserId()
@@ -120,67 +131,22 @@ public class MediaController : ControllerBase
         return userId;
     }
 
-    private async Task AddMediaBasicLinks(MediaBasicResult media, PageQueryParameter pageQuery)
-    {
-        media.Links.Add(new Link
-        {
-            Href = Url.Link(nameof(Get), new { id = media.Id }) ?? string.Empty,
-            Rel = "self",
-            Method = "GET"
-        });
-
-        var similarMedia = _mediaManager.GetSimilar(media.Id, pageQuery);
-        if (similarMedia != null)
-        {
-            media.Links.Add(new Link
-            {
-                Href = Url.Link(nameof(GetSimilar), new { id = media.Id, page = pageQuery.Number, pageSize = pageQuery.Count }) ?? string.Empty,
+    private List<Link> GenerateLinks(int mediaId)
+        => [
+            new Link {
+                Href = Url.Link(nameof(Get), new { id = mediaId }) ?? string.Empty,
+                Rel = "self",
+                Method = "GET"
+            },
+            new Link {
+                Href = Url.Link(nameof(GetSimilar), new { id = mediaId }) ?? string.Empty,
                 Rel = "similar_media",
                 Method = "GET"
-            });
-        }
-
-        var relatedMedia = _mediaManager.GetRelated(media.Id, pageQuery);
-        if (relatedMedia != null)
-        {
-            media.Links.Add(new Link
-            {
-                Href = Url.Link(nameof(GetRelated), new { id = media.Id, page = pageQuery.Number, pageSize = pageQuery.Count }) ?? string.Empty,
+            },
+            new Link {
+                Href = Url.Link(nameof(GetRelated), new { id = mediaId }) ?? string.Empty,
                 Rel = "related_media",
                 Method = "GET"
-            });
-        }
-    }
-
-    private async Task AddMediaLinks(MediaResult media, PageQueryParameter pageQuery)
-    {
-        media.Links.Add(new Link
-        {
-            Href = Url.Link(nameof(Get), new { id = media.Id }) ?? string.Empty,
-            Rel = "self",
-            Method = "GET"
-        });
-
-        var similarMedia = _mediaManager.GetSimilar(media.Id, pageQuery);
-        if (similarMedia != null)
-        {
-            media.Links.Add(new Link
-            {
-                Href = Url.Link(nameof(GetSimilar), new { id = media.Id, page = pageQuery.Number, pageSize = pageQuery.Count }) ?? string.Empty,
-                Rel = "similar_media",
-                Method = "GET"
-            });
-        }
-
-        var relatedMedia = _mediaManager.GetRelated(media.Id, pageQuery);
-        if (relatedMedia != null)
-        {
-            media.Links.Add(new Link
-            {
-                Href = Url.Link(nameof(GetRelated), new { id = media.Id, page = pageQuery.Number, pageSize = pageQuery.Count }) ?? string.Empty,
-                Rel = "related_media",
-                Method = "GET"
-            });
-        }
-    }
+            }
+        ];
 }
