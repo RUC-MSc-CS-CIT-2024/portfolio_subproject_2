@@ -14,8 +14,7 @@ public class PersonRepository : IPersonRepository
         return await _dataContext.People
             .AsNoTracking()
             .OrderBy(p => p.PersonId)
-            .Skip(page * pageSize)
-            .Take(pageSize)
+            .Pagination(page, pageSize)
             .ToListAsync();
     }
     public async Task<int> GetTotalPersonsCountAsync()
@@ -42,8 +41,7 @@ public class PersonRepository : IPersonRepository
             .OrderBy(m => m.Id);
 
         return await mediaQuery
-            .Skip(page * pageSize)
-            .Take(pageSize)
+            .Pagination(page, pageSize)
             .ToListAsync();
     }
 
@@ -82,8 +80,7 @@ public class PersonRepository : IPersonRepository
     {
         var coActors = await _dataContext.GetFrequentCoActors(actorName)
             .AsNoTracking()
-            .Skip(page * pageSize)
-            .Take(pageSize)
+            .Pagination(page, pageSize)
             .ToListAsync();
 
         return coActors;

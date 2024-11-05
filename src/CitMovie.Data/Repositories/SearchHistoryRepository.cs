@@ -13,8 +13,7 @@ public class SearchHistoryRepository : ISearchHistoryRepository
         return await _context.SearchHistories
             .AsNoTracking()
             .Where(sh => sh.UserId == userId)
-            .Skip(page * pageSize)
-            .Take(pageSize)
+            .Pagination(page, pageSize)
             .ToListAsync();
     }
 

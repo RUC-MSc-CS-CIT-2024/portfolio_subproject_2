@@ -12,8 +12,7 @@ public class TitleTypeRepository : ITitleTypeRepository
     public async Task<List<TitleType>> GetTitleTypesAsync(int page, int pageSize)
     {
         return await _context.TitleTypes
-            .Skip(page * pageSize)
-            .Take(pageSize)
+            .Pagination(page, pageSize)
             .ToListAsync();
     }
 

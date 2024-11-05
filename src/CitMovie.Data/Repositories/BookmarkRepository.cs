@@ -53,14 +53,13 @@ public class BookmarkRepository : IBookmarkRepository
         await _context.Bookmarks
             .AsNoTracking()
             .Where(b => b.BookmarkId == bookmarkId)
-            .FirstOrDefaultAsync();
+            .FirstAsync();
 
     public async Task<IEnumerable<Bookmark>> GetUserBookmarksAsync(int userId, int page, int pageSize) =>
         await _context.Bookmarks
             .AsNoTracking()
             .Where(b => b.UserId == userId)
-            .Skip(page * pageSize)
-            .Take(pageSize)
+            .Pagination(page, pageSize)
             .ToListAsync();
 
     public async Task<int> GetTotalUserBookmarksCountAsync(int userId) =>

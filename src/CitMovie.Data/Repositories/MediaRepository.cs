@@ -15,17 +15,7 @@ public class MediaRepository : IMediaRepository {
         => GetMultipleWithInclude()
             .OrderBy(x => x.Id)
             .ThenBy(x => x.PrimaryInformation.Title.Name)
-            .Skip(pageSize * (page - 1))
-            .Take(pageSize)
-            .ToList();
-
-    public IEnumerable<Media> GetAll(Func<Media, bool> wherePredicate, int page, int pageSize)
-        => GetMultipleWithInclude()
-            .OrderBy(x => x.Id)
-            .ThenBy(x => x.PrimaryInformation.Title.Name)
-            .Where(wherePredicate)
-            .Skip(pageSize * (page - 1))
-            .Take(pageSize)
+            .Pagination(page, pageSize)
             .ToList();
 
     public Media? GetDetailed(int id)
@@ -55,8 +45,7 @@ public class MediaRepository : IMediaRepository {
         return withIncludes
             .OrderBy(x => x.Id)
             .ThenBy(x => x.PrimaryInformation.Title.Name)
-            .Skip(pageSize * (page - 1))
-            .Take(pageSize)
+            .Pagination(page, pageSize)
             .ToList();
     }
 
@@ -94,8 +83,7 @@ public class MediaRepository : IMediaRepository {
         IQueryable<int> ids = query
             .OrderBy(x => x.Id)
             .ThenBy(x => x.Title)
-            .Skip(pageSize * (page - 1))
-            .Take(pageSize)
+            .Pagination(page, pageSize)
             .Select(x => x.Id)
             .Distinct();
 

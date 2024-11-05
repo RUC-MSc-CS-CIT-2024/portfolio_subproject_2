@@ -20,9 +20,9 @@ public class SearchHistoryController : ControllerBase
     }
 
     [HttpGet(Name = nameof(GetUserSearchHistories))]
-    public async Task<IActionResult> GetUserSearchHistories(int userId, int page = 0, int pageSize = 10)
+    public async Task<IActionResult> GetUserSearchHistories(int userId, [FromQuery] PageQueryParameter page)
     {
-        var searchHistories = await _searchHistoryManager.GetUserSearchHistoriesAsync(userId, page, pageSize);
+        var searchHistories = await _searchHistoryManager.GetUserSearchHistoriesAsync(userId, page.Number, page.Count);
         var total_items = await _searchHistoryManager.GetUsersTotalSearchHistoriesCountAsync(userId);
 
         foreach (var searchHistory in searchHistories)
@@ -30,7 +30,7 @@ public class SearchHistoryController : ControllerBase
             await AddSearchHistoryUserLink(searchHistory);
         }
 
-        var result = _pagingHelper.CreatePaging(nameof(GetUserSearchHistories), page, pageSize, total_items, searchHistories, new { userId });
+        var result = _pagingHelper.CreatePaging(nameof(GetUserSearchHistories), page.Number, page.Count, total_items, searchHistories, new { userId });
 
         return Ok(result);
     }

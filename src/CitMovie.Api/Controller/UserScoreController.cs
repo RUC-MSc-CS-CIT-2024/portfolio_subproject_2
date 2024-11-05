@@ -22,21 +22,18 @@ public class UserScoreController : ControllerBase
     [HttpGet(Name = nameof(GetUserScores))]
     public async Task<ActionResult<IEnumerable<UserScoreResult>>> GetUserScores(
         int userId,
+        [FromQuery] PageQueryParameter page,
         [FromQuery] string mediaType = null,
         [FromQuery] int? mediaId = null,
-        [FromQuery] string mediaName = null,
-        [FromQuery] int page = 0,
-        [FromQuery] int pageSize = 10)
+        [FromQuery] string mediaName = null)
     {
         var totalCount = await _userScoreManager.GetTotalUserScoresCountAsync(userId);
-        var scores = await _userScoreManager.GetScoresByUserIdAsync(userId, page, pageSize, mediaType, mediaId, mediaName);
-
-        var result = _pagingHelper.CreatePaging(nameof(GetUserScores), page, pageSize, totalCount, scores, new { userId, mediaType, mediaId, mediaName });
+        var scores = await _userScoreManager.GetScoresByUserIdAsync(userId, page.Number, page.Count, mediaType, mediaId, mediaName);
 
         foreach (var score in scores)
-        {
-            await AddUserScoreLinks(score);
-        }
+            score.Links = AddUserScoreLinks(score);
+
+        var result = _pagingHelper.CreatePaging(nameof(GetUserScores), page.Number, page.Count, totalCount, scores, new { userId, mediaType, mediaId, mediaName });
 
         return Ok(result);
     }
@@ -49,35 +46,21 @@ public class UserScoreController : ControllerBase
             return BadRequest("Invalid request data.");
         }
 
-        await _userScoreManager.CreateUserScoreAsync(userId, userScoreCreateRequest.ImdbId, userScoreCreateRequest.Score, userScoreCreateRequest.ReviewText);
+        await _userScoreManager.CreateUserScoreAsync(userId, userScoreCreateRequest);
         return CreatedAtRoute(nameof(GetUserScores), new { userId }, null);
     }
 
 
-    private async Task AddUserScoreLinks(UserScoreResult userScore)
-    {
-        var user = await _userManager.GetUserAsync(userScore.UserId);
-        if (user != null)
-        {
-            userScore.Links.Add(new Link
-            {
+    private List<Link> AddUserScoreLinks(UserScoreResult userScore)
+        => [ new Link {
                 Href = _pagingHelper.GetResourceLink(nameof(UserController.GetUser), new { userId = userScore.UserId }) ?? string.Empty,
                 Rel = "user",
                 Method = "GET"
-            });
-        }
-
-        var media = _mediaManager.Get(userScore.MediaId);
-        if (media != null)
-        {
-            userScore.Links.Add(new Link
-            {
+            }, 
+            new Link {
                 Href = _pagingHelper.GetResourceLink(nameof(MediaController.Get), new { id = userScore.MediaId }) ?? string.Empty,
                 Rel = "media",
                 Method = "GET"
-            });
-        }
-    }
-
-
+            }
+        ];
 }

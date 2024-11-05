@@ -15,12 +15,12 @@ public class TitleAttributeController : ControllerBase
     }
     
     [HttpGet(Name = nameof(GetTitleAttributesAsync))]
-    public async Task<IActionResult> GetTitleAttributesAsync(int page = 0 , int pageSize = 10)
+    public async Task<IActionResult> GetTitleAttributesAsync([FromQuery] PageQueryParameter page)
     {
-        var list = await _titleAttributeManager.GetTitleAttributesAsync(page, pageSize);
+        var list = await _titleAttributeManager.GetTitleAttributesAsync(page.Number, page.Count);
         var totalItems = await _titleAttributeManager.GetTotalTitleAttributesCountAsync();
         
-        var result = _pagingHelper.CreatePaging(nameof(GetTitleAttributesAsync), page, pageSize, totalItems, list);
+        var result = _pagingHelper.CreatePaging(nameof(GetTitleAttributesAsync), page.Number, page.Count, totalItems, list);
         
         return Ok(result);
     }

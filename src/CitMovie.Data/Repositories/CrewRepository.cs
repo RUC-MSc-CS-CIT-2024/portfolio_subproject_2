@@ -1,4 +1,3 @@
-
 namespace CitMovie.Data;
 
 public class CrewRepository : ICrewRepository
@@ -19,8 +18,7 @@ public class CrewRepository : ICrewRepository
             .Include(x => x.JobCategory)
             .OrderBy(x => x.PersonId)
             .ThenBy(x => x.Person!.Name)
-            .Skip((page - 1) * pageCount)
-            .Take(pageCount)
+            .Pagination(page, pageCount)
             .ToListAsync();
     
     public Task<List<CastMember>> GetCastAsync(int mediaId, int page, int pageCount) 
@@ -32,8 +30,7 @@ public class CrewRepository : ICrewRepository
             .Include(x => x.Person)
             .OrderBy(x => x.PersonId)
             .ThenBy(x => x.Person!.Name)
-            .Skip((page - 1) * pageCount)
-            .Take(pageCount)
+            .Pagination(page, pageCount)
             .ToListAsync();
         
 }

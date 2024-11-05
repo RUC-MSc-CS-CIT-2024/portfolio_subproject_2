@@ -18,11 +18,11 @@ public class ReleaseController : ControllerBase
     }
 
     [HttpGet(Name = nameof(GetReleasesOfMedia))]
-    public async Task<IActionResult> GetReleasesOfMedia(int mediaId, int page = 0, int pageSize = 10)
+    public async Task<IActionResult> GetReleasesOfMedia(int mediaId, [FromQuery] PageQueryParameter page)
     {
         try
         {
-            var releases = await _releaseManager.GetReleasesOfMediaAsync(mediaId, page, pageSize);
+            var releases = await _releaseManager.GetReleasesOfMediaAsync(mediaId, page.Number, page.Count);
             var totalItems = await _releaseManager.GetReleasesCountAsync(mediaId);
 
             foreach (var release in releases)
@@ -30,7 +30,7 @@ public class ReleaseController : ControllerBase
                 AddReleaseLinks(release);
             }
 
-            var result = _pageHelper.CreatePaging(nameof(GetReleasesOfMedia), page, pageSize, totalItems, releases, new { mediaId });
+            var result = _pageHelper.CreatePaging(nameof(GetReleasesOfMedia), page.Number, page.Count, totalItems, releases, new { mediaId });
 
             return Ok(result);
         }

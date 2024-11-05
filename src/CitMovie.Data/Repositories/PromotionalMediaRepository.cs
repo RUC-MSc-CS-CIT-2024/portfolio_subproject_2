@@ -15,8 +15,7 @@ public class PromotionalMediaRepository : IPromotionalMediaRepository
         return await _context.PromotionalMedia
             .Include(pm => pm.Release)
             .Where(pm => pm.Release.MediaId == mediaId)
-            .Skip(page * pageSize)
-            .Take(pageSize)
+            .Pagination(page, pageSize)
             .ToListAsync();
     }
 
@@ -27,8 +26,7 @@ public class PromotionalMediaRepository : IPromotionalMediaRepository
             .Include(pm => pm.Release)
             .Where(pm => pm.ReleaseId == releaseId)
             .Where(pm => pm.Release.MediaId == mediaId)
-            .Skip(pageSize * page)
-            .Take(pageSize)
+            .Pagination(page, pageSize)
             .ToListAsync();
     }
 

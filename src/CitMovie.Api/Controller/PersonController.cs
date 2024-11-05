@@ -17,17 +17,14 @@ public class PersonController : ControllerBase
     }
 
     [HttpGet(Name = nameof(GetPersons))]
-    public async Task<ActionResult<IEnumerable<PersonResult>>> GetPersons(
-        [FromQuery] int page = 0,
-        [FromQuery] int pageSize = 10)
+    public async Task<ActionResult<IEnumerable<PersonResult>>> GetPersons([FromQuery] PageQueryParameter page)
     {
-        var persons = await _personManager.GetPersonsAsync(page, pageSize);
+        var persons = await _personManager.GetPersonsAsync(page.Number, page.Count);
         var totalCount = await _personManager.GetTotalPersonsCountAsync();
 
         var result = _pagingHelper.CreatePaging(
             nameof(GetPersons),
-            page,
-            pageSize,
+            page.Number, page.Count,
             totalCount,
             persons
         );
@@ -55,17 +52,14 @@ public class PersonController : ControllerBase
     }
 
     [HttpGet("{id}/media", Name = nameof(GetMediaByPersonId))]
-    public async Task<ActionResult<IEnumerable<MediaBasicResult>>> GetMediaByPersonId(int id,
-          [FromQuery] int page = 0,
-          [FromQuery] int pageSize = 10)
+    public async Task<ActionResult<IEnumerable<MediaBasicResult>>> GetMediaByPersonId(int id, [FromQuery] PageQueryParameter page)
     {
-        var media = await _personManager.GetMediaByPersonIdAsync(id, page, pageSize);
+        var media = await _personManager.GetMediaByPersonIdAsync(id, page.Number, page.Count);
         var totalCount = await _personManager.GetMediaByPersonIdCountAsync(id);
 
         var result = _pagingHelper.CreatePaging(
             nameof(GetMediaByPersonId),
-            page,
-            pageSize,
+            page.Number, page.Count,
             totalCount,
             media,
             new { id }
@@ -80,13 +74,10 @@ public class PersonController : ControllerBase
     }
 
     [HttpGet("{id}/coactors", Name = nameof(GetFrequentCoActors))]
-    public async Task<ActionResult<IEnumerable<CoActorResult>>> GetFrequentCoActors(
-      int id,
-      [FromQuery] int page = 0,
-      [FromQuery] int pageSize = 10)
+    public async Task<ActionResult<IEnumerable<CoActorResult>>> GetFrequentCoActors(int id, [FromQuery] PageQueryParameter page)
     {
         var actorName = await _personManager.GetActorNameByIdAsync(id);
-        var coActor = await _personManager.GetFrequentCoActorsAsync(actorName, page, pageSize);
+        var coActor = await _personManager.GetFrequentCoActorsAsync(actorName, page.Number, page.Count);
         var totalCount = await _personManager.GetFrequentCoActorsCountAsync(id);
 
         foreach (var ca in coActor)
@@ -96,8 +87,7 @@ public class PersonController : ControllerBase
 
         var result = _pagingHelper.CreatePaging(
             nameof(GetFrequentCoActors),
-            page,
-            pageSize,
+            page.Number, page.Count,
             totalCount,
             coActor,
             new { id }

@@ -1,7 +1,7 @@
 namespace CitMovie.Api;
 
 [ApiController]
-[Route("api/user")]
+[Route("api/users")]
 [Authorize(Policy = "user_scope")]
 [Tags("User")]
 public class UserController : ControllerBase

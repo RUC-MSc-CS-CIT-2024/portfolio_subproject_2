@@ -17,11 +17,11 @@ public class PromotionalMediaController : ControllerBase
     }
 
     [HttpGet("/api/media/{mediaId}/promotional_media", Name = nameof(GetPromotionalMediaofMedia))]
-    public async Task<IActionResult> GetPromotionalMediaofMedia(int mediaId, int page = 0, int pageSize = 10)
+    public async Task<IActionResult> GetPromotionalMediaofMedia(int mediaId, [FromQuery] PageQueryParameter page)
     {
         try
         {
-            var promotionalMedia = await _manager.GetPromotionalMediaOfMediaAsync(mediaId, page, pageSize);
+            var promotionalMedia = await _manager.GetPromotionalMediaOfMediaAsync(mediaId, page.Number, page.Count);
             var totalItems = await _manager.GetPromotionalMediaCountAsync(mediaId, "media");
 
             var updatedItems = promotionalMedia.Select(item =>
@@ -38,8 +38,7 @@ public class PromotionalMediaController : ControllerBase
 
             var result = _pagingHelper.CreatePaging(
                 nameof(GetPromotionalMediaofMedia),
-                page,
-                pageSize,
+                page.Number, page.Count,
                 totalItems,
                 updatedItems,
                 new { mediaId }
@@ -54,11 +53,11 @@ public class PromotionalMediaController : ControllerBase
     }
 
     [HttpGet(Name = nameof(GetPromotionalMediaOfRelease))]
-    public async Task<IActionResult> GetPromotionalMediaOfRelease(int mediaId, int releaseId, int page = 0, int pageSize = 10)
+    public async Task<IActionResult> GetPromotionalMediaOfRelease(int mediaId, int releaseId, [FromQuery] PageQueryParameter page)
     {
         try
         {
-            var promotionalMedia = await _manager.GetPromotionalMediaOfReleaseAsync(mediaId, releaseId, page, pageSize);
+            var promotionalMedia = await _manager.GetPromotionalMediaOfReleaseAsync(mediaId, releaseId, page.Number, page.Count);
             var totalItems = await _manager.GetPromotionalMediaCountAsync(releaseId, "release");
 
             var updatedItems = promotionalMedia.Select(item =>
@@ -75,8 +74,7 @@ public class PromotionalMediaController : ControllerBase
 
             var result = _pagingHelper.CreatePaging(
                 nameof(GetPromotionalMediaOfRelease),
-                page,
-                pageSize,
+                page.Number, page.Count,
                 totalItems,
                 updatedItems,
                 new { mediaId, releaseId }

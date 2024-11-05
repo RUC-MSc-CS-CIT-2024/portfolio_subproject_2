@@ -15,12 +15,12 @@ public class JobCategoryController : ControllerBase
     }
 
     [HttpGet(Name = nameof(GetAllJobCategories))]
-    public async Task<ActionResult<IEnumerable<JobCategoryResult>>> GetAllJobCategories(int page = 0, int pageSize = 10)
+    public async Task<ActionResult<IEnumerable<JobCategoryResult>>> GetAllJobCategories([FromQuery] PageQueryParameter page)
     {
         var totalItems = await _jobCategoryManager.GetTotalJobCategoriesCountAsync();
-        var jobCategories = await _jobCategoryManager.GetAllJobCategoriesAsync(page, pageSize);
+        var jobCategories = await _jobCategoryManager.GetAllJobCategoriesAsync(page.Number, page.Count);
 
-        var result = _pagingHelper.CreatePaging(nameof(GetAllJobCategories), page, pageSize, totalItems, jobCategories);
+        var result = _pagingHelper.CreatePaging(nameof(GetAllJobCategories), page.Number, page.Count, totalItems, jobCategories);
 
         return Ok(result);
     }

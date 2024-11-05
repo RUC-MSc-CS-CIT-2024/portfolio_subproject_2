@@ -1,5 +1,3 @@
-using System.Security.Claims;
-
 namespace CitMovie.Api;
 
 [ApiController]
@@ -49,15 +47,15 @@ public class BookmarkController : ControllerBase
     }
 
     [HttpGet(Name = nameof(GetUserBookmarks))]
-    public async Task<IActionResult> GetUserBookmarks(int userId, int page = 0, int pageSize = 10)
+    public async Task<IActionResult> GetUserBookmarks(int userId, [FromQuery] PageQueryParameter page)
     {
-        var bookmarks = await _bookmarkManager.GetUserBookmarksAsync(userId, page, pageSize);
+        var bookmarks = await _bookmarkManager.GetUserBookmarksAsync(userId, page.Number, page.Count);
         var totalItems = await _bookmarkManager.GetTotalUserBookmarksCountAsync(userId);
 
         foreach (var bookmark in bookmarks)
             bookmark.Links = AddBookmarkLinks(bookmark);
 
-        var result = _pagingHelper.CreatePaging(nameof(GetUserBookmarks), page, pageSize, totalItems, bookmarks, new { userId });
+        var result = _pagingHelper.CreatePaging(nameof(GetUserBookmarks), page.Number, page.Count, totalItems, bookmarks, new { userId });
 
         return Ok(result);
     }

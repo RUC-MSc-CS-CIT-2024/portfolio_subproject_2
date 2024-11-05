@@ -12,8 +12,7 @@ public class GenreRepository : IGenreRepository
     {
         return await _context.Genres
             .AsNoTracking()
-            .Skip(page * pageSize)
-            .Take(pageSize)
+            .Pagination(page, pageSize)
             .ToListAsync();
     }
 

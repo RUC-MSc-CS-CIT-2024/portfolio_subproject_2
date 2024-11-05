@@ -1,5 +1,3 @@
-using System.Security.Claims;
-
 namespace CitMovie.Api.Controllers;
 
 [ApiController]
@@ -21,14 +19,11 @@ public class CompletedController : ControllerBase
         _pagingHelper = pagingHelper;
     }
 
-    private int GetUserId() =>
-        int.Parse(User.FindFirstValue("user_id") ?? throw new UnauthorizedAccessException("User ID not found"));
-
     [HttpPost("move")]
     public async Task<IActionResult> MoveBookmarkToCompleted(int userId, [FromBody] CompletedCreateRequest createCompletedDto)
     {
-        if (userId != GetUserId())
-            return Forbid();
+        if (createCompletedDto == null)
+            return BadRequest("Completed data is required.");
 
         createCompletedDto.UserId = userId;
         var completedItem = await _completedManager.MoveBookmarkToCompletedAsync(createCompletedDto);
@@ -39,9 +34,6 @@ public class CompletedController : ControllerBase
     [HttpGet("{id}", Name = nameof(GetCompleted))]
     public async Task<IActionResult> GetCompleted(int userId, int id)
     {
-        if (userId != GetUserId())
-            return Forbid();
-
         var completed = await _completedManager.GetCompletedAsync(id);
         if (completed == null)
             return NotFound();
@@ -49,26 +41,21 @@ public class CompletedController : ControllerBase
         if (completed.UserId != userId)
             return Forbid();
 
-        await AddCompletedLinks(completed);
+        completed.Links = AddCompletedLinks(completed);
 
         return Ok(completed);
     }
 
     [HttpGet(Name = nameof(GetUserCompleted))]
-    public async Task<IActionResult> GetUserCompleted(int userId, int page = 0, int pageSize = 10)
+    public async Task<IActionResult> GetUserCompleted(int userId, [FromQuery] PageQueryParameter page)
     {
-        if (userId != GetUserId())
-            return Forbid();
-
-        var completedItems = await _completedManager.GetUserCompletedItemsAsync(userId, page, pageSize);
+        var completedItems = await _completedManager.GetUserCompletedItemsAsync(userId, page.Number, page.Count);
         var totalItems = await _completedManager.GetTotalUserCompletedCountAsync(userId);
 
         foreach (var completed in completedItems)
-        {
-            await AddCompletedLinks(completed);
-        }
+            completed.Links = AddCompletedLinks(completed);
 
-        var result = _pagingHelper.CreatePaging(nameof(GetUserCompleted), page, pageSize, totalItems, completedItems, new { userId });
+        var result = _pagingHelper.CreatePaging(nameof(GetUserCompleted), page.Number, page.Count, totalItems, completedItems, new { userId });
 
         return Ok(result);
     }
@@ -76,9 +63,6 @@ public class CompletedController : ControllerBase
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateCompleted(int userId, int id, [FromBody] UpdateCompletedDto updateCompletedDto)
     {
-        if (userId != GetUserId())
-            return Forbid();
-
         if (updateCompletedDto == null)
             return BadRequest("Update data is required.");
 
@@ -89,42 +73,32 @@ public class CompletedController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteCompleted(int userId, int id)
     {
-        if (userId != GetUserId())
+        var completed = await _completedManager.GetCompletedAsync(id);
+        if (completed == null)
+            return NotFound();
+
+        if (completed.UserId != userId)
             return Forbid();
 
         var deleted = await _completedManager.DeleteCompletedAsync(id);
         return deleted ? NoContent() : NotFound();
     }
 
-    private async Task AddCompletedLinks(CompletedResult completed)
-    {
-        completed.Links.Add(new Link
-        {
-            Href = _pagingHelper.GetResourceLink(nameof(GetCompleted), new { userId = completed.UserId, id = completed.CompletedId }) ?? string.Empty,
-            Rel = "self",
-            Method = "GET"
-        });
-
-        var user = await _userManager.GetUserAsync(completed.UserId);
-        if (user != null)
-        {
-            completed.Links.Add(new Link
-            {
+    private List<Link> AddCompletedLinks(CompletedResult completed)
+        => [ new Link {
+                Href = _pagingHelper.GetResourceLink(nameof(GetCompleted), new { userId = completed.UserId, id = completed.CompletedId }) ?? string.Empty,
+                Rel = "self",
+                Method = "GET"
+            }, 
+            new Link {
                 Href = _pagingHelper.GetResourceLink(nameof(UserController.GetUser), new { userId = completed.UserId }) ?? string.Empty,
                 Rel = "user",
                 Method = "GET"
-            });
-        }
-
-        var media = _mediaManager.Get(completed.MediaId);
-        if (media != null)
-        {
-            completed.Links.Add(new Link
-            {
+            },
+            new Link {
                 Href = _pagingHelper.GetResourceLink(nameof(MediaController.Get), new { id = completed.MediaId }) ?? string.Empty,
                 Rel = "media",
                 Method = "GET"
-            });
-        }
-    }
+            }
+        ];
 }

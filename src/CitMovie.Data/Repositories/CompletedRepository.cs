@@ -48,8 +48,7 @@ public async Task<Completed> MoveBookmarkToCompletedAsync(int userId, int mediaI
         await _context.Completed
             .Where(c => c.UserId == userId)
             .AsNoTracking()
-            .Skip(page * pageSize)
-            .Take(pageSize)
+            .Pagination(page, pageSize)
             .ToListAsync();
 
     public async Task<Completed> UpdateCompletedAsync(Completed completed)

@@ -16,8 +16,7 @@ public class ReleaseRepository : IReleaseRepository
             .Include(x => x.Country)
             .Include(x => x.SpokenLanguages)
             .Where(r => r.MediaId == mediaId)
-            .Skip(page * pageSize)
-            .Take(pageSize)
+            .Pagination(page, pageSize)
             .ToListAsync();
     }
 
