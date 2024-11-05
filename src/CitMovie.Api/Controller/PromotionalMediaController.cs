@@ -92,7 +92,6 @@ public class PromotionalMediaController : ControllerBase
     }
 
     [HttpGet("{id}", Name = nameof(GetPromotionalMediaById))]
-    [HttpGet("/promotional_media/{id}")]
     public async Task<IActionResult> GetPromotionalMediaById(int id, int? mediaId, int? releaseId)
     {
 
