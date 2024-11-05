@@ -8,6 +8,7 @@ public class MediaBasicResult {
     public required string Title { get; set; }
     public DateTime? ReleaseDate { get; set; }
     public string? PosterUri { get; set; }
+    public List<Link> Links { get; set; } = new List<Link>();
 }
 
 public record MediaResult {
