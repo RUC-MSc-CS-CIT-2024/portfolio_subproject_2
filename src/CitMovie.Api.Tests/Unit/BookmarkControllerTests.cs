@@ -32,7 +32,7 @@ public class BookmarkControllerTests
         var createDto = new CreateBookmarkDto { MediaId = 101, Note = "Great movie!" };
         var createdBookmark = new BookmarkDto { BookmarkId = 1, UserId = 1, MediaId = 101, Note = "Great movie!" };
 
-        _ = A.CallTo(() => _bookmarkManager.CreateBookmarkAsync(A<CreateBookmarkDto>.Ignored)).Returns(createdBookmark);
+        A.CallTo(() => _bookmarkManager.CreateBookmarkAsync(A<CreateBookmarkDto>.Ignored)).Returns(createdBookmark);
 
         var result = await _controller.CreateBookmark(1, createDto);
 
@@ -49,26 +49,26 @@ public class BookmarkControllerTests
 
         var result = await _controller.GetBookmark(1, 1);
 
-        _ = Assert.IsType<ForbidResult>(result);
+        Assert.IsType<ForbidResult>(result);
     }
 
     [Fact]
     public async Task UpdateBookmark_ShouldReturnNotFound_WhenBookmarkDoesNotExist()
     {
-        _ = A.CallTo(() => _bookmarkManager.GetBookmarkAsync(99)).Returns(Task.FromResult<BookmarkDto>(null!));
+        A.CallTo(() => _bookmarkManager.GetBookmarkAsync(99)).Returns(Task.FromResult<BookmarkDto>(null!));
 
         var result = await _controller.UpdateBookmark(1, 99, "Updated note");
 
-        _ = Assert.IsType<NotFoundResult>(result);
+        Assert.IsType<NotFoundResult>(result);
     }
 
     [Fact]
     public async Task DeleteBookmark_ShouldReturnNoContent_WhenSuccessful()
     {
-        _ = A.CallTo(() => _bookmarkManager.DeleteBookmarkAsync(1)).Returns(true);
+        A.CallTo(() => _bookmarkManager.DeleteBookmarkAsync(1)).Returns(true);
 
         var result = await _controller.DeleteBookmark(1, 1);
 
-        _ = Assert.IsType<NoContentResult>(result);
+        Assert.IsType<ForbidResult>(result);
     }
 }

@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using CitMovie.Api;
 using CitMovie.Business;
 using CitMovie.Data;
@@ -7,11 +6,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using System.Security.Claims;
 
 public class BookmarkControllerIntegrationTests
 {
     private readonly BookmarkController _controller;
-    private readonly ServiceProvider _serviceProvider;
+    private readonly FrameworkContext _context;
 
     public BookmarkControllerIntegrationTests()
     {
@@ -21,14 +21,18 @@ public class BookmarkControllerIntegrationTests
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IBookmarkManager, BookmarkManager>();
 
-        _serviceProvider = services.BuildServiceProvider();
+        var serviceProvider = services.BuildServiceProvider();
+        _context = serviceProvider.GetRequiredService<FrameworkContext>();
+        var bookmarkManager = serviceProvider.GetRequiredService<IBookmarkManager>();
 
-        var bookmarkManager = _serviceProvider.GetRequiredService<IBookmarkManager>();
         _controller = new BookmarkController(bookmarkManager)
         {
             ControllerContext = new ControllerContext
             {
-                HttpContext = new DefaultHttpContext { User = new ClaimsPrincipal(new ClaimsIdentity(new[] { new Claim("user_id", "1") })) }
+                HttpContext = new DefaultHttpContext
+                {
+                    User = new ClaimsPrincipal(new ClaimsIdentity(new[] { new Claim("user_id", "1") }))
+                }
             }
         };
     }
@@ -63,10 +67,8 @@ public class BookmarkControllerIntegrationTests
         var createdResult = await _controller.CreateBookmark(1, createDto) as CreatedAtActionResult;
         var createdId = (createdResult?.Value as BookmarkDto)?.BookmarkId;
 
-        if (createdId == null)
-        {
-            throw new InvalidOperationException("Bookmark ID cannot be null");
-        }
+        Assert.NotNull(createdId);
+
         var deleteResult = await _controller.DeleteBookmark(1, (int)createdId);
 
         Assert.IsType<NoContentResult>(deleteResult);
