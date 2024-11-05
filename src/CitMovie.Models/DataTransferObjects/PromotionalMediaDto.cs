@@ -5,6 +5,7 @@ public class PromotionalMediaMinimalInfoResult
     public string PromotionalMediaId { get; set; }
     public string Type { get; set; }
     public string Uri { get; set; }
+    public List<Link> Links { get; set; } = new List<Link>();
 }
 
 public class PromotionalMediaResult
