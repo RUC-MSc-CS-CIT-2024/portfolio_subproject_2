@@ -1,4 +1,5 @@
 namespace CitMovie.Business;
+
 public class BookmarkManager : IBookmarkManager
 {
     private readonly IBookmarkRepository _bookmarkRepository;
@@ -12,25 +13,15 @@ public class BookmarkManager : IBookmarkManager
 
     public async Task<BookmarkDto> CreateBookmarkAsync(CreateBookmarkDto createBookmarkDto)
     {
-        var user = await _userRepository.GetUserAsync(createBookmarkDto.UserId);
+        // Call the database function to add a bookmark
+        await _bookmarkRepository.BookmarkMediaAsync(createBookmarkDto.UserId, createBookmarkDto.MediaId, createBookmarkDto.Note);
 
-        var newBookmark = new Bookmark
+        // Return a DTO representing the newly created bookmark
+        return new BookmarkDto
         {
             UserId = createBookmarkDto.UserId,
             MediaId = createBookmarkDto.MediaId,
-            Note = createBookmarkDto.Note != null
-                ? new Note(user.Username, createBookmarkDto.MediaTitle, createBookmarkDto.Note).ToString()
-                : null
-        };
-
-        var result = await _bookmarkRepository.AddBookmarkAsync(newBookmark);
-
-        return new BookmarkDto
-        {
-            BookmarkId = result.BookmarkId,
-            UserId = result.UserId,
-            MediaId = result.MediaId,
-            Note = result.Note
+            Note = createBookmarkDto.Note
         };
     }
 
@@ -39,15 +30,8 @@ public class BookmarkManager : IBookmarkManager
         var existingBookmark = await _bookmarkRepository.GetBookmarkByIdAsync(bookmarkId);
         if (existingBookmark == null) return null;
 
-        var user = await _userRepository.GetUserAsync(existingBookmark.UserId);
-
-        if (existingBookmark.Note != note)
-        {
-            existingBookmark.Note = note != null
-                ? new Note(user.Username, existingBookmark.Note, note).ToString()
-                : null;
-            existingBookmark = await _bookmarkRepository.UpdateBookmarkAsync(existingBookmark);
-        }
+        // Calls the updated repository method, which uses EF to update the note
+        existingBookmark = await _bookmarkRepository.UpdateBookmarkAsync(bookmarkId, note);
 
         return new BookmarkDto
         {
@@ -57,6 +41,7 @@ public class BookmarkManager : IBookmarkManager
             Note = existingBookmark.Note
         };
     }
+
 
     public async Task<BookmarkDto> GetBookmarkAsync(int bookmarkId) =>
         await TransformToBookmarkDto(await _bookmarkRepository.GetBookmarkByIdAsync(bookmarkId));
@@ -71,8 +56,15 @@ public class BookmarkManager : IBookmarkManager
                 Note = b.Note
             });
 
-    public async Task<bool> DeleteBookmarkAsync(int bookmarkId) =>
-        await _bookmarkRepository.DeleteBookmarkAsync(bookmarkId);
+    public async Task<bool> DeleteBookmarkAsync(int bookmarkId)
+    {
+        var bookmark = await _bookmarkRepository.GetBookmarkByIdAsync(bookmarkId);
+        if (bookmark == null) return false;
+
+        // Call the database function to remove the bookmark
+        await _bookmarkRepository.UnbookmarkMediaAsync(bookmark.UserId, bookmark.MediaId);
+        return true;
+    }
 
     private async Task<BookmarkDto> TransformToBookmarkDto(Bookmark bookmark)
     {

@@ -24,18 +24,19 @@ public class CompletedController : ControllerBase
     private int GetUserId() =>
         int.Parse(User.FindFirstValue("user_id") ?? throw new UnauthorizedAccessException("User ID not found"));
 
-    [HttpPost]
-    public async Task<IActionResult> CreateCompleted(int userId, [FromBody] CreateCompletedDto createCompletedDto)
+    [HttpPost("move")]
+    public async Task<IActionResult> MoveBookmarkToCompleted(int userId, [FromBody] MoveCompletedDto moveCompletedDto)
     {
         if (userId != GetUserId())
             return Forbid();
 
-        if (createCompletedDto == null)
-            return BadRequest("Completed data is required.");
+        if (moveCompletedDto == null)
+            return BadRequest("Move completed data is required.");
 
-        createCompletedDto.UserId = userId;
-        var createdCompleted = await _completedManager.CreateCompletedAsync(createCompletedDto);
-        return CreatedAtAction(nameof(GetCompleted), new { userId, id = createdCompleted.CompletedId }, createdCompleted);
+        moveCompletedDto.UserId = userId;
+        var completedItem = await _completedManager.MoveBookmarkToCompletedAsync(userId, moveCompletedDto.MediaId, moveCompletedDto.Rewatchability, moveCompletedDto.Note);
+        
+        return CreatedAtAction(nameof(GetCompleted), new { userId, id = completedItem.CompletedId }, completedItem);
     }
 
     [HttpGet("{id}", Name = nameof(GetCompleted))]
@@ -75,47 +76,8 @@ public class CompletedController : ControllerBase
         return Ok(result);
     }
 
-    [HttpPatch("{id}")]
-    public async Task<IActionResult> UpdateCompleted(int userId, int id, [FromBody] string? note)
-    {
-        if (userId != GetUserId())
-            return Forbid();
-
-        if (note == null)
-            return BadRequest("Note content is required.");
-
-        var completed = await _completedManager.GetCompletedAsync(id);
-        if (completed == null)
-            return NotFound();
-
-        if (completed.UserId != userId)
-            return Forbid();
-
-        var updateCompletedDto = new UpdateCompletedDto { Note = note };
-        var updatedCompleted = await _completedManager.UpdateCompletedAsync(id, updateCompletedDto);
-        return updatedCompleted == null ? NotFound() : Ok(updatedCompleted);
-    }
-
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteCompleted(int userId, int id)
-    {
-        if (userId != GetUserId())
-            return Forbid();
-
-        var completed = await _completedManager.GetCompletedAsync(id);
-        if (completed == null)
-            return NotFound();
-
-        if (completed.UserId != userId)
-            return Forbid();
-
-        var deleted = await _completedManager.DeleteCompletedAsync(id);
-        return deleted ? NoContent() : NotFound();
-    }
-
     private async Task AddCompletedLinks(CompletedDto completed)
     {
-
         completed.Links.Add(new Link
         {
             Href = _pagingHelper.GetResourceLink(nameof(GetCompleted), new { userId = completed.UserId, id = completed.CompletedId }) ?? string.Empty,
