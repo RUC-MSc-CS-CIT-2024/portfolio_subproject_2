@@ -20,7 +20,7 @@ public interface IBookmarkRepository
     /// </summary>
     /// <param name="userId">The ID of the user whose bookmarks are retrieved.</param>
     /// <returns>A collection of bookmark entities for the specified user.</returns>
-    Task<IEnumerable<Bookmark>> GetUserBookmarksAsync(int userId);
+    Task<IEnumerable<Bookmark>> GetUserBookmarksAsync(int userId, int page, int pageSize);
 
     /// <summary>
     /// Updates an existing bookmark in the database.
@@ -36,4 +36,5 @@ public interface IBookmarkRepository
     /// <param name="bookmarkId">The ID of the bookmark to delete.</param>
     /// <returns>True if the bookmark was successfully deleted; otherwise, false.</returns>
     Task<bool> DeleteBookmarkAsync(int bookmarkId);
+    Task<int> GetTotalUserBookmarksCountAsync(int userId);
 }

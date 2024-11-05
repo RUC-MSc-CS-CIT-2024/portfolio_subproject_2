@@ -116,4 +116,15 @@ public class MediaRepository : IMediaRepository {
                 .ThenInclude(x => x.Release)
             .Include(x => x.PrimaryInformation)
                 .ThenInclude(x => x.PromotionalMedia);
+
+
+    public async Task<int> GetTotalRelatedMediaCountAsync(int id)
+        => await _context.Media
+            .Include(x => x.RelatedMedia)
+            .Where(x => x.Id == id)
+            .SelectMany(x => x.RelatedMedia.Select(y => y.Related))
+            .CountAsync();
+    
+    public async Task<int> GetTotalSimilarMediaCountAsync(int id)
+        => await _context.GetSimilarMedia(id).CountAsync();
 }

@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace CitMovie.Models.DataTransferObjects;
 
-public class MediaBasicResult {
+public class MediaBasicResult : BaseResult {
     public required int Id { get; set; }
     public required string Type { get; set; }
     public required string Title { get; set; }
@@ -10,7 +10,7 @@ public class MediaBasicResult {
     public string? PosterUri { get; set; }
 }
 
-public record MediaResult {
+public class MediaResult : BaseResult {
     public required int Id { get; set; }
     public required string Type { get; set; }
     public required string Title { get; set; }

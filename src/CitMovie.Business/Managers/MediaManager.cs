@@ -50,4 +50,14 @@ public class MediaManager : IMediaManager {
         
         return _mapper.Map<IEnumerable<MediaBasicResult>>(result);
     }
+
+    public async Task<int> GetTotalRelatedMediaCountAsync(int id)
+    {
+        return await _mediaRepository.GetTotalRelatedMediaCountAsync(id);
+    }
+
+    public async Task<int> GetTotalSimilarMediaCountAsync(int id)
+    {
+        return await _mediaRepository.GetTotalSimilarMediaCountAsync(id);
+    }
 }

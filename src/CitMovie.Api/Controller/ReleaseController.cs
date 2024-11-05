@@ -1,33 +1,36 @@
+using CitMovie.Models;
+
 namespace CitMovie.Api;
 [ApiController]
 [Route("/api/media/{mediaId}/releases")]
 public class ReleaseController : ControllerBase
 {
     private readonly IReleaseManager _releaseManager;
-    private readonly LinkGenerator _linkGenerator;
+    private readonly IMediaManager _mediaManager;
+    private readonly PagingHelper _pageHelper;
 
-    public ReleaseController(IReleaseManager releaseManager, LinkGenerator linkGenerator)
+    public ReleaseController(IReleaseManager releaseManager, IMediaManager mediaManager, PagingHelper pagingHelper)
     {
         _releaseManager = releaseManager;
-        _linkGenerator = linkGenerator;
+        _mediaManager = mediaManager;
+        _pageHelper = pagingHelper;
     }
 
-    [HttpGet(Name = nameof(GetReleasesOfMediaAsync))]
-    public async Task<IActionResult> GetReleasesOfMediaAsync(int mediaId, int page = 0, int pageSize = 10)
+    [HttpGet(Name = nameof(GetReleasesOfMedia))]
+    public async Task<IActionResult> GetReleasesOfMedia(int mediaId, int page = 0, int pageSize = 10)
     {
         try
         {
             var releases = await _releaseManager.GetReleasesOfMediaAsync(mediaId, page, pageSize);
             var totalItems = await _releaseManager.GetReleasesCountAsync(mediaId);
 
-            var result = CreatePaging(
-                nameof(GetReleasesOfMediaAsync),
-                mediaId,
-                page,
-                pageSize,
-                totalItems,
-                releases);
-        
+            foreach (var release in releases)
+            {
+                AddReleaseLinks(release);
+            }
+
+            var result = _pageHelper.CreatePaging(nameof(GetReleasesOfMedia), page, pageSize, totalItems, releases, new { mediaId });
+
             return Ok(result);
         }
         catch (Exception e)
@@ -36,12 +39,19 @@ public class ReleaseController : ControllerBase
         }
     }
 
-    [HttpGet("{id}", Name = nameof(GetReleaseOfMediaByIdAsync))]
-    public async Task<IActionResult> GetReleaseOfMediaByIdAsync(int mediaId, int id)
+    [HttpGet("{id}", Name = nameof(GetReleaseOfMediaById))]
+    public async Task<IActionResult> GetReleaseOfMediaById(int mediaId, int id)
     {
         try
         {
             var release = await _releaseManager.GetReleaseOfMediaByIdAsync(mediaId, id);
+
+            if (release == null)
+            {
+                return NotFound();
+            }
+            AddReleaseLinks(release);
+
             return Ok(release);
         }
         catch (Exception e)
@@ -78,7 +88,7 @@ public class ReleaseController : ControllerBase
             return BadRequest(e.Message);
         }
     }
-    
+
     [HttpPatch("{id}")]
     public async Task<IActionResult> UpdateReleaseForMediaAsync(int mediaId, int id, ReleaseUpdateRequest request)
     {
@@ -92,40 +102,25 @@ public class ReleaseController : ControllerBase
             return BadRequest(e.Message);
         }
     }
-    
-    private string? GetLink(string linkName,int mediaId, int page, int pageSize)
+
+    private void AddReleaseLinks(ReleaseResult release)
     {
-        var uri = _linkGenerator.GetUriByName(
-            HttpContext,
-            linkName,
-            new {mediaId, page, pageSize }
-        );
-        return uri;
-    }
-
-    private object CreatePaging<T>(string linkName, int mediaId, int page, int pageSize, int total, IEnumerable<T?> items)
-    {
-        var numberOfPages = (int)Math.Ceiling(total / (double)pageSize);
-
-        var curPage = GetLink(linkName, mediaId, page, pageSize);
-
-        var nextPage = page < numberOfPages - 1
-            ? GetLink(linkName, mediaId, page + 1, pageSize)
-            : null;
-
-        var prevPage = page > 0
-            ? GetLink(linkName, mediaId, page - 1, pageSize)
-            : null;
-
-        var result = new
+        release.Links.Add(new Link
         {
-            CurPage = curPage,
-            NextPage = nextPage,
-            PrevPage = prevPage,
-            NumberOfItems = total,
-            NumberPages = numberOfPages,
-            Items = items
-        };
-        return result;
+            Href = _pageHelper.GetResourceLink(nameof(GetReleaseOfMediaById), new { mediaId = release.MediaId, id = release.ReleaseId }) ?? string.Empty,
+            Rel = "self",
+            Method = "GET"
+        });
+
+        var media = _mediaManager.Get(release.MediaId);
+        if (media != null)
+        {
+            release.Links.Add(new Link
+            {
+                Href = _pageHelper.GetResourceLink(nameof(MediaController.Get), new { id = media.Id }) ?? string.Empty,
+                Rel = "media",
+                Method = "GET"
+            });
+        }
     }
 }

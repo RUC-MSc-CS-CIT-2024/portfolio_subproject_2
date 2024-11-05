@@ -2,7 +2,8 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace CitMovie.Data;
 
-public interface IMediaRepository {
+public interface IMediaRepository
+{
     IEnumerable<Media> SearchBestMatch(string[] keywords, int page, int pageSize);
     IEnumerable<Media> SearchExactMatch(string[] keywords, int page, int pageSize);
     IEnumerable<Media> SearchSimple(string query, int userId, int page, int pageSize);
@@ -13,4 +14,6 @@ public interface IMediaRepository {
     IEnumerable<Media> GetRelated(int id, int page, int pageSize);
     Media? GetDetailed(int id);
     Media? Get(int id);
+    Task<int> GetTotalRelatedMediaCountAsync(int id);
+    Task<int> GetTotalSimilarMediaCountAsync(int id);
 }

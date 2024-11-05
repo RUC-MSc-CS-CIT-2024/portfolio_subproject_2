@@ -6,4 +6,6 @@ public interface IMediaManager {
     MediaResult? Get(int id);
     IEnumerable<MediaBasicResult> GetSimilar(int id, PageQueryParameter page);
     IEnumerable<MediaBasicResult> GetRelated(int id, PageQueryParameter page);
+    Task<int> GetTotalRelatedMediaCountAsync(int id);
+    Task<int> GetTotalSimilarMediaCountAsync(int id);
 }
