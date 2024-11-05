@@ -45,6 +45,13 @@ public class ReleaseController : ControllerBase
         try
         {
             var release = await _releaseManager.GetReleaseOfMediaByIdAsync(mediaId, id);
+
+            if (release == null)
+            {
+                return NotFound();
+            }
+            AddReleaseLinks(release);
+
             return Ok(release);
         }
         catch (Exception e)
