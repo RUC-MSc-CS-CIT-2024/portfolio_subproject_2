@@ -1,6 +1,6 @@
 namespace CitMovie.Models.DataTransferObjects;
 
-public class PromotionalMediaMinimalInfoResult
+public class PromotionalMediaMinimalInfoResult : BaseResult
 {
     public string PromotionalMediaId { get; set; }
     public string Type { get; set; }

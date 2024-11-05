@@ -1,28 +1,59 @@
+using System.Text.Json;
 
 namespace CitMovie.Business;
 
 public class MediaManager : IMediaManager {
     private readonly IMediaRepository _mediaRepository;
+    private readonly ICrewRepository _crewRepository;
     private readonly IMapper _mapper;
 
-    public MediaManager(IMediaRepository mediaRepository, IMapper mapper)
+    public MediaManager(
+        IMediaRepository mediaRepository, 
+        ICrewRepository crewRepository,
+        IMapper mapper)
     {
         _mediaRepository = mediaRepository;
+        _crewRepository = crewRepository;
         _mapper = mapper;
     }
 
-    public MediaResult? Get(int id)
+    public MediaResult Get(int id)
     {
         Media? media = _mediaRepository.GetDetailed(id);
         if (media is null)
-            return null;
-        return _mapper.Map<MediaResult>(media);
+            throw new KeyNotFoundException();
+        
+        if (media is Episode e)
+            return _mapper.Map<MediaResult>(e);
+        else if (media is Season s)
+            return _mapper.Map<MediaResult>(s);
+        else
+            return _mapper.Map<MediaResult>(media);
     }
 
     public IEnumerable<MediaBasicResult> GetAllMedia(PageQueryParameter page)
     {
-        IEnumerable<Media> result = _mediaRepository.GetAll(page.Number, page.Number);
+        IEnumerable<Media> result = _mediaRepository.GetAll(page.Number, page.Count);
         return _mapper.Map<IEnumerable<MediaBasicResult>>(result);
+    }
+
+    public async Task<IEnumerable<CrewResult>> GetCrewAsync(int mediaId, PageQueryParameter page)
+    {
+        if (_mediaRepository.Get(mediaId) == null)
+            throw new KeyNotFoundException();
+
+        IEnumerable<CrewMember> result = await _crewRepository.GetCrewAsync(mediaId, page.Number, page.Count);
+
+        return _mapper.Map<IEnumerable<CrewResult>>(result);
+    }
+
+    public async Task<IEnumerable<CrewResult>> GetCastAsync(int mediaId, PageQueryParameter page)
+    {
+        if (_mediaRepository.Get(mediaId) == null)
+            throw new KeyNotFoundException();
+
+        IEnumerable<CastMember> result = await _crewRepository.GetCastAsync(mediaId, page.Number, page.Count);
+        return _mapper.Map<IEnumerable<CrewResult>>(result);
     }
 
     public IEnumerable<MediaBasicResult> GetRelated(int id, PageQueryParameter page)
@@ -48,6 +79,22 @@ public class MediaManager : IMediaManager {
             _ => []
         };
         
-        return _mapper.Map<IEnumerable<MediaBasicResult>>(result);
+        IEnumerable<MediaBasicResult> basicMedia = _mapper.Map<IEnumerable<MediaBasicResult>>(result.OfType<Media>());
+        IEnumerable<MediaBasicResult> episodes = _mapper.Map<IEnumerable<MediaBasicResult>>(result.OfType<Episode>());
+        IEnumerable<MediaBasicResult> seasons = _mapper.Map<IEnumerable<MediaBasicResult>>(result.OfType<Season>());
+
+        return basicMedia.Concat(episodes).Concat(seasons)
+            .OrderBy(x => x.Id)
+            .ThenBy(x => x.Title);
+    }
+
+    public async Task<int> GetTotalRelatedMediaCountAsync(int id)
+    {
+        return await _mediaRepository.GetTotalRelatedMediaCountAsync(id);
+    }
+
+    public async Task<int> GetTotalSimilarMediaCountAsync(int id)
+    {
+        return await _mediaRepository.GetTotalSimilarMediaCountAsync(id);
     }
 }

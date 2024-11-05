@@ -21,10 +21,12 @@ public class BookmarkRepository : IBookmarkRepository
             .Where(b => b.BookmarkId == bookmarkId)
             .FirstOrDefaultAsync();
 
-    public async Task<IEnumerable<Bookmark>> GetUserBookmarksAsync(int userId) =>
+    public async Task<IEnumerable<Bookmark>> GetUserBookmarksAsync(int userId, int page, int pageSize) =>
         await _context.Bookmarks
             .AsNoTracking()
             .Where(b => b.UserId == userId)
+            .Skip(page * pageSize)
+            .Take(pageSize)
             .ToListAsync();
 
     public async Task<Bookmark> UpdateBookmarkAsync(Bookmark bookmark)
@@ -59,5 +61,10 @@ public class BookmarkRepository : IBookmarkRepository
         {
             return false;
         }
+    }
+
+     public async Task<int> GetTotalUserBookmarksCountAsync(int userId)
+    {
+        return await _context.Bookmarks.CountAsync(b => b.UserId == userId);
     }
 }

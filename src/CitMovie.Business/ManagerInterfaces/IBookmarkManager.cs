@@ -13,14 +13,13 @@ public interface IBookmarkManager
     /// </summary>
     /// <param name="bookmarkId">The unique ID of the bookmark.</param>
     /// <returns>A BookmarkDto representing the bookmark if found; otherwise, null.</returns>
-    Task<BookmarkDto> GetBookmarkAsync(int bookmarkId);
-
+    Task<BookmarkDto> GetBookmarkAsync(int bookmarkId );
     /// <summary>
     /// Retrieves all bookmarks for a specified user.
     /// </summary>
     /// <param name="userId">The ID of the user whose bookmarks are being retrieved.</param>
     /// <returns>A collection of BookmarkDto objects for the specified user.</returns>
-    Task<IEnumerable<BookmarkDto>> GetUserBookmarksAsync(int userId);
+    Task<IEnumerable<BookmarkDto>> GetUserBookmarksAsync(int userId, int page, int pageSize);
 
     /// <summary>
     /// Updates an existing bookmark's note.
@@ -36,5 +35,7 @@ public interface IBookmarkManager
     /// <param name="bookmarkId">The unique ID of the bookmark to delete.</param>
     /// <returns>True if the bookmark was successfully deleted; otherwise, false.</returns>
     Task<bool> DeleteBookmarkAsync(int bookmarkId);
+
+    Task<int> GetTotalUserBookmarksCountAsync(int userId);
 }
 

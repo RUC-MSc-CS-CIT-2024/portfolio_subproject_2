@@ -74,4 +74,9 @@ public class CompletedManager : ICompletedManager
             Rewatchability = completed.Rewatchability,
             Note = completed.Note
         };
+
+    public async Task<int> GetTotalUserCompletedCountAsync(int userId)
+    {
+        return await _completedRepository.GetTotalUserCompletedCountAsync(userId);
+    }
 }

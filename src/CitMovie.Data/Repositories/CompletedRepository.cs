@@ -41,4 +41,7 @@ public class CompletedRepository : ICompletedRepository
         await _context.SaveChangesAsync();
         return true;
     }
+
+    public async Task<int> GetTotalUserCompletedCountAsync(int userId) =>
+        await _context.Completed.CountAsync(c => c.UserId == userId);
 }
