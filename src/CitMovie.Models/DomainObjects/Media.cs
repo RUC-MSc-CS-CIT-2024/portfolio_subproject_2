@@ -33,17 +33,19 @@ public class Media
     // [Column("primary_release_id")]
     // public int PrimaryReleaseId { get; set; }
 
-    public MediaProductionCompany? MediaProductionCompany { get; set; }
-    
-    public ICollection<Score> Score { get; } = new List<Score>();
-    public ICollection<Release> Release { get; } = new List<Release>();
-    public ICollection<Title> Title { get; } = new List<Title>();
-    public ICollection<RelatedMedia> RelatedMedia { get; } = new List<RelatedMedia>();
-    public ICollection<CastMember> CastMembers { get; } = new List<CastMember>();
-    public ICollection<CrewMember> CrewMembers { get; } = new List<CrewMember>();
+    public MediaPrimaryInformation? PrimaryInformation { get; set; }
 
-    public ICollection<MediaCollection> Collections { get; } = new List<MediaCollection>();
-    public ICollection<Country> Countries { get; } = new List<Country>();
-    public ICollection<Genre> Genres { get; } = new List<Genre>();
+    public List<MediaProductionCompany> MediaProductionCompany { get; } = [];
+    
+    public List<Score> Scores { get; } = [];
+    public List<Release> Releases { get; } = [];
+    public List<Title> Titles { get; } = [];
+    public List<RelatedMedia> RelatedMedia { get; } = [];
+    public List<CastMember> CastMembers { get; } = [];
+    public List<CrewMember> CrewMembers { get; } = [];
+
+    public List<MediaCollection> Collections { get; } = [];
+    public List<Country> Countries { get; } = [];
+    public List<Genre> Genres { get; } = [];
 
 }
