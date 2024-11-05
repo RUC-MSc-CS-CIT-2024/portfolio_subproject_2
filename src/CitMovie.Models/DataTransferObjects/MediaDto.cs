@@ -27,6 +27,22 @@ public record MediaResult {
     public List<MediaProductionCompanyResult> ProductionCompanies { get; set; } = [];
     public List<CountryResult> ProductionCountries { get; set; } = [];
 
+    // Season info
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? SeasonNumber { get; set; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public DateTime? EndDate { get; set; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? Status { get; set; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? SeriesId { get; set; }
+
+    // Episode info
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? EpisodeNumber { get; set; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? SeasonId { get; set; }
+
     public class ScoreResult {
         public required string Source { get; set; }
         public required string Value { get; set; }

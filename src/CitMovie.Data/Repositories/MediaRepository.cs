@@ -15,7 +15,7 @@ public class MediaRepository : IMediaRepository {
         => GetMultipleWithInclude()
             .OrderBy(x => x.Id)
             .ThenBy(x => x.PrimaryInformation.Title.Name)
-            .Skip(pageSize * page - 1)
+            .Skip(pageSize * (page - 1))
             .Take(pageSize)
             .ToList();
 
@@ -24,7 +24,7 @@ public class MediaRepository : IMediaRepository {
             .OrderBy(x => x.Id)
             .ThenBy(x => x.PrimaryInformation.Title.Name)
             .Where(wherePredicate)
-            .Skip(pageSize * page - 1)
+            .Skip(pageSize * (page - 1))
             .Take(pageSize)
             .ToList();
 

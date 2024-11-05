@@ -11,10 +11,12 @@ public class CrewRepository : ICrewRepository
     }
     public Task<List<CrewMember>> GetCrewAsync(int mediaId, int page, int pageCount) 
         => _context.Media
+            .AsNoTracking()
             .Include(x => x.CrewMembers)
             .Where(x => x.Id == mediaId)
             .SelectMany(x => x.CrewMembers)
             .Include(x => x.Person)
+            .Include(x => x.JobCategory)
             .OrderBy(x => x.PersonId)
             .ThenBy(x => x.Person!.Name)
             .Skip((page - 1) * pageCount)
@@ -23,6 +25,7 @@ public class CrewRepository : ICrewRepository
     
     public Task<List<CastMember>> GetCastAsync(int mediaId, int page, int pageCount) 
         => _context.Media
+            .AsNoTracking()
             .Include(x => x.CastMembers)
             .Where(x => x.Id == mediaId)
             .SelectMany(x => x.CastMembers)

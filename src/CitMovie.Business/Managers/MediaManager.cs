@@ -1,3 +1,5 @@
+using System.Text.Json;
+
 namespace CitMovie.Business;
 
 public class MediaManager : IMediaManager {
@@ -20,12 +22,18 @@ public class MediaManager : IMediaManager {
         Media? media = _mediaRepository.GetDetailed(id);
         if (media is null)
             throw new KeyNotFoundException();
-        return _mapper.Map<MediaResult>(media);
+        
+        if (media is Episode e)
+            return _mapper.Map<MediaResult>(e);
+        else if (media is Season s)
+            return _mapper.Map<MediaResult>(s);
+        else
+            return _mapper.Map<MediaResult>(media);
     }
 
     public IEnumerable<MediaBasicResult> GetAllMedia(PageQueryParameter page)
     {
-        IEnumerable<Media> result = _mediaRepository.GetAll(page.Number, page.Number);
+        IEnumerable<Media> result = _mediaRepository.GetAll(page.Number, page.Count);
         return _mapper.Map<IEnumerable<MediaBasicResult>>(result);
     }
 
@@ -35,6 +43,7 @@ public class MediaManager : IMediaManager {
             throw new KeyNotFoundException();
 
         IEnumerable<CrewMember> result = await _crewRepository.GetCrewAsync(mediaId, page.Number, page.Count);
+
         return _mapper.Map<IEnumerable<CrewResult>>(result);
     }
 

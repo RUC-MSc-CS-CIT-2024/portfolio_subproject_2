@@ -58,6 +58,12 @@ public class AutoMapperProfile : Profile
                 opt.AllowNull();
                 opt.MapFrom(src => src.Awards);
             });
+        
+        CreateMap<Episode, MediaResult>()
+            .IncludeBase<Media, MediaResult>();
+            
+        CreateMap<Season, MediaResult>()
+            .IncludeBase<Media, MediaResult>();
 
         CreateMap<Score, MediaResult.ScoreResult>();
         CreateMap<ProductionCompany, MediaResult.MediaProductionCompanyResult>();
@@ -111,7 +117,8 @@ public class AutoMapperProfile : Profile
         CreateMap<TitleCreateRequest, Title>();
 
         // Crew
-        CreateMap<CrewMember, CrewResult>();
+        CreateMap<CrewMember, CrewResult>()
+            .ForMember(dest => dest.JobCategory, opt => opt.MapFrom(src => src.JobCategory.Name));
         CreateMap<CastMember, CrewResult>()
             .ForMember(dest => dest.JobCategory, opt => opt.MapFrom(src => "Actor"));
     }
