@@ -6,6 +6,6 @@ public interface IMediaManager {
     MediaResult Get(int id);
     IEnumerable<MediaBasicResult> GetSimilar(int id, PageQueryParameter page);
     IEnumerable<MediaBasicResult> GetRelated(int id, PageQueryParameter page);
-    Task<IEnumerable<CrewResult>> GetCrew(int mediaId, PageQueryParameter page);
-    Task<IEnumerable<CrewResult>> GetCast(int mediaId, PageQueryParameter page);
+    Task<IEnumerable<CrewResult>> GetCrewAsync(int mediaId, PageQueryParameter page);
+    Task<IEnumerable<CrewResult>> GetCastAsync(int mediaId, PageQueryParameter page);
 }

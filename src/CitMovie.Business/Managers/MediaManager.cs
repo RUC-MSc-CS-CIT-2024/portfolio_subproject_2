@@ -29,21 +29,21 @@ public class MediaManager : IMediaManager {
         return _mapper.Map<IEnumerable<MediaBasicResult>>(result);
     }
 
-    public async Task<IEnumerable<CrewResult>> GetCrew(int mediaId, PageQueryParameter page)
+    public async Task<IEnumerable<CrewResult>> GetCrewAsync(int mediaId, PageQueryParameter page)
     {
         if (_mediaRepository.Get(mediaId) == null)
             throw new KeyNotFoundException();
 
-        IEnumerable<CrewMember> result = await _crewRepository.GetCrew(mediaId, page.Number, page.Count);
+        IEnumerable<CrewMember> result = await _crewRepository.GetCrewAsync(mediaId, page.Number, page.Count);
         return _mapper.Map<IEnumerable<CrewResult>>(result);
     }
 
-    public async Task<IEnumerable<CrewResult>> GetCast(int mediaId, PageQueryParameter page)
+    public async Task<IEnumerable<CrewResult>> GetCastAsync(int mediaId, PageQueryParameter page)
     {
         if (_mediaRepository.Get(mediaId) == null)
             throw new KeyNotFoundException();
 
-        IEnumerable<CastMember> result = await _crewRepository.GetCast(mediaId, page.Number, page.Count);
+        IEnumerable<CastMember> result = await _crewRepository.GetCastAsync(mediaId, page.Number, page.Count);
         return _mapper.Map<IEnumerable<CrewResult>>(result);
     }
 

@@ -59,10 +59,10 @@ public class MediaController : ControllerBase
     }
 
     [HttpGet("{id}/crew")]
-    public IActionResult GetCrew(int id, [FromQuery] PageQueryParameter pageQuery) {
+    public async Task<ActionResult> GetCrew(int id, [FromQuery] PageQueryParameter pageQuery) {
         
         try {
-            return Ok(_mediaManager.GetCrew(id, pageQuery));
+            return Ok(await _mediaManager.GetCrewAsync(id, pageQuery));
         } catch (KeyNotFoundException) {
             return NotFound();
         } catch (Exception e) {
@@ -72,10 +72,10 @@ public class MediaController : ControllerBase
     }
 
     [HttpGet("{id}/cast")]
-    public IActionResult GetCast(int id, [FromQuery] PageQueryParameter pageQuery) {
+    public async Task<IActionResult> GetCast(int id, [FromQuery] PageQueryParameter pageQuery) {
         
         try {
-            return Ok(_mediaManager.GetCast(id, pageQuery));
+            return Ok(await _mediaManager.GetCastAsync(id, pageQuery));
         } catch (KeyNotFoundException) {
             return NotFound();
         } catch (Exception e) {

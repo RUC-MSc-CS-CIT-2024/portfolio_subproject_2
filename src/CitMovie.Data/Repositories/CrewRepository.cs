@@ -9,7 +9,7 @@ public class CrewRepository : ICrewRepository
     {
         _context = context;
     }
-    public Task<List<CrewMember>> GetCrew(int mediaId, int page, int pageCount) 
+    public Task<List<CrewMember>> GetCrewAsync(int mediaId, int page, int pageCount) 
         => _context.Media
             .Include(x => x.CrewMembers)
             .Where(x => x.Id == mediaId)
@@ -21,7 +21,7 @@ public class CrewRepository : ICrewRepository
             .Take(pageCount)
             .ToListAsync();
     
-    public Task<List<CastMember>> GetCast(int mediaId, int page, int pageCount) 
+    public Task<List<CastMember>> GetCastAsync(int mediaId, int page, int pageCount) 
         => _context.Media
             .Include(x => x.CastMembers)
             .Where(x => x.Id == mediaId)
