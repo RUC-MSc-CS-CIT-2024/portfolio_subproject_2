@@ -3,11 +3,16 @@ namespace CitMovie.Business;
 
 public class MediaManager : IMediaManager {
     private readonly IMediaRepository _mediaRepository;
+    private readonly ICrewRepository _crewRepository;
     private readonly IMapper _mapper;
 
-    public MediaManager(IMediaRepository mediaRepository, IMapper mapper)
+    public MediaManager(
+        IMediaRepository mediaRepository, 
+        ICrewRepository crewRepository,
+        IMapper mapper)
     {
         _mediaRepository = mediaRepository;
+        _crewRepository = crewRepository;
         _mapper = mapper;
     }
 
@@ -23,6 +28,24 @@ public class MediaManager : IMediaManager {
     {
         IEnumerable<Media> result = _mediaRepository.GetAll(page.Number, page.Number);
         return _mapper.Map<IEnumerable<MediaBasicResult>>(result);
+    }
+
+    public async Task<IEnumerable<CrewResult>> GetCrew(int mediaId, PageQueryParameter page)
+    {
+        if (_mediaRepository.Get(mediaId) == null)
+            throw new KeyNotFoundException();
+
+        IEnumerable<CrewMember> result = await _crewRepository.GetCrew(mediaId, page.Number, page.Count);
+        return _mapper.Map<IEnumerable<CrewResult>>(result);
+    }
+
+    public async Task<IEnumerable<CrewResult>> GetCast(int mediaId, PageQueryParameter page)
+    {
+        if (_mediaRepository.Get(mediaId) == null)
+            throw new KeyNotFoundException();
+
+        IEnumerable<CastMember> result = await _crewRepository.GetCast(mediaId, page.Number, page.Count);
+        return _mapper.Map<IEnumerable<CrewResult>>(result);
     }
 
     public IEnumerable<MediaBasicResult> GetRelated(int id, PageQueryParameter page)

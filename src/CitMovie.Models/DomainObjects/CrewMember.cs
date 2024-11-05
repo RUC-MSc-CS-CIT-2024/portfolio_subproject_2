@@ -1,23 +1,28 @@
 namespace CitMovie.Models.DomainObjects;
 
+public abstract class CrewBase
+{
+    public abstract int Id { get; set; }
+    [Column("role")]
+    public required string Role { get; set; }
+    [Column("person_id")]
+    public required int PersonId { get; set; }
+    [Column("media_id")]
+    public required int MediaId { get; set; }
+    
+    public Media? Media { get; set; }
+    public Person? Person { get; set; }
+}
+
+
 [Table("crew_member")]
-public class CrewMember
+public class CrewMember : CrewBase
 {
     [Key, Column("crew_member_id")]
-    public int CrewMemberId { get; set; }
-    [Column("role")]
-    public string? Role { get; set; }
-    [Column("person_id")]
-    public int PersonId { get; set; }
-    [Column("media_id")]
-    public int MediaId { get; set; }
+    public override int Id { get; set; }
+
     [Column("job_category_id")]
-    public int JobCategoryId { get; set; }
+    public required int JobCategoryId { get; set; }
     
-    [ForeignKey(nameof(MediaId))]
-    public Media Media { get; set; }
-    [ForeignKey(nameof(PersonId))]
-    public Person Person { get; set; }
-    [ForeignKey(nameof(JobCategoryId))]
-    public JobCategory JobCategory { get; set; }
+    public JobCategory? JobCategory { get; set; }
 }

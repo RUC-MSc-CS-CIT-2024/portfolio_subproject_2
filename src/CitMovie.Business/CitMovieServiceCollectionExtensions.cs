@@ -47,6 +47,7 @@ public static class CitMovieServiceCollectionExtensions
         services.AddScoped<ITitleAttributeManager, TitleAttributeManager>();
         services.AddScoped<IUserScoreManager, UserScoreManager>();
         services.AddScoped<ICompletedManager, CompletedManager>();
+        services.AddScoped<ICrewRepository, CrewRepository>();
 
         services.AddOptions<JwtOptions>()
             .Configure<IConfiguration>((options, configuration) =>

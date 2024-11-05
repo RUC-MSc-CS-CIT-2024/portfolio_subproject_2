@@ -109,5 +109,10 @@ public class AutoMapperProfile : Profile
             .ForMember(dest => dest.Types, opt => opt.MapFrom(src => src.TitleTypes))
             .ForMember(dest => dest.Attributes, opt => opt.MapFrom(src => src.TitleAttributes));
         CreateMap<TitleCreateRequest, Title>();
+
+        // Crew
+        CreateMap<CrewMember, CrewResult>();
+        CreateMap<CastMember, CrewResult>()
+            .ForMember(dest => dest.JobCategory, opt => opt.MapFrom(src => "Actor"));
     }
 }

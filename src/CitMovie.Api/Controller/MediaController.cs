@@ -57,8 +57,29 @@ public class MediaController : ControllerBase
     }
 
     [HttpGet("{id}/crew")]
-    public IActionResult GetCrew(int id) {
-        throw new NotImplementedException();
+    public IActionResult GetCrew(int id, [FromQuery] PageQueryParameter pageQuery) {
+        
+        try {
+            return Ok(_mediaManager.GetCrew(id, pageQuery));
+        } catch (KeyNotFoundException) {
+            return NotFound();
+        } catch (Exception e) {
+            _logger.LogError(e, "Unexpected error occured");
+            return StatusCode(StatusCodes.Status500InternalServerError);
+        }
+    }
+
+    [HttpGet("{id}/cast")]
+    public IActionResult GetCast(int id, [FromQuery] PageQueryParameter pageQuery) {
+        
+        try {
+            return Ok(_mediaManager.GetCast(id, pageQuery));
+        } catch (KeyNotFoundException) {
+            return NotFound();
+        } catch (Exception e) {
+            _logger.LogError(e, "Unexpected error occured");
+            return StatusCode(StatusCodes.Status500InternalServerError);
+        }
     }
 
     private int? GetUserId() {
