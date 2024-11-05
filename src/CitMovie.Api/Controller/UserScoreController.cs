@@ -1,3 +1,5 @@
+using CitMovie.Models;
+
 namespace CitMovie.Api
 {
     [ApiController]
@@ -7,14 +9,17 @@ namespace CitMovie.Api
     public class UserScoreController : ControllerBase
     {
         private readonly IUserScoreManager _userScoreManager;
-        private readonly LinkGenerator _linkGenerator;
+        private readonly IUserManager _userManager;
+        private readonly IMediaManager _mediaManager;
+        private readonly PagingHelper _pagingHelper;
 
-        public UserScoreController(IUserScoreManager userScoreManager, LinkGenerator linkGenerator)
+        public UserScoreController(IUserScoreManager userScoreManager, IUserManager userManager, IMediaManager mediaManager, PagingHelper pagingHelper)
         {
             _userScoreManager = userScoreManager;
-            _linkGenerator = linkGenerator;
+            _userManager = userManager;
+            _mediaManager = mediaManager;
+            _pagingHelper = pagingHelper;
         }
-
 
         [HttpGet(Name = nameof(GetUserScores))]
         public async Task<ActionResult<IEnumerable<UserScoreResult>>> GetUserScores(
@@ -28,17 +33,12 @@ namespace CitMovie.Api
             var totalCount = await _userScoreManager.GetTotalUserScoresCountAsync(userId);
             var scores = await _userScoreManager.GetScoresByUserIdAsync(userId, page, pageSize, mediaType, mediaId, mediaName);
 
-            var result = CreatePaging(
-                nameof(GetUserScores),
-                userId,
-                mediaType,
-                mediaId ?? 0,
-                mediaName,
-                page,
-                pageSize,
-                totalCount,
-                scores
-            );
+            var result = _pagingHelper.CreatePaging(nameof(GetUserScores), page, pageSize, totalCount, scores, new { userId, mediaType, mediaId, mediaName });
+
+            foreach (var score in scores)
+            {
+                await AddUserScoreLinks(score);
+            }
 
             return Ok(result);
         }
@@ -55,41 +55,31 @@ namespace CitMovie.Api
             return CreatedAtRoute(nameof(GetUserScores), new { userId }, null);
         }
 
-        // HATEOAS and Pagination
-        private string? GetLink(string linkName, int userId, string mediaType, int mediaId, string mediaName, int page, int pageSize)
+
+        private async Task AddUserScoreLinks(UserScoreResult userScore)
         {
-            var uri = _linkGenerator.GetUriByName(
-                        HttpContext,
-                        linkName,
-                        new { userId, mediaType, mediaId, mediaName, page, pageSize }
-                        );
-            return uri;
-        }
-
-        private object CreatePaging<T>(string linkName, int userId, string mediaType, int mediaId, string mediaName, int page, int pageSize, int total, IEnumerable<T?> items)
-        {
-            var numberOfPages = (int)Math.Ceiling(total / (double)pageSize);
-
-            var curPage = GetLink(linkName, userId, mediaType, mediaId, mediaName, page, pageSize);
-
-            var nextPage = page < numberOfPages - 1
-                ? GetLink(linkName, userId, mediaType, mediaId, mediaName, page + 1, pageSize)
-                : null;
-
-            var prevPage = page > 0
-                ? GetLink(linkName, userId, mediaType, mediaId, mediaName, page - 1, pageSize)
-                : null;
-
-            var result = new
+            var user = await _userManager.GetUserAsync(userScore.UserId);
+            if (user != null)
             {
-                CurPage = curPage,
-                NextPage = nextPage,
-                PrevPage = prevPage,
-                NumberOfItems = total,
-                NumberPages = numberOfPages,
-                Items = items
-            };
-            return result;
+                userScore.Links.Add(new Link
+                {
+                    Href = _pagingHelper.GetResourceLink(nameof(UserController.GetUser), new { userId = userScore.UserId }) ?? string.Empty,
+                    Rel = "user",
+                    Method = "GET"
+                });
+            }
+
+            var media = _mediaManager.Get(userScore.MediaId);
+            if (media != null)
+            {
+                userScore.Links.Add(new Link
+                {
+                    Href = _pagingHelper.GetResourceLink(nameof(MediaController.Get), new { id = userScore.MediaId }) ?? string.Empty,
+                    Rel = "media",
+                    Method = "GET"
+                });
+            }
         }
+
     }
 }

@@ -6,6 +6,7 @@ namespace CitMovie.Models.DataTransferObjects
         public int MediaId { get; set; }
         public int Score { get; set; }
         public string? ReviewText { get; set; }
+        public List<Link> Links { get; set; } = new List<Link>();
     }
 
     public record UserScoreCreateRequest
