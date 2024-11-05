@@ -1,6 +1,6 @@
 namespace CitMovie.Models.DataTransferObjects;
 
-public class ReleaseResult
+public class ReleaseResult : BaseResult
 {
     public int ReleaseId { get; set; }
     public int MediaId { get; set; }
@@ -10,7 +10,6 @@ public class ReleaseResult
     public string? Country { get; set; }
     public string? Title { get; set; }
     public required DateTime ReleaseDate { get; set; }
-    public List<Link> Links { get; set; } = new List<Link>();
 }
 
 public class ReleaseCreateRequest

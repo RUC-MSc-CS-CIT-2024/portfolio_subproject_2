@@ -1,11 +1,10 @@
 namespace CitMovie.Models.DataTransferObjects;
 
-public class PromotionalMediaMinimalInfoResult
+public class PromotionalMediaMinimalInfoResult : BaseResult
 {
     public string PromotionalMediaId { get; set; }
     public string Type { get; set; }
     public string Uri { get; set; }
-    public List<Link> Links { get; set; } = new List<Link>();
 }
 
 public class PromotionalMediaResult
