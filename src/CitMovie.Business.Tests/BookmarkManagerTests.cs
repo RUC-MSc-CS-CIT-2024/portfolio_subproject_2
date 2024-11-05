@@ -1,100 +1,69 @@
-using CitMovie.Business.Managers;
-using CitMovie.Data.Repositories;
+using CitMovie.Business;
+using CitMovie.Data;
+using CitMovie.Models.DataTransferObjects;
 using CitMovie.Models.DomainObjects;
-using CitMovie.Models.DTOs;
 using FakeItEasy;
-using System.Threading.Tasks;
 
 public class BookmarkManagerTests
 {
     private readonly IBookmarkRepository _bookmarkRepository;
     private readonly IUserRepository _userRepository;
-    private readonly IMediaRepository _mediaRepository;
     private readonly BookmarkManager _bookmarkManager;
 
     public BookmarkManagerTests()
     {
         _bookmarkRepository = A.Fake<IBookmarkRepository>();
         _userRepository = A.Fake<IUserRepository>();
-        _mediaRepository = A.Fake<IMediaRepository>();
-        _bookmarkManager = new BookmarkManager(_bookmarkRepository, _userRepository, _mediaRepository);
+        _bookmarkManager = new BookmarkManager(_bookmarkRepository, _userRepository);
     }
 
-   [Fact]
-    public async Task CreateBookmark_ShouldReturnCreated_WhenValidDataIsProvided()
+    [Fact]
+    public async Task CreateBookmarkAsync_ShouldReturnCreatedBookmark_WhenValidDataIsProvided()
     {
-        // Arrange
         var createBookmarkDto = new CreateBookmarkDto
         {
+            UserId = 1,
             MediaId = 101,
-            MediaTitle = "Test Movie", // Media title provided by frontend
             Note = "Interesting movie!"
         };
-        var createdBookmark = new BookmarkDto
+        var createdBookmark = new Bookmark
         {
             BookmarkId = 1,
             UserId = 1,
             MediaId = 101,
-            Note = "Structured Note Content"
+            Note = "Interesting movie!"
         };
 
-        A.CallTo(() => _bookmarkManager.CreateBookmarkAsync(A<CreateBookmarkDto>.Ignored)).Returns(createdBookmark);
+        A.CallTo(() => _bookmarkRepository.AddBookmarkAsync(A<Bookmark>.Ignored)).Returns(createdBookmark);
 
-        // Act
-        var result = await _controller.CreateBookmark(createBookmarkDto);
+        var result = await _bookmarkManager.CreateBookmarkAsync(createBookmarkDto);
 
-        // Assert
-        var createdResult = Assert.IsType<CreatedAtActionResult>(result);
-        var returnedBookmark = Assert.IsType<BookmarkDto>(createdResult.Value);
-        Assert.Equal(createdBookmark.BookmarkId, returnedBookmark.BookmarkId);
-        Assert.Equal("Structured Note Content", returnedBookmark.Note);
-        Assert.Equal(101, returnedBookmark.MediaId);
-    }
-
-
-    [Fact]
-    public async Task GetBookmarkAsync_ShouldReturnNull_WhenBookmarkDoesNotExist()
-    {
-        // Arrange
-        int nonExistentId = 99;
-        A.CallTo(() => _bookmarkRepository.GetBookmarkByIdAsync(nonExistentId)).Returns((Bookmark)null);
-
-        // Act
-        var result = await _bookmarkManager.GetBookmarkAsync(nonExistentId);
-
-        // Assert
-        Assert.Null(result);
-    }
-
-    [Fact]
-    public async Task UpdateBookmarkAsync_ShouldUpdateNote_WhenDifferentNoteProvided()
-    {
-        // Arrange
-        var existingBookmark = new Bookmark { BookmarkId = 1, UserId = 1, MediaId = 101, Note = "Old note" };
-        var newNote = "Updated note";
-
-        A.CallTo(() => _bookmarkRepository.GetBookmarkByIdAsync(existingBookmark.BookmarkId)).Returns(existingBookmark);
-        A.CallTo(() => _bookmarkRepository.UpdateBookmarkAsync(A<Bookmark>.Ignored)).Returns(existingBookmark);
-
-        // Act
-        var result = await _bookmarkManager.UpdateBookmarkAsync(existingBookmark.BookmarkId, newNote);
-
-        // Assert
         Assert.NotNull(result);
-        Assert.Equal(newNote, result.Note);
+        Assert.Equal(1, result.BookmarkId);
+        Assert.Equal("Interesting movie!", result.Note);
     }
 
     [Fact]
-    public async Task DeleteBookmarkAsync_ShouldReturnTrue_WhenBookmarkDeleted()
+    public async Task UpdateBookmarkAsync_ShouldUpdateNote_WhenNoteIsProvided()
     {
-        // Arrange
-        int bookmarkId = 1;
-        A.CallTo(() => _bookmarkRepository.DeleteBookmarkAsync(bookmarkId)).Returns(true);
+        var existingBookmark = new Bookmark { BookmarkId = 1, UserId = 1, MediaId = 101, Note = "Old note" };
+        var updatedBookmark = new Bookmark { BookmarkId = 1, UserId = 1, MediaId = 101, Note = "Updated note" };
 
-        // Act
-        var result = await _bookmarkManager.DeleteBookmarkAsync(bookmarkId);
+        A.CallTo(() => _bookmarkRepository.GetBookmarkByIdAsync(1)).Returns(existingBookmark);
+        A.CallTo(() => _bookmarkRepository.UpdateBookmarkAsync(A<Bookmark>.Ignored)).Returns(updatedBookmark);
 
-        // Assert
+        var result = await _bookmarkManager.UpdateBookmarkAsync(1, "Updated note");
+
+        Assert.Equal("Updated note", result.Note);
+    }
+
+    [Fact]
+    public async Task DeleteBookmarkAsync_ShouldReturnTrue_WhenBookmarkIsDeleted()
+    {
+        A.CallTo(() => _bookmarkRepository.DeleteBookmarkAsync(1)).Returns(true);
+
+        var result = await _bookmarkManager.DeleteBookmarkAsync(1);
+
         Assert.True(result);
     }
 }
