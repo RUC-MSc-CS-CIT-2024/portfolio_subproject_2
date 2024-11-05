@@ -9,7 +9,7 @@ public class MediaRepository : IMediaRepository {
     }
 
     public Media? Get(int id)
-        => _context.Media.AsNoTracking().FirstOrDefault();
+        => _context.Media.FirstOrDefault();
 
     public IEnumerable<Media> GetAll(int page, int pageSize)
         => GetMultipleWithInclude()

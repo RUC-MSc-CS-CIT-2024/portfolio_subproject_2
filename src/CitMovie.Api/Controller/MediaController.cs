@@ -24,11 +24,14 @@ public class MediaController : ControllerBase
 
     [HttpGet("{id}")]
     public IActionResult Get(int id) {
-        MediaResult? m = _mediaManager.Get(id);
-        if (m is null)
+        try {
+            return Ok(_mediaManager.Get(id));
+        } catch (KeyNotFoundException) {
             return NotFound();
-        
-        return Ok(m);
+        } catch (Exception e) {
+            _logger.LogError(e, "Unexpected error occured");
+            return StatusCode(StatusCodes.Status500InternalServerError);
+        }
     }
 
     [HttpGet("{id}/similar_media")]
@@ -53,7 +56,6 @@ public class MediaController : ControllerBase
             _logger.LogError(e, "Unexpected error occured");
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
-
     }
 
     [HttpGet("{id}/crew")]

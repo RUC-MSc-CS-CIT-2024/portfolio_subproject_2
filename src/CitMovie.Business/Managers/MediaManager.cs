@@ -1,4 +1,3 @@
-
 namespace CitMovie.Business;
 
 public class MediaManager : IMediaManager {
@@ -16,11 +15,11 @@ public class MediaManager : IMediaManager {
         _mapper = mapper;
     }
 
-    public MediaResult? Get(int id)
+    public MediaResult Get(int id)
     {
         Media? media = _mediaRepository.GetDetailed(id);
         if (media is null)
-            return null;
+            throw new KeyNotFoundException();
         return _mapper.Map<MediaResult>(media);
     }
 
@@ -71,6 +70,12 @@ public class MediaManager : IMediaManager {
             _ => []
         };
         
-        return _mapper.Map<IEnumerable<MediaBasicResult>>(result);
+        IEnumerable<MediaBasicResult> basicMedia = _mapper.Map<IEnumerable<MediaBasicResult>>(result.OfType<Media>());
+        IEnumerable<MediaBasicResult> episodes = _mapper.Map<IEnumerable<MediaBasicResult>>(result.OfType<Episode>());
+        IEnumerable<MediaBasicResult> seasons = _mapper.Map<IEnumerable<MediaBasicResult>>(result.OfType<Season>());
+
+        return basicMedia.Concat(episodes).Concat(seasons)
+            .OrderBy(x => x.Id)
+            .ThenBy(x => x.Title);
     }
 }
