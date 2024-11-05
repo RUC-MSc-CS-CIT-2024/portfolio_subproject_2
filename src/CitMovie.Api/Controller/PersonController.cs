@@ -55,7 +55,7 @@ public class PersonController : ControllerBase
     }
 
     [HttpGet("{id}/media", Name = nameof(GetMediaByPersonId))]
-    public async Task<ActionResult<IEnumerable<PersonResult.MediaResult>>> GetMediaByPersonId(int id,
+    public async Task<ActionResult<IEnumerable<MediaBasicResult>>> GetMediaByPersonId(int id,
           [FromQuery] int page = 0,
           [FromQuery] int pageSize = 10)
     {
@@ -137,14 +137,14 @@ public class PersonController : ControllerBase
         }
     }
 
-    private async Task AddMediaLinks(PersonResult.MediaResult media)
+    private async Task AddMediaLinks(MediaBasicResult media)
     {
-        var m = _mediaManager.Get(media.MediaId);
+        var m = _mediaManager.Get(media.Id);
         if (media != null)
         {
             media.Links.Add(new Link
             {
-                Href = _pagingHelper.GetResourceLink(nameof(MediaController.Get), new { id = media.MediaId }) ?? string.Empty,
+                Href = _pagingHelper.GetResourceLink(nameof(MediaController.Get), new { id = media.Id }) ?? string.Empty,
                 Rel = "self",
                 Method = "GET"
             });

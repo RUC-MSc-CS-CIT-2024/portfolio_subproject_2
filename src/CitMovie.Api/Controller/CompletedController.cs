@@ -25,16 +25,13 @@ public class CompletedController : ControllerBase
         int.Parse(User.FindFirstValue("user_id") ?? throw new UnauthorizedAccessException("User ID not found"));
 
     [HttpPost("move")]
-    public async Task<IActionResult> MoveBookmarkToCompleted(int userId, [FromBody] MoveCompletedDto moveCompletedDto)
+    public async Task<IActionResult> MoveBookmarkToCompleted(int userId, [FromBody] CompletedCreateRequest createCompletedDto)
     {
         if (userId != GetUserId())
             return Forbid();
 
-        if (moveCompletedDto == null)
-            return BadRequest("Move completed data is required.");
-
-        moveCompletedDto.UserId = userId;
-        var completedItem = await _completedManager.MoveBookmarkToCompletedAsync(userId, moveCompletedDto.MediaId, moveCompletedDto.Rewatchability, moveCompletedDto.Note);
+        createCompletedDto.UserId = userId;
+        var completedItem = await _completedManager.MoveBookmarkToCompletedAsync(createCompletedDto);
         
         return CreatedAtAction(nameof(GetCompleted), new { userId, id = completedItem.CompletedId }, completedItem);
     }
@@ -99,7 +96,7 @@ public class CompletedController : ControllerBase
         return deleted ? NoContent() : NotFound();
     }
 
-    private async Task AddCompletedLinks(CompletedDto completed)
+    private async Task AddCompletedLinks(CompletedResult completed)
     {
         completed.Links.Add(new Link
         {

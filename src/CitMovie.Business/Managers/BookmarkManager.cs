@@ -3,29 +3,22 @@ namespace CitMovie.Business;
 public class BookmarkManager : IBookmarkManager
 {
     private readonly IBookmarkRepository _bookmarkRepository;
-    private readonly IUserRepository _userRepository;
+    private readonly IMapper _mapper;
 
-    public BookmarkManager(IBookmarkRepository bookmarkRepository, IUserRepository userRepository)
+    public BookmarkManager(IBookmarkRepository bookmarkRepository, IMapper mapper)
     {
         _bookmarkRepository = bookmarkRepository;
-        _userRepository = userRepository;
+        _mapper = mapper;
     }
 
-    public async Task<BookmarkDto> CreateBookmarkAsync(CreateBookmarkDto createBookmarkDto)
+    public async Task<BookmarkResult> CreateBookmarkAsync(int userId, BookmarkCreateRequest createBookmarkDto)
     {
         // Call the database function to add a bookmark
-        await _bookmarkRepository.BookmarkMediaAsync(createBookmarkDto.UserId, createBookmarkDto.MediaId, createBookmarkDto.Note);
-
-        // Return a DTO representing the newly created bookmark
-        return new BookmarkDto
-        {
-            UserId = createBookmarkDto.UserId,
-            MediaId = createBookmarkDto.MediaId,
-            Note = createBookmarkDto.Note
-        };
+        Bookmark result = await _bookmarkRepository.BookmarkMediaAsync(userId, createBookmarkDto.MediaId, createBookmarkDto.Note);
+        return _mapper.Map<BookmarkResult>(result);
     }
 
-    public async Task<BookmarkDto> UpdateBookmarkAsync(int bookmarkId, string? note)
+    public async Task<BookmarkResult> UpdateBookmarkAsync(int bookmarkId, string? note)
     {
         var existingBookmark = await _bookmarkRepository.GetBookmarkByIdAsync(bookmarkId);
         if (existingBookmark == null) return null;
@@ -33,7 +26,7 @@ public class BookmarkManager : IBookmarkManager
         // Calls the updated repository method, which uses EF to update the note
         existingBookmark = await _bookmarkRepository.UpdateBookmarkAsync(bookmarkId, note);
 
-        return new BookmarkDto
+        return new BookmarkResult
         {
             BookmarkId = existingBookmark.BookmarkId,
             UserId = existingBookmark.UserId,
@@ -42,13 +35,12 @@ public class BookmarkManager : IBookmarkManager
         };
     }
 
-
-    public async Task<BookmarkDto> GetBookmarkAsync(int bookmarkId) =>
+    public async Task<BookmarkResult> GetBookmarkAsync(int bookmarkId) =>
         await TransformToBookmarkDto(await _bookmarkRepository.GetBookmarkByIdAsync(bookmarkId));
 
-    public async Task<IEnumerable<BookmarkDto>> GetUserBookmarksAsync(int userId, int page, int pageSize) =>
+    public async Task<IEnumerable<BookmarkResult>> GetUserBookmarksAsync(int userId, int page, int pageSize) =>
         (await _bookmarkRepository.GetUserBookmarksAsync(userId, page, pageSize))
-            .Select(b => new BookmarkDto
+            .Select(b => new BookmarkResult
             {
                 BookmarkId = b.BookmarkId,
                 UserId = b.UserId,
@@ -66,9 +58,9 @@ public class BookmarkManager : IBookmarkManager
         return true;
     }
 
-    private async Task<BookmarkDto> TransformToBookmarkDto(Bookmark bookmark)
+    private async Task<BookmarkResult> TransformToBookmarkDto(Bookmark bookmark)
     {
-        return bookmark == null ? null : new BookmarkDto
+        return bookmark == null ? null : new BookmarkResult
         {
             BookmarkId = bookmark.BookmarkId,
             UserId = bookmark.UserId,

@@ -10,14 +10,13 @@ public class Bookmark
 
     [Required, Column("user_id")]
     public int UserId { get; set; }
-    
-    [ForeignKey("UserId")]
-    public required User User { get; set; }
 
     [Column("media_id")]
     public int MediaId { get; set; }
 
     [Column("note")]
     public string? Note { get; set; }
+
+    public User? User { get; set; }
 }
 

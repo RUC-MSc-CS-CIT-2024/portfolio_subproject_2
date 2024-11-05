@@ -23,14 +23,14 @@ public class BookmarkController : ControllerBase
 
 
     [HttpPost]
-    public async Task<IActionResult> CreateBookmark(int userId, [FromBody] CreateBookmarkDto createBookmarkDto)
+    public async Task<IActionResult> CreateBookmark(int userId, [FromBody] BookmarkCreateRequest createBookmarkDto)
     {
         if (createBookmarkDto == null)
             return BadRequest("Bookmark data is required.");
 
-        createBookmarkDto.UserId = userId;
-        await _bookmarkManager.CreateBookmarkAsync(createBookmarkDto);
-        return Created("Bookmark created successfully.", createBookmarkDto);
+        var createdBookmark = await _bookmarkManager.CreateBookmarkAsync(userId, createBookmarkDto);
+        createdBookmark.Links = AddBookmarkLinks(createdBookmark);
+        return CreatedAtAction(nameof(GetBookmark), new { userId, id = createdBookmark.BookmarkId }, createdBookmark);
     }
 
     [HttpGet("{id}", Name = nameof(GetBookmark))]
@@ -43,7 +43,7 @@ public class BookmarkController : ControllerBase
         if (bookmark.UserId != userId)
             return Forbid();
 
-        await AddBookmarkLinks(bookmark);
+        bookmark.Links = AddBookmarkLinks(bookmark);
 
         return Ok(bookmark);
     }
@@ -55,9 +55,7 @@ public class BookmarkController : ControllerBase
         var totalItems = await _bookmarkManager.GetTotalUserBookmarksCountAsync(userId);
 
         foreach (var bookmark in bookmarks)
-        {
-            await AddBookmarkLinks(bookmark);
-        }
+            bookmark.Links = AddBookmarkLinks(bookmark);
 
         var result = _pagingHelper.CreatePaging(nameof(GetUserBookmarks), page, pageSize, totalItems, bookmarks, new { userId });
 
@@ -95,35 +93,22 @@ public class BookmarkController : ControllerBase
         return NoContent();
     }
 
-    private async Task AddBookmarkLinks(BookmarkDto bookmark)
-    {
-        bookmark.Links.Add(new Link
-        {
-            Href = _pagingHelper.GetResourceLink(nameof(GetBookmark), new { userId = bookmark.UserId, id = bookmark.BookmarkId }) ?? string.Empty,
-            Rel = "self",
-            Method = "GET"
-        });
-
-        var user = await _userManager.GetUserAsync(bookmark.UserId);
-        if (user != null)
-        {
-            bookmark.Links.Add(new Link
-            {
+    private List<Link> AddBookmarkLinks(BookmarkResult bookmark)
+        => [
+            new Link {
+                Href = _pagingHelper.GetResourceLink(nameof(GetBookmark), new { userId = bookmark.UserId, id = bookmark.BookmarkId }) ?? string.Empty,
+                Rel = "self",
+                Method = "GET"
+            },
+            new Link {
                 Href = _pagingHelper.GetResourceLink(nameof(UserController.GetUser), new { userId = bookmark.UserId }) ?? string.Empty,
                 Rel = "user",
                 Method = "GET"
-            });
-        }
-
-        var media = _mediaManager.Get(bookmark.MediaId);
-        if (media != null)
-        {
-            bookmark.Links.Add(new Link
-            {
+            },
+            new Link {
                 Href = _pagingHelper.GetResourceLink(nameof(MediaController.Get), new { id = bookmark.MediaId }) ?? string.Empty,
                 Rel = "media",
                 Method = "GET"
-            });
-        }
-    }
+            }
+        ];
 }

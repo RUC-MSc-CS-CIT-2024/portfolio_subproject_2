@@ -5,7 +5,7 @@ public static class TimeZoneHelper
     public static readonly TimeZoneInfo CopenhagenTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Central European Standard Time");
 }
 
-public class CompletedDto : BaseResult
+public class CompletedResult : BaseResult
 {
     public int CompletedId { get; set; }
     public int UserId { get; set; }
@@ -15,7 +15,7 @@ public class CompletedDto : BaseResult
     public string? Note { get; set; }
 }
 
-public class CreateCompletedDto : BaseResult
+public class CompletedCreateRequest
 {
     public int UserId { get; set; }
     public int MediaId { get; set; }

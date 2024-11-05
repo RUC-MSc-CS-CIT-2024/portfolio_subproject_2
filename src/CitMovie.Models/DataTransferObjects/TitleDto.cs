@@ -1,5 +1,3 @@
-using CitMovie.Models.DomainObjects;
-
 namespace CitMovie.Models.DataTransferObjects;
 
 public record TitleResult {

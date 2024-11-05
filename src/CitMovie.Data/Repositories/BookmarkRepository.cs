@@ -9,7 +9,7 @@ public class BookmarkRepository : IBookmarkRepository
     public BookmarkRepository(FrameworkContext context) =>
         _context = context;
 
-    public async Task BookmarkMediaAsync(int userId, int mediaId, string? note = null)
+    public async Task<Bookmark> BookmarkMediaAsync(int userId, int mediaId, string? note = null)
     {
         var sql = "SELECT bookmark_media(@p_user_id, @p_media_id, @p_note)";
         var parameters = new[]
@@ -20,6 +20,8 @@ public class BookmarkRepository : IBookmarkRepository
         };
 
         await _context.Database.ExecuteSqlRawAsync(sql, parameters);
+
+        return await _context.Bookmarks.FirstAsync(x => x.UserId == userId && x.MediaId == mediaId);
     }
 
     public async Task UnbookmarkMediaAsync(int userId, int mediaId)
