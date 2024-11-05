@@ -4,6 +4,7 @@ namespace CitMovie.Api;
 
 [ApiController]
 [Route("api/media/{mediaId}/releases/{releaseId}/promotional_media")]
+[Tags("Media")]
 public class PromotionalMediaController : ControllerBase
 {
     private readonly IPromotionalMediaManager _manager;

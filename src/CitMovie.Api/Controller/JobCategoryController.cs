@@ -2,6 +2,7 @@ namespace CitMovie.Api;
 
 [ApiController]
 [Route("api/job_categories")]
+[Tags("Base data")]
 public class JobCategoryController : ControllerBase
 {
     private readonly IJobCategoryManager _jobCategoryManager;

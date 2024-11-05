@@ -1,9 +1,8 @@
-using CitMovie.Models;
-
 namespace CitMovie.Api;
 
 [ApiController]
 [Route("api/persons")]
+[Tags("Person")]
 public class PersonController : ControllerBase
 {
     private readonly IPersonManager _personManager;

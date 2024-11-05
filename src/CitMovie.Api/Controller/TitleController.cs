@@ -2,6 +2,7 @@ namespace CitMovie.Api;
 
 [ApiController]
 [Route("api/media/{mediaId}/titles")]
+[Tags("Media")]
 public class TitleController : ControllerBase {
     private readonly ITitleManager _titleManager;
     private readonly ILogger<TitleController> _logger;

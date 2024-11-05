@@ -2,6 +2,7 @@ namespace CitMovie.Api;
 
 [ApiController]
 [Route("api/genres")]
+[Tags("Base data")]
 public class GenreController : ControllerBase
 {
     private readonly IGenreManager _genreManager;

@@ -2,6 +2,7 @@ namespace CitMovie.Api;
 
 [ApiController]
 [Route("api/countries")]
+[Tags("Base data")]
 public class CountryController : ControllerBase
 {
     private readonly ICountryManager _countryManager;

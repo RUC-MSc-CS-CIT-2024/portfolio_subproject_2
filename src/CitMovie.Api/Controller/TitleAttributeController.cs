@@ -2,6 +2,7 @@ namespace CitMovie.Api;
 
 [ApiController]
 [Route("api/title_attributes")]
+[Tags("Base data")]
 public class TitleAttributeController : ControllerBase
 {
     private readonly ITitleAttributeManager _titleAttributeManager;

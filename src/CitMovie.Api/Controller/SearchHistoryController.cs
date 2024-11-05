@@ -5,6 +5,7 @@ namespace CitMovie.Api;
 [ApiController]
 [Authorize(Policy = "user_scope")]
 [Route("api/users/{userId}/search_history")]
+[Tags("User")]
 public class SearchHistoryController : ControllerBase
 {
     private readonly ISearchHistoryManager _searchHistoryManager;

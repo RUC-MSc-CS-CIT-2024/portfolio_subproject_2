@@ -4,7 +4,7 @@ namespace CitMovie.Api;
 
 [ApiController]
 [Route("api/auth")]
-[Tags("Authentication and connection")]
+[Tags("Authentication")]
 public class LoginController : ControllerBase {
     private readonly ILogger<LoginController> _logger;
     private readonly ILoginManager _loginService;
@@ -15,7 +15,7 @@ public class LoginController : ControllerBase {
         _loginService = loginService;
     }
     
-    [HttpPost("login"), RequireHttps]
+    [HttpPost("generate-token"), RequireHttps]
     public async Task<ActionResult> Login([FromHeader(Name = "Authorization")] string? authorizationHeader) {
         if (authorizationHeader == null) {
             return BadRequest("Authorization header is missing");

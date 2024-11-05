@@ -1,11 +1,11 @@
 using System.Security.Claims;
-using CitMovie.Models;
 
 namespace CitMovie.Api.Controllers;
 
 [ApiController]
 [Route("api/users/{userId}/completed")]
 [Authorize(Policy = "user_scope")]
+[Tags("User")]
 public class CompletedController : ControllerBase
 {
     private readonly ICompletedManager _completedManager;

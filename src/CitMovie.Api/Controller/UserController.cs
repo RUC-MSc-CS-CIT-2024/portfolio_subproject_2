@@ -1,9 +1,9 @@
-using CitMovie.Models;
-
 namespace CitMovie.Api;
 
 [ApiController]
 [Route("api/user")]
+[Authorize(Policy = "user_scope")]
+[Tags("User")]
 public class UserController : ControllerBase
 {
     private readonly ILogger<UserController> _logger;
@@ -17,7 +17,7 @@ public class UserController : ControllerBase
         _userManager = userManager;
     }
 
-    [Authorize(Policy = "user_scope")]
+    
     [HttpGet("{userId}", Name = nameof(GetUser))]
     public async Task<ActionResult> GetUser(int userId)
     {

@@ -5,6 +5,7 @@ namespace CitMovie.Api;
 [ApiController]
 [Authorize(Policy = "user_scope")]
 [Route("api/users/{userId}/following")]
+[Tags("User")]
 public class FollowController : ControllerBase
 {
     private readonly IFollowManager _followManager;

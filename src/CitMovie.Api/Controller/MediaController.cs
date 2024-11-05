@@ -1,10 +1,8 @@
-using CitMovie.Models;
-using CitMovie.Models.DomainObjects;
-
 namespace CitMovie.Api;
 
 [ApiController]
 [Route("api/media")]
+[Tags("Media")]
 public class MediaController : ControllerBase
 {
     private readonly IMediaManager _mediaManager;

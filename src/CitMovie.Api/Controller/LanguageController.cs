@@ -2,7 +2,7 @@ namespace CitMovie.Api;
 
 [ApiController]
 [Route("api/languages")]
-
+[Tags("Base data")]
 public class LanguageController : ControllerBase
 {
     private readonly ILanguageManager _languageManager;

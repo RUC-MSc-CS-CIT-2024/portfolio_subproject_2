@@ -3,6 +3,7 @@ using CitMovie.Models;
 namespace CitMovie.Api;
 [ApiController]
 [Route("/api/media/{mediaId}/releases")]
+[Tags("Media")]
 public class ReleaseController : ControllerBase
 {
     private readonly IReleaseManager _releaseManager;
