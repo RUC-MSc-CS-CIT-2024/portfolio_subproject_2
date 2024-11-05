@@ -1,4 +1,4 @@
-namespace CitMovie.Models.DataTransferObjects;
+namespace CitMovie.Models;
 
 public record PageQueryParameter(
     [property: FromQuery(Name = "page")] int Number = 1, 

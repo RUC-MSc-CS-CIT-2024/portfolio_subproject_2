@@ -87,4 +87,14 @@ public class MediaManager : IMediaManager {
             .OrderBy(x => x.Id)
             .ThenBy(x => x.Title);
     }
+
+    public async Task<int> GetTotalRelatedMediaCountAsync(int id)
+    {
+        return await _mediaRepository.GetTotalRelatedMediaCountAsync(id);
+    }
+
+    public async Task<int> GetTotalSimilarMediaCountAsync(int id)
+    {
+        return await _mediaRepository.GetTotalSimilarMediaCountAsync(id);
+    }
 }

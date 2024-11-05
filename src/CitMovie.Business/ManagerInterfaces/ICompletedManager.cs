@@ -7,4 +7,5 @@ public interface ICompletedManager
     Task<IEnumerable<CompletedDto>> GetUserCompletedItemsAsync(int userId, int page, int pageSize);
     Task<CompletedDto?> UpdateCompletedAsync(int completedId, UpdateCompletedDto updateCompletedDto);
     Task<bool> DeleteCompletedAsync(int completedId);
+    Task<int> GetTotalUserCompletedCountAsync(int userId);
 }

@@ -148,6 +148,7 @@ app.MapGet("/test-connection", async (FrameworkContext context) =>
     {
         return Results.Problem("Connection test failed: " + ex.Message);
     }
-});
+})
+.WithTags("Authentication and connection");
 
 app.Run();

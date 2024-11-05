@@ -4,6 +4,7 @@ namespace CitMovie.Api;
 
 [ApiController]
 [Route("api/auth")]
+[Tags("Authentication and connection")]
 public class LoginController : ControllerBase {
     private readonly ILogger<LoginController> _logger;
     private readonly ILoginManager _loginService;
