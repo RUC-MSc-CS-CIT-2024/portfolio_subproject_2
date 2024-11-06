@@ -8,4 +8,5 @@ public interface ICompletedRepository
     Task<Completed> UpdateCompletedAsync(Completed completed);
     Task<bool> DeleteCompletedAsync(int completedId);
     Task<int> GetTotalUserCompletedCountAsync(int userId);
+    Task<Completed> CreateCompletedAsync(Completed newCompleted);
 }

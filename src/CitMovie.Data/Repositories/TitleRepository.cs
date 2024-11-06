@@ -1,3 +1,5 @@
+using System.Text.Json;
+
 namespace CitMovie.Data;
 
 public class TitleRepository : ITitleRepository {

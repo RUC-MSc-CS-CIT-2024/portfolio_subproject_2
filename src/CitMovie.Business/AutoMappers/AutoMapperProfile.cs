@@ -117,5 +117,7 @@ public class AutoMapperProfile : Profile
         // Bookmark & Completed
         CreateMap<Bookmark, BookmarkResult>();
         CreateMap<Completed, CompletedResult>();
+
+        CreateMap<CompletedCreateRequest, Completed>();
     }
 }

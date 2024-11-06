@@ -3,23 +3,27 @@ namespace CitMovie.Business;
 public class CompletedManager : ICompletedManager
 {
     private readonly ICompletedRepository _completedRepository;
+    private readonly IBookmarkRepository _bookmarkRepository;
+    private readonly IMapper _mapper;
 
-    public CompletedManager(ICompletedRepository completedRepository) =>
-        _completedRepository = completedRepository;
-
-    public async Task<CompletedResult> MoveBookmarkToCompletedAsync(CompletedCreateRequest createCompletedDto)
+    public CompletedManager(
+        ICompletedRepository completedRepository, 
+        IBookmarkRepository bookmarkRepository,
+        IMapper mapper)
     {
-        var completed = await _completedRepository.MoveBookmarkToCompletedAsync(createCompletedDto.UserId, createCompletedDto.MediaId, createCompletedDto.Rewatchability, createCompletedDto.Note);
+        _completedRepository = completedRepository;
+        _bookmarkRepository = bookmarkRepository;
+        _mapper = mapper;
+    }
 
-        return new CompletedResult
-        {
-            CompletedId = completed.CompletedId,
-            UserId = completed.UserId,
-            MediaId = completed.MediaId,
-            CompletedDate = completed.CompletedDate,
-            Rewatchability = completed.Rewatchability,
-            Note = completed.Note
-        };
+    public async Task<CompletedResult> MoveBookmarkToCompletedAsync(int userId, int bookmarkId, BookmarkMoveRequest createCompletedDto)
+    {
+        Bookmark b = await _bookmarkRepository.GetBookmarkByIdAsync(bookmarkId);
+        if (b.UserId != userId)
+            throw new InvalidOperationException();
+
+        var completed = await _completedRepository.MoveBookmarkToCompletedAsync(userId, b.MediaId, createCompletedDto.Rewatchability, createCompletedDto.Note);
+        return _mapper.Map<CompletedResult>(completed);
     }
 
     public async Task<CompletedResult?> GetCompletedAsync(int completedId)
@@ -69,5 +73,14 @@ public class CompletedManager : ICompletedManager
     public async Task<int> GetTotalUserCompletedCountAsync(int userId)
     {
         return await _completedRepository.GetTotalUserCompletedCountAsync(userId);
+    }
+
+    public async Task<CompletedResult> CreateBookmarkAsync(int userId, CompletedCreateRequest createRequest)
+    {
+        Completed c = _mapper.Map<Completed>(createRequest);
+        c.UserId = userId;
+
+        Completed result = await _completedRepository.CreateCompletedAsync(c);
+        return _mapper.Map<CompletedResult>(result);
     }
 }

@@ -31,7 +31,6 @@ public class TitleAttributeRepository : ITitleAttributeRepository
 
     public Task<List<TitleAttribute>> GetMultipleByIdsAsync(IEnumerable<int> ids)
         => _context.TitleAttributes
-            .AsNoTracking()
             .Where(x => ids.Contains(x.TitleAttributeId))
             .ToListAsync();
 }

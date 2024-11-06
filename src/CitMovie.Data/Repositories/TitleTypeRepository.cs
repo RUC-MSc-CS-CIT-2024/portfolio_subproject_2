@@ -29,7 +29,6 @@ public class TitleTypeRepository : ITitleTypeRepository
 
     public Task<List<TitleType>> GetMultipleByIdsAsync(IEnumerable<int> ids)
         => _context.TitleTypes
-            .AsNoTracking()
             .Where(x => ids.Contains(x.TitleTypeId))
             .ToListAsync();
 }
