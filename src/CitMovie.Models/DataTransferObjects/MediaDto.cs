@@ -1,4 +1,4 @@
-using System.Text.Json.Serialization;
+using System.ComponentModel;
 
 namespace CitMovie.Models.DataTransferObjects;
 
@@ -58,7 +58,7 @@ public class MediaResult : BaseResult {
 
 [JsonConverter(typeof(JsonStringEnumConverter<MediaQueryType>))]
 public enum MediaQueryType {
-    Basic,
+    All,
     ExactMatch,
     BestMatch,
     Simple,
@@ -68,8 +68,8 @@ public enum MediaQueryType {
 public class MediaQueryParameter {
     public PageQueryParameter Page { get; init; } = new PageQueryParameter();
 
-    [FromQuery(Name = "query_type")]
-    public MediaQueryType QueryType { get; init; } = MediaQueryType.Basic;
+    [FromQuery(Name = "query_type"), DefaultValue(MediaQueryType.All)]
+    public MediaQueryType QueryType { get; init; } = MediaQueryType.All;
     
     [FromQuery(Name = "keywords")]
     public string[]? Keywords { get; init; }

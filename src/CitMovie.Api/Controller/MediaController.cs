@@ -20,7 +20,7 @@ public class MediaController : ControllerBase
     public IActionResult Get([FromQuery] MediaQueryParameter queryParameter)
     {
         IEnumerable<MediaBasicResult> mediaResult;
-        if (queryParameter.QueryType == MediaQueryType.Basic)
+        if (queryParameter.QueryType == MediaQueryType.All)
             mediaResult = _mediaManager.GetAllMedia(queryParameter.Page);
         else
             mediaResult = _mediaManager.Search(queryParameter, GetUserId());
