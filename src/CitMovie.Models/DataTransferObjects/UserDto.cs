@@ -7,5 +7,10 @@ public class UserResult : BaseResult
     public required string Email { get; set; }
 }
 
-public record UserCreateRequest(string Username, string Email, string Password);
+public record UserCreateRequest {
+    public required string Username { get; set; }
+    public required string Email { get; set; }
+    public required string Password { get; set; }
+}
+
 public record UserUpdateRequest(string? Username, string? Email, string? Password);

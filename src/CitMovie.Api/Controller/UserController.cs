@@ -35,17 +35,18 @@ public class UserController : ControllerBase
     }
 
     [HttpPost]
+    [AllowAnonymous]
     public async Task<ActionResult> CreateUser([FromBody] UserCreateRequest user)
     {
         try
         {
             UserResult newUser = await _userManager.CreateUserAsync(user);
-            return CreatedAtAction(nameof(GetUser), new { id = newUser.Id }, newUser);
+            return CreatedAtAction(nameof(GetUser), new { userId = newUser.Id }, newUser);
         }
         catch (Exception ex)
         {
-            _logger.LogInformation(ex, "Create user failed");
-            return BadRequest("Create user failed");
+            _logger.LogError(ex, "Create user failed");
+            return StatusCode(StatusCodes.Status500InternalServerError);
         }
     }
 
@@ -60,8 +61,8 @@ public class UserController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogInformation(ex, "Update user failed");
-            return BadRequest("Update user failed");
+            _logger.LogError(ex, "Update user failed");
+            return StatusCode(StatusCodes.Status500InternalServerError);
         }
     }
 
@@ -78,8 +79,8 @@ public class UserController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogInformation(ex, "Delete user failed");
-            return BadRequest("Delete user failed");
+            _logger.LogError(ex, "Delete user failed");
+            return StatusCode(StatusCodes.Status500InternalServerError);
         }
     }
 

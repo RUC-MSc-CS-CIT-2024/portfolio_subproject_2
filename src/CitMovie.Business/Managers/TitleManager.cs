@@ -26,11 +26,11 @@ public class TitleManager : ITitleManager
     public async Task<TitleResult> CreateAsync(int mediaId, TitleCreateRequest createRequest)
     {
         Title t = _mapper.Map<Title>(createRequest);
-        if (createRequest.AttributeIds is not null) {
+        if (createRequest.AttributeIds != null) {
             List<TitleAttribute> attributes = await _titleAttributeRepository.GetMultipleByIdsAsync(createRequest.AttributeIds);
             t.TitleAttributes.AddRange(attributes);
         }
-        if (createRequest.TypeIds is not null) {
+        if (createRequest.TypeIds != null) {
             List<TitleType> types = await _titleTypeRepository.GetMultipleByIdsAsync(createRequest.TypeIds);
             t.TitleTypes.AddRange(types);
         }

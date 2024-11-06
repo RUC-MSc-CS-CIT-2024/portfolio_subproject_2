@@ -1,3 +1,5 @@
+using System.Text.Json;
+
 namespace CitMovie.Data;
 
 public class TitleRepository : ITitleRepository {
@@ -10,6 +12,7 @@ public class TitleRepository : ITitleRepository {
 
     public async Task<Title> CreateAsync(Title title)
     {
+        Console.WriteLine(JsonSerializer.Serialize(title));
         _context.Titles.Add(title);
         await _context.SaveChangesAsync();
         return _context.Titles
