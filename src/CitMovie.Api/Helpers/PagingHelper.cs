@@ -14,14 +14,14 @@ public class PagingHelper
     public string? GetLink(string linkName, object routeValues)
     {
         var uri = _linkGenerator.GetUriByName(
-            _httpContextAccessor.HttpContext,
+            _httpContextAccessor.HttpContext!,
             linkName,
             routeValues
         );
         return uri;
     }
 
-    public object CreatePaging<T>(string linkName, int page, int pageSize, int total, IEnumerable<T?> items, object additionalRouteValues = null)
+    public object CreatePaging<T>(string linkName, int page, int pageSize, int total, IEnumerable<T?> items, object? additionalRouteValues = null)
     {
         var numberOfPages = (int)Math.Ceiling(total / (double)pageSize);
 
@@ -38,11 +38,11 @@ public class PagingHelper
 
         var curPage = GetLink(linkName, routeValues) ?? string.Empty;
 
-        var nextPage = page < numberOfPages - 1
+        var nextPage = page < numberOfPages
             ? GetLink(linkName, MergeObjects(routeValues, new { page = page + 1 })) ?? string.Empty
             : null;
 
-        var prevPage = page > 0
+        var prevPage = page > 1
             ? GetLink(linkName, MergeObjects(routeValues, new { page = page - 1 })) ?? string.Empty
             : null;
 

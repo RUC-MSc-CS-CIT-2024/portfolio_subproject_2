@@ -1,6 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
 namespace CitMovie.Models.DomainObjects;
 
 
@@ -12,15 +9,15 @@ public class SearchHistory
     public int SearchHistoryId { get; set; }
 
     [Required, Column("user_id")]
-    public int UserId { get; set; }
+    public required int UserId { get; set; }
     
     [ForeignKey("UserId")]
-    public User User { get; set; }
+    public User? User { get; set; }
 
     [Required, MaxLength(50), Column("type")]
-    public string Type { get; set; }
+    public required string Type { get; set; }
 
     [Required, Column("query")]
-    public string Query { get; set; }
+    public required string Query { get; set; }
 }
 

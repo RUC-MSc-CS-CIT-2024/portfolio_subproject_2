@@ -27,12 +27,6 @@ public class Media
     [Column("awards")]
     public string? Awards { get; set; }
 
-    // [Column("original_title_id")]
-    // public int OriginalTitleId { get; set; }
-
-    // [Column("primary_release_id")]
-    // public int PrimaryReleaseId { get; set; }
-
     public MediaPrimaryInformation? PrimaryInformation { get; set; }
 
     public List<MediaProductionCompany> MediaProductionCompany { get; } = [];

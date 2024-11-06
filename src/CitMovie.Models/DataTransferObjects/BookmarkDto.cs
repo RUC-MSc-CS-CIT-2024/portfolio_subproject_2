@@ -1,6 +1,6 @@
 namespace CitMovie.Models.DataTransferObjects;
 
-public class BookmarkDto : BaseResult
+public class BookmarkResult : BaseResult
 {
     public int BookmarkId { get; set; }
     public int UserId { get; set; }
@@ -8,10 +8,9 @@ public class BookmarkDto : BaseResult
     public string? Note { get; set; }
 }
 
-    public class CreateBookmarkDto
+public class BookmarkCreateRequest
 {
-    public int UserId { get; set; }
-    public int MediaId { get; set; }
-    public string MediaTitle { get; set; }
+    public required int MediaId { get; set; }
+    public required string MediaTitle { get; set; }
     public string? Note { get; set; }
 }

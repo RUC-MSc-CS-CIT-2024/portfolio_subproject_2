@@ -2,9 +2,9 @@ namespace CitMovie.Models.DataTransferObjects;
 
 public class UserResult : BaseResult
 {
-    public int Id { get; set; }
-    public string Username { get; set; }
-    public string Email { get; set; }
+    public required int Id { get; set; }
+    public required string Username { get; set; }
+    public required string Email { get; set; }
 }
 
 public record UserCreateRequest(string Username, string Email, string Password);

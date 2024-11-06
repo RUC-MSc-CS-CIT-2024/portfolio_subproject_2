@@ -41,8 +41,10 @@ All paths are prefixed with `/api/` and support pagination in the form of `page=
 |`GET`|`/api/media/{mediaId}/titles`|200 (empty if no titles)|Retrieve all titles for a media.|
 |`POST`|`/api/media/{mediaId}/titles`|201|Create a new title for a media.|
 |`DELETE`|`/api/media/{mediaId}/titles/{titleId}`|200 or 404|Delete a specific title for a media.|
-|`GET`|`/api/media/{id}/crew`|200 (empty if no crew)|Retrieve all crew and cast members for a media.|
+|`GET`|`/api/media/{id}/crew`|200 (empty if no crew)|Retrieve all crew members for a media.|
+|`GET`|`/api/media/{id}/cast`|200 (empty if no cast)|Retrieve all cast members for a media.|
 |`GET`|`/api/media/{id}/similar_media`|200 (empty if no related media)|Retrieve all similar media.|
+|`GET`|`/api/media/{id}/related_media`|200 (empty if no related media)|Retrieve all related media.|
 
 #### **User Media Reviews & Recommendations**
 

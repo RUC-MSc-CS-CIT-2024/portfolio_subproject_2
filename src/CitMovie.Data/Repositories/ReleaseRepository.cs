@@ -1,5 +1,3 @@
-using Microsoft.EntityFrameworkCore;
-
 namespace CitMovie.Data;
 
 public class ReleaseRepository : IReleaseRepository
@@ -18,8 +16,7 @@ public class ReleaseRepository : IReleaseRepository
             .Include(x => x.Country)
             .Include(x => x.SpokenLanguages)
             .Where(r => r.MediaId == mediaId)
-            .Skip(page * pageSize)
-            .Take(pageSize)
+            .Pagination(page, pageSize)
             .ToListAsync();
     }
 
@@ -81,9 +78,9 @@ public class ReleaseRepository : IReleaseRepository
             .FirstAsync(x => x.ReleaseId == releaseId);;
     }
 
-    public async Task<int> GetReleasesCountAsync(int mediaId)
+    public Task<int> GetReleasesCountAsync(int mediaId)
     {
-        return _context.Releases.Count(x => x.MediaId == mediaId);
+        return _context.Releases.CountAsync(x => x.MediaId == mediaId);
     }
 
     private async Task ValidateMediaAsync(int mediaId)

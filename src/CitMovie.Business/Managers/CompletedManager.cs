@@ -7,43 +7,34 @@ public class CompletedManager : ICompletedManager
     public CompletedManager(ICompletedRepository completedRepository) =>
         _completedRepository = completedRepository;
 
-    public async Task<CompletedDto> CreateCompletedAsync(CreateCompletedDto createCompletedDto)
+    public async Task<CompletedResult> MoveBookmarkToCompletedAsync(CompletedCreateRequest createCompletedDto)
     {
-        var completed = new Completed
-        {
-            UserId = createCompletedDto.UserId,
-            MediaId = createCompletedDto.MediaId,
-            CompletedDate = createCompletedDto.CompletedDate,
-            Rewatchability = createCompletedDto.Rewatchability,
-            Note = createCompletedDto.Note
-        };
+        var completed = await _completedRepository.MoveBookmarkToCompletedAsync(createCompletedDto.UserId, createCompletedDto.MediaId, createCompletedDto.Rewatchability, createCompletedDto.Note);
 
-        var result = await _completedRepository.AddCompletedAsync(completed);
-
-        return new CompletedDto
+        return new CompletedResult
         {
-            CompletedId = result.CompletedId,
-            UserId = result.UserId,
-            MediaId = result.MediaId,
-            CompletedDate = result.CompletedDate,
-            Rewatchability = result.Rewatchability,
-            Note = result.Note
+            CompletedId = completed.CompletedId,
+            UserId = completed.UserId,
+            MediaId = completed.MediaId,
+            CompletedDate = completed.CompletedDate,
+            Rewatchability = completed.Rewatchability,
+            Note = completed.Note
         };
     }
 
-    public async Task<CompletedDto?> GetCompletedAsync(int completedId)
+    public async Task<CompletedResult?> GetCompletedAsync(int completedId)
     {
         var completed = await _completedRepository.GetCompletedByIdAsync(completedId);
         return completed == null ? null : MapToDto(completed);
     }
 
-    public async Task<IEnumerable<CompletedDto>> GetUserCompletedItemsAsync(int userId, int page, int pageSize)
+    public async Task<IEnumerable<CompletedResult>> GetUserCompletedItemsAsync(int userId, int page, int pageSize)
     {
         var completedItems = await _completedRepository.GetUserCompletedItemsAsync(userId, page, pageSize);
         return completedItems.Select(MapToDto);
     }
 
-    public async Task<CompletedDto?> UpdateCompletedAsync(int completedId, UpdateCompletedDto updateCompletedDto)
+    public async Task<CompletedResult?> UpdateCompletedAsync(int completedId, UpdateCompletedDto updateCompletedDto)
     {
         var completed = await _completedRepository.GetCompletedByIdAsync(completedId);
         if (completed == null) return null;
@@ -64,7 +55,7 @@ public class CompletedManager : ICompletedManager
     public async Task<bool> DeleteCompletedAsync(int completedId) =>
         await _completedRepository.DeleteCompletedAsync(completedId);
 
-    private static CompletedDto MapToDto(Completed completed) =>
+    private static CompletedResult MapToDto(Completed completed) =>
         new()
         {
             CompletedId = completed.CompletedId,

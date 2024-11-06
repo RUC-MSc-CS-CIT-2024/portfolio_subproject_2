@@ -1,9 +1,8 @@
-using CitMovie.Models;
-
 namespace CitMovie.Api;
 
 [ApiController]
 [Route("api/persons")]
+[Tags("Person")]
 public class PersonController : ControllerBase
 {
     private readonly IPersonManager _personManager;
@@ -18,25 +17,21 @@ public class PersonController : ControllerBase
     }
 
     [HttpGet(Name = nameof(GetPersons))]
-    public async Task<ActionResult<IEnumerable<PersonResult>>> GetPersons(
-        [FromQuery] int page = 0,
-        [FromQuery] int pageSize = 10)
+    public async Task<ActionResult<IEnumerable<PersonResult>>> GetPersons([FromQuery] PageQueryParameter page)
     {
-        var persons = await _personManager.GetPersonsAsync(page, pageSize);
+        var persons = await _personManager.GetPersonsAsync(page.Number, page.Count);
         var totalCount = await _personManager.GetTotalPersonsCountAsync();
 
         var result = _pagingHelper.CreatePaging(
             nameof(GetPersons),
-            page,
-            pageSize,
+            page.Number, page.Count,
             totalCount,
             persons
         );
 
         foreach (var person in persons)
-        {
-            AddPersonLinks(person);
-        }
+            person.Links = AddPersonLinks(person.Id);
+        
 
         return Ok(result);
     }
@@ -46,59 +41,45 @@ public class PersonController : ControllerBase
     {
         var person = await _personManager.GetPersonByIdAsync(id);
         if (person == null)
-        {
             return NotFound();
-        }
 
-        AddPersonLinks(person);
+        person.Links = AddPersonLinks(person.Id);
 
         return Ok(person);
     }
 
     [HttpGet("{id}/media", Name = nameof(GetMediaByPersonId))]
-    public async Task<ActionResult<IEnumerable<PersonResult.MediaResult>>> GetMediaByPersonId(int id,
-          [FromQuery] int page = 0,
-          [FromQuery] int pageSize = 10)
+    public async Task<ActionResult<IEnumerable<MediaBasicResult>>> GetMediaByPersonId(int id, [FromQuery] PageQueryParameter page)
     {
-        var media = await _personManager.GetMediaByPersonIdAsync(id, page, pageSize);
+        var media = await _personManager.GetMediaByPersonIdAsync(id, page.Number, page.Count);
         var totalCount = await _personManager.GetMediaByPersonIdCountAsync(id);
 
         var result = _pagingHelper.CreatePaging(
             nameof(GetMediaByPersonId),
-            page,
-            pageSize,
+            page.Number, page.Count,
             totalCount,
             media,
             new { id }
         );
 
         foreach (var m in media)
-        {
-            await AddMediaLinks(m);
-        }
+            m.Links = AddMediaLinks(m);
 
         return Ok(result);
     }
 
     [HttpGet("{id}/coactors", Name = nameof(GetFrequentCoActors))]
-    public async Task<ActionResult<IEnumerable<CoActorResult>>> GetFrequentCoActors(
-      int id,
-      [FromQuery] int page = 0,
-      [FromQuery] int pageSize = 10)
+    public async Task<ActionResult<IEnumerable<CoActorResult>>> GetFrequentCoActors(int id, [FromQuery] PageQueryParameter page)
     {
-        var actorName = await _personManager.GetActorNameByIdAsync(id);
-        var coActor = await _personManager.GetFrequentCoActorsAsync(actorName, page, pageSize);
+        var coActor = await _personManager.GetFrequentCoActorsAsync(id, page.Number, page.Count);
         var totalCount = await _personManager.GetFrequentCoActorsCountAsync(id);
 
         foreach (var ca in coActor)
-        {
-            await AddCoActorLinks(ca);
-        }
+            ca.Links = AddPersonLinks(ca.Id);
 
         var result = _pagingHelper.CreatePaging(
             nameof(GetFrequentCoActors),
-            page,
-            pageSize,
+            page.Number, page.Count,
             totalCount,
             coActor,
             new { id }
@@ -107,48 +88,24 @@ public class PersonController : ControllerBase
         return Ok(result);
     }
 
-    private void AddPersonLinks(PersonResult person)
-    {
-        person.Links.Add(new Link
-        {
-            Href = _pagingHelper.GetResourceLink(nameof(GetPersonById), new { id = person.Id }) ?? string.Empty,
-            Rel = "self",
-            Method = "GET"
-        });
-
-        person.Links.Add(new Link
-        {
-            Href = _pagingHelper.GetResourceLink(nameof(GetFrequentCoActors), new { id = person.Id }) ?? string.Empty,
-            Rel = "frequent-coactors",
-            Method = "GET"
-        });
-    }
-
-    private async Task AddCoActorLinks(CoActorResult coActor)
-    {
-        var personId = await _personManager.GetPersonIdByImdbIdAsync(coActor.Id);
-        if (personId.HasValue)
-        {
-            coActor.Links.Add(new Link
-            {
+    private List<Link> AddPersonLinks(int personId)
+        => [ new Link {
                 Href = _pagingHelper.GetResourceLink(nameof(GetPersonById), new { id = personId }) ?? string.Empty,
                 Rel = "self",
                 Method = "GET"
-            });
-        }
-    }
+            },
+            new Link {
+                Href = _pagingHelper.GetResourceLink(nameof(GetFrequentCoActors), new { id = personId }) ?? string.Empty,
+                Rel = "frequent-coactors",
+                Method = "GET"
+            }
+        ];
 
-    private async Task AddMediaLinks(PersonResult.MediaResult media)
-    {
-        var m = _mediaManager.Get(media.MediaId);
-        if (media != null)
-        {
-            media.Links.Add(new Link
-            {
-                Href = _pagingHelper.GetResourceLink(nameof(MediaController.Get), new { id = media.MediaId }) ?? string.Empty,
+    private List<Link> AddMediaLinks(MediaBasicResult media)
+        => [ new Link {
+                Href = _pagingHelper.GetResourceLink(nameof(MediaController.Get), new { id = media.Id }) ?? string.Empty,
                 Rel = "self",
                 Method = "GET"
-            });
-        }
-    }
+            }
+        ];
 }

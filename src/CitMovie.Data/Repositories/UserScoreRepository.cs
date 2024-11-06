@@ -1,6 +1,5 @@
-using Microsoft.EntityFrameworkCore;
-
 namespace CitMovie.Data;
+
 public class UserScoreRepository : IUserScoreRepository
 {
     private readonly FrameworkContext _frameworkContext;
@@ -39,8 +38,7 @@ public class UserScoreRepository : IUserScoreRepository
         
         var filteredUserScores = await userScoresQuery
             .Where(us => mediaIds.Contains(us.MediaId) && (string.IsNullOrEmpty(mediaName) || titleMediaIds.Contains(us.MediaId)))
-            .Skip(page * pageSize)
-            .Take(pageSize)
+            .Pagination(page, pageSize)
             .ToListAsync();
 
         return filteredUserScores;
@@ -52,9 +50,13 @@ public class UserScoreRepository : IUserScoreRepository
             .CountAsync(us => us.UserId == userId);
     }
 
-    public async Task CreateUserScoreAsync(int userId, string imdbId, int score, string reviewText)
+    public async Task CreateUserScoreAsync(int userId, int mediaId, int score, string? reviewText)
     {
+        Media m = _dataContext.Media.AsNoTracking().First(x => x.Id == mediaId);
+        if (m.ImdbId == null)
+            throw new InvalidOperationException();
+
         await _frameworkContext.Database.ExecuteSqlInterpolatedAsync(
-            $"SELECT rate({userId}, {imdbId}, {score}, {reviewText})");
+            $"SELECT rate({userId}, {m.ImdbId}, {score}, {reviewText})");
     }
 }

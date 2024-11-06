@@ -19,10 +19,10 @@ public class Title
     public int? LanguageId { get; set; }
     
     public Media? Media { get; set; }
-    public Country Country { get; set; } = null!;
+    public Country? Country { get; set; }
     public Language? Language { get; set; }
     
-    public ICollection<Release> Releases { get; } = new List<Release>();
+    public List<Release> Releases { get; } = [];
  
     public List<TitleType> TitleTypes { get; } = [];
     public List<TitleAttribute> TitleAttributes { get; } = [];

@@ -29,7 +29,7 @@ public class AutoMapperProfile : Profile
 
         // Media
         CreateMap<Media, MediaBasicResult>()
-            .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.PrimaryInformation!.Title.Name))
+            .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.PrimaryInformation!.Title!.Name))
             .ForMember(dest => dest.ReleaseDate, opt => {
                 opt.AllowNull();
                 opt.MapFrom(src => src.PrimaryInformation!.Release!.ReleaseDate);
@@ -41,7 +41,7 @@ public class AutoMapperProfile : Profile
 
 
         CreateMap<Media, MediaResult>()
-            .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.PrimaryInformation!.Title.Name))
+            .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.PrimaryInformation!.Title!.Name))
             .ForMember(dest => dest.ReleaseDate, opt => {
                 opt.AllowNull();
                 opt.MapFrom(src => src.PrimaryInformation!.Release!.ReleaseDate);
@@ -58,6 +58,12 @@ public class AutoMapperProfile : Profile
                 opt.AllowNull();
                 opt.MapFrom(src => src.Awards);
             });
+        
+        CreateMap<Episode, MediaResult>()
+            .IncludeBase<Media, MediaResult>();
+            
+        CreateMap<Season, MediaResult>()
+            .IncludeBase<Media, MediaResult>();
 
         CreateMap<Score, MediaResult.ScoreResult>();
         CreateMap<ProductionCompany, MediaResult.MediaProductionCompanyResult>();
@@ -69,17 +75,15 @@ public class AutoMapperProfile : Profile
             .ForMember(dest => dest.SpokenLanguages, opt => opt.Ignore());
         CreateMap<Release, ReleaseResult>()
             .ForMember(m => m.Title, 
-                opt => opt.MapFrom(src => src.Title.Name))
+                opt => opt.MapFrom(src => src.Title!.Name))
             .ForMember(m => m.Country, 
-                opt => opt.MapFrom(src => src.Country.Name))
+                opt => opt.MapFrom(src => src.Country!.Name))
             .ForMember(m => m.SpokenLanguages, 
                 opt => opt.MapFrom(src => src.SpokenLanguages.Select(sl => sl.Name)));
                 
         //Promotional Media
         CreateMap<PromotionalMediaCreateRequest, PromotionalMedia>();
-        CreateMap<PromotionalMedia, PromotionalMediaResult>()
-            .ForMember(dest => dest.MediaId, 
-                opt => opt.MapFrom(src => src.Release.MediaId));
+        CreateMap<PromotionalMedia, PromotionalMediaResult>();
 
         // Search History
         CreateMap<SearchHistory, SearchHistoryResult>()
@@ -88,13 +92,7 @@ public class AutoMapperProfile : Profile
         // Person
         CreateMap<Person, PersonResult>()
           .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.PersonId));
-        CreateMap<Media, PersonResult.MediaResult>()
-            .ForMember(dest => dest.Genres, opt => opt.MapFrom(src => src.Genres.Select(g => g.Name)))
-            .ForMember(dest => dest.MediaId, opt => opt.MapFrom(src => src.Id))
-            .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Plot))
-            .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.Titles.FirstOrDefault().Name));
         CreateMap<CoActor, CoActorResult>()
-            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.CoActorImdbId))
             .ForMember(dest => dest.ActorName, opt => opt.MapFrom(src => src.CoActorName));
         
         // TitleAttribute
@@ -109,5 +107,15 @@ public class AutoMapperProfile : Profile
             .ForMember(dest => dest.Types, opt => opt.MapFrom(src => src.TitleTypes))
             .ForMember(dest => dest.Attributes, opt => opt.MapFrom(src => src.TitleAttributes));
         CreateMap<TitleCreateRequest, Title>();
+
+        // Crew
+        CreateMap<CrewMember, CrewResult>()
+            .ForMember(dest => dest.JobCategory, opt => opt.MapFrom(src => src.JobCategory!.Name));
+        CreateMap<CastMember, CrewResult>()
+            .ForMember(dest => dest.JobCategory, opt => opt.MapFrom(src => "Actor"));
+
+        // Bookmark & Completed
+        CreateMap<Bookmark, BookmarkResult>();
+        CreateMap<Completed, CompletedResult>();
     }
 }

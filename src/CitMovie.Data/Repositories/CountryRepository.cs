@@ -1,5 +1,3 @@
-using Microsoft.EntityFrameworkCore;
-
 namespace CitMovie.Data;
 
 public class CountryRepository : ICountryRepository
@@ -15,8 +13,7 @@ public class CountryRepository : ICountryRepository
     {
         return await _context.Countries
             .AsNoTracking()
-            .Skip(page * pageSize)
-            .Take(pageSize)
+            .Pagination(page, pageSize)
             .ToListAsync();
     }
 

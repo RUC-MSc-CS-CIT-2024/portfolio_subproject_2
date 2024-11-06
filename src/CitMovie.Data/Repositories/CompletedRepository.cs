@@ -1,3 +1,5 @@
+using Npgsql;
+
 namespace CitMovie.Data;
 
 public class CompletedRepository : ICompletedRepository
@@ -7,12 +9,37 @@ public class CompletedRepository : ICompletedRepository
     public CompletedRepository(FrameworkContext context) =>
         _context = context;
 
-    public async Task<Completed> AddCompletedAsync(Completed completed)
+public async Task<Completed> MoveBookmarkToCompletedAsync(int userId, int mediaId, int rewatchability, string? note = null)
+{
+    var sql = "SELECT move_bookmark_to_completed(@p_user_id, @p_media_id, @p_rewatchability, @p_note)";
+    var parameters = new[]
     {
-        _context.Completed.Add(completed);
-        await _context.SaveChangesAsync();
-        return completed;
+        new NpgsqlParameter("p_user_id", userId),
+        new NpgsqlParameter("p_media_id", mediaId),
+        new NpgsqlParameter("p_rewatchability", rewatchability),
+        new NpgsqlParameter("p_note", note ?? (object)DBNull.Value)
+    };
+
+    await _context.Database.ExecuteSqlRawAsync(sql, parameters);
+
+    var user = await _context.Users.FindAsync(userId);
+
+    if (user == null)
+    {
+        throw new InvalidOperationException($"User with ID {userId} not found.");
     }
+
+    var completed = new Completed
+    {
+        UserId = userId,
+        MediaId = mediaId,
+        Rewatchability = rewatchability,
+        Note = note,
+        User = user
+    };
+
+    return completed;
+}
 
     public async Task<Completed?> GetCompletedByIdAsync(int completedId) =>
         await _context.Completed.FindAsync(completedId);
@@ -21,8 +48,7 @@ public class CompletedRepository : ICompletedRepository
         await _context.Completed
             .Where(c => c.UserId == userId)
             .AsNoTracking()
-            .Skip(page * pageSize)
-            .Take(pageSize)
+            .Pagination(page, pageSize)
             .ToListAsync();
 
     public async Task<Completed> UpdateCompletedAsync(Completed completed)
@@ -44,4 +70,5 @@ public class CompletedRepository : ICompletedRepository
 
     public async Task<int> GetTotalUserCompletedCountAsync(int userId) =>
         await _context.Completed.CountAsync(c => c.UserId == userId);
+
 }

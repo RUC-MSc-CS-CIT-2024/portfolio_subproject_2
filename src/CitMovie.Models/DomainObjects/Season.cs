@@ -15,5 +15,5 @@ public class Season : Media
     [Column("series_id")]
     public required int SeriesId { get; set; }
 
-    public required Media Series { get; set; }
+    public Media? Series { get; set; }
 }

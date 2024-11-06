@@ -1,5 +1,3 @@
-using Microsoft.EntityFrameworkCore;
-
 namespace CitMovie.Data;
 
 public class LanguageRepository : ILanguageRepository
@@ -20,8 +18,7 @@ public class LanguageRepository : ILanguageRepository
     public async Task<List<Language>> GetLanguagesAsync(int page, int pageSize)
     {
         return await _context.Languages
-            .Skip(pageSize * page)
-            .Take(pageSize)
+            .Pagination(page, pageSize)
             .ToListAsync();
     }
     
