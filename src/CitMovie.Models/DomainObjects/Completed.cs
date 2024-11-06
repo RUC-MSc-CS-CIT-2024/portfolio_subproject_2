@@ -1,6 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
 namespace CitMovie.Models.DomainObjects;
 
 
@@ -15,7 +12,7 @@ public class Completed
     public int UserId { get; set; }
 
     [ForeignKey("UserId")]
-    public User User { get; set; }
+    public required User User { get; set; }
 
     [Column("media_id")]
     public int MediaId { get; set; }

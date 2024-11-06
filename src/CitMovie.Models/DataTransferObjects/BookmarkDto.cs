@@ -8,10 +8,10 @@ public class BookmarkDto : BaseResult
     public string? Note { get; set; }
 }
 
-    public class CreateBookmarkDto
+    public class CreateBookmarkDto : BaseResult
 {
     public int UserId { get; set; }
     public int MediaId { get; set; }
-    public string MediaTitle { get; set; }
+    public string? MediaTitle { get; set; }
     public string? Note { get; set; }
 }

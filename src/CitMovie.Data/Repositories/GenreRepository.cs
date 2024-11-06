@@ -1,5 +1,3 @@
-using Microsoft.EntityFrameworkCore;
-
 namespace CitMovie.Data;
 
 public class GenreRepository : IGenreRepository

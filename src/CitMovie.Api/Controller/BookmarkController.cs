@@ -34,8 +34,8 @@ public class BookmarkController : ControllerBase
             return BadRequest("Bookmark data is required.");
 
         createBookmarkDto.UserId = userId;
-        var createdBookmark = await _bookmarkManager.CreateBookmarkAsync(createBookmarkDto);
-        return CreatedAtAction(nameof(GetBookmark), new { userId, id = createdBookmark.BookmarkId }, createdBookmark);
+        await _bookmarkManager.CreateBookmarkAsync(createBookmarkDto);
+        return Created("Bookmark created successfully.", createBookmarkDto);
     }
 
     [HttpGet("{id}", Name = nameof(GetBookmark))]
@@ -108,8 +108,8 @@ public class BookmarkController : ControllerBase
         if (bookmark.UserId != userId)
             return Forbid();
 
-        var deleted = await _bookmarkManager.DeleteBookmarkAsync(id);
-        return deleted ? NoContent() : NotFound();
+        await _bookmarkManager.DeleteBookmarkAsync(id);
+        return NoContent();
     }
 
     private async Task AddBookmarkLinks(BookmarkDto bookmark)

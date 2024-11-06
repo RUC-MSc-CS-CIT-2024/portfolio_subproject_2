@@ -7,27 +7,19 @@ public class CompletedManager : ICompletedManager
     public CompletedManager(ICompletedRepository completedRepository) =>
         _completedRepository = completedRepository;
 
-    public async Task<CompletedDto> CreateCompletedAsync(CreateCompletedDto createCompletedDto)
+    public async Task<CompletedDto> MoveBookmarkToCompletedAsync(int userId, int mediaId, int rewatchability, string? note = null)
     {
-        var completed = new Completed
-        {
-            UserId = createCompletedDto.UserId,
-            MediaId = createCompletedDto.MediaId,
-            CompletedDate = createCompletedDto.CompletedDate,
-            Rewatchability = createCompletedDto.Rewatchability,
-            Note = createCompletedDto.Note
-        };
+        var completed = await _completedRepository.MoveBookmarkToCompletedAsync(userId, mediaId, rewatchability, note);
 
-        var result = await _completedRepository.AddCompletedAsync(completed);
-
+        // Map to CompletedDto
         return new CompletedDto
         {
-            CompletedId = result.CompletedId,
-            UserId = result.UserId,
-            MediaId = result.MediaId,
-            CompletedDate = result.CompletedDate,
-            Rewatchability = result.Rewatchability,
-            Note = result.Note
+            CompletedId = completed.CompletedId,
+            UserId = completed.UserId,
+            MediaId = completed.MediaId,
+            CompletedDate = completed.CompletedDate,
+            Rewatchability = completed.Rewatchability,
+            Note = completed.Note
         };
     }
 
