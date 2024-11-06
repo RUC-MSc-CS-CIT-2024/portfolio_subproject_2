@@ -17,7 +17,7 @@ public class TitleController : ControllerBase {
     public IActionResult GetAll(int mediaId, [FromQuery] PageQueryParameter page) {
         try {
             return Ok(_titleManager.GetAllForMedia(mediaId, page));
-        } catch (InvalidOperationException) {
+        } catch (KeyNotFoundException) {
             return NotFound();
         } catch (Exception e) {
             _logger.LogError(e, "Unexpected error:");
@@ -29,7 +29,7 @@ public class TitleController : ControllerBase {
     public IActionResult Get(int mediaId, int titleId) {
         try {
             return Ok(_titleManager.Get(mediaId, titleId));
-        } catch (InvalidOperationException) {
+        } catch (KeyNotFoundException) {
             return NotFound();
         } catch (Exception e) {
             _logger.LogError(e, "Unexpected error:");
