@@ -19,14 +19,13 @@ public class CompletedController : ControllerBase
         _pagingHelper = pagingHelper;
     }
 
-    [HttpPost("move")]
+    [HttpPost()]
     public async Task<IActionResult> MoveBookmarkToCompleted(int userId, [FromBody] CompletedCreateRequest createCompletedDto)
     {
         if (createCompletedDto == null)
             return BadRequest("Completed data is required.");
 
-        createCompletedDto.UserId = userId;
-        var completedItem = await _completedManager.MoveBookmarkToCompletedAsync(createCompletedDto);
+        var completedItem = await _completedManager.CreateBookmarkAsync(userId, createCompletedDto);
         
         return CreatedAtAction(nameof(GetCompleted), new { userId, id = completedItem.CompletedId }, completedItem);
     }

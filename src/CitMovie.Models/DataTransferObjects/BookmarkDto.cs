@@ -11,6 +11,12 @@ public class BookmarkResult : BaseResult
 public class BookmarkCreateRequest
 {
     public required int MediaId { get; set; }
-    public required string MediaTitle { get; set; }
+    public string? Note { get; set; }
+}
+
+public class BookmarkMoveRequest 
+{
+    public DateTime? CompletedDate { get; set; } = TimeZoneInfo.ConvertTime(DateTime.Now, TimeZoneHelper.CopenhagenTimeZone);
+    public int Rewatchability { get; set; }
     public string? Note { get; set; }
 }

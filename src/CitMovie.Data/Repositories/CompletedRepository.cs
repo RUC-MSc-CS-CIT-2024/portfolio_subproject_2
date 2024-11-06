@@ -9,37 +9,30 @@ public class CompletedRepository : ICompletedRepository
     public CompletedRepository(FrameworkContext context) =>
         _context = context;
 
-public async Task<Completed> MoveBookmarkToCompletedAsync(int userId, int mediaId, int rewatchability, string? note = null)
-{
-    var sql = "SELECT move_bookmark_to_completed(@p_user_id, @p_media_id, @p_rewatchability, @p_note)";
-    var parameters = new[]
-    {
-        new NpgsqlParameter("p_user_id", userId),
-        new NpgsqlParameter("p_media_id", mediaId),
-        new NpgsqlParameter("p_rewatchability", rewatchability),
-        new NpgsqlParameter("p_note", note ?? (object)DBNull.Value)
-    };
-
-    await _context.Database.ExecuteSqlRawAsync(sql, parameters);
-
-    var user = await _context.Users.FindAsync(userId);
-
-    if (user == null)
-    {
-        throw new InvalidOperationException($"User with ID {userId} not found.");
+    public async Task<Completed> CreateCompletedAsync(Completed newCompleted) {
+        _context.Completed.Add(newCompleted);
+        
+        await _context.SaveChangesAsync();
+        return _context.Completed
+            .AsNoTracking()
+            .First(x => x.CompletedId == newCompleted.CompletedId);
     }
 
-    var completed = new Completed
+    public async Task<Completed> MoveBookmarkToCompletedAsync(int userId, int mediaId, int rewatchability, string? note = null)
     {
-        UserId = userId,
-        MediaId = mediaId,
-        Rewatchability = rewatchability,
-        Note = note,
-        User = user
-    };
+        var sql = "SELECT move_bookmark_to_completed(@p_user_id, @p_media_id, @p_rewatchability, @p_note)";
+        var parameters = new[]
+        {
+            new NpgsqlParameter("p_user_id", userId),
+            new NpgsqlParameter("p_media_id", mediaId),
+            new NpgsqlParameter("p_rewatchability", rewatchability),
+            new NpgsqlParameter("p_note", note ?? (object)DBNull.Value)
+        };
 
-    return completed;
-}
+        await _context.Database.ExecuteSqlRawAsync(sql, parameters);
+
+        return await _context.Completed.FirstAsync(x => x.MediaId == mediaId && x.UserId == userId);
+    }
 
     public async Task<Completed?> GetCompletedByIdAsync(int completedId) =>
         await _context.Completed.FindAsync(completedId);

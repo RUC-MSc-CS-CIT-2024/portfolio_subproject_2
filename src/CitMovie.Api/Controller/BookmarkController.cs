@@ -1,3 +1,5 @@
+using CitMovie.Api.Controllers;
+
 namespace CitMovie.Api;
 
 [ApiController]
@@ -7,16 +9,26 @@ namespace CitMovie.Api;
 public class BookmarkController : ControllerBase
 {
     private readonly IBookmarkManager _bookmarkManager;
+    private readonly ICompletedManager _completedManager;
     private readonly IUserManager _userManager;
     private readonly IMediaManager _mediaManager;
     private readonly PagingHelper _pagingHelper;
+    private readonly ILogger<BookmarkController> _logger;
 
-    public BookmarkController(IBookmarkManager bookmarkManager, IUserManager userManager, IMediaManager mediaManager, PagingHelper pagingHelper)
+    public BookmarkController(
+        IBookmarkManager bookmarkManager, 
+        ICompletedManager completedManager,
+        IUserManager userManager, 
+        IMediaManager mediaManager,
+        PagingHelper pagingHelper,
+        ILogger<BookmarkController> logger)
     {
         _bookmarkManager = bookmarkManager;
+        _completedManager = completedManager;
         _userManager = userManager;
         _mediaManager = mediaManager;
         _pagingHelper = pagingHelper;
+        _logger = logger;
     }
 
 
@@ -29,6 +41,21 @@ public class BookmarkController : ControllerBase
         var createdBookmark = await _bookmarkManager.CreateBookmarkAsync(userId, createBookmarkDto);
         createdBookmark.Links = AddBookmarkLinks(createdBookmark);
         return CreatedAtAction(nameof(GetBookmark), new { userId, id = createdBookmark.BookmarkId }, createdBookmark);
+    }
+
+    [HttpPost("{id}/move")]
+    public async Task<IActionResult> MoveBookmarkToCompleted(int userId, int id, [FromBody] BookmarkMoveRequest bookmarkMoveRequest)
+    {
+        if (bookmarkMoveRequest == null)
+            return BadRequest("Completed data is required.");
+
+        try {
+            var completedItem = await _completedManager.MoveBookmarkToCompletedAsync(userId, id, bookmarkMoveRequest);
+            return Created($"/api/users/{userId}/completed/{completedItem.CompletedId}", completedItem);
+        } catch (Exception e) {
+            _logger.LogError(e, "Unexpected error: ");
+            return StatusCode(StatusCodes.Status500InternalServerError);
+        }
     }
 
     [HttpGet("{id}", Name = nameof(GetBookmark))]

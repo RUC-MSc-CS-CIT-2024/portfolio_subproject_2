@@ -17,7 +17,6 @@ public class CompletedResult : BaseResult
 
 public class CompletedCreateRequest
 {
-    public int UserId { get; set; }
     public int MediaId { get; set; }
     public DateTime? CompletedDate { get; set; } = TimeZoneInfo.ConvertTime(DateTime.Now, TimeZoneHelper.CopenhagenTimeZone);
     public int Rewatchability { get; set; }
