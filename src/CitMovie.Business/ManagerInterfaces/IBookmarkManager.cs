@@ -30,7 +30,7 @@ public interface IBookmarkManager
     /// <param name="bookmarkId">The ID of the bookmark to update.</param>
     /// <param name="note">The new note content for the bookmark, if any.</param>
     /// <returns>The updated BookmarkDto if successful; otherwise, null.</returns>
-    Task<BookmarkResult> UpdateBookmarkAsync(int bookmarkId, string? note);
+    Task<BookmarkResult?> UpdateBookmarkAsync(int bookmarkId, string? note);
 
     /// <summary>
     /// Deletes a specific bookmark by ID.

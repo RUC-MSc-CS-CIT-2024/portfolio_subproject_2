@@ -49,7 +49,7 @@ public class BookmarkRepository : IBookmarkRepository
     return bookmark;
 }
 
-    public async Task<Bookmark?> GetBookmarkByIdAsync(int bookmarkId) =>
+    public async Task<Bookmark> GetBookmarkByIdAsync(int bookmarkId) =>
         await _context.Bookmarks
             .AsNoTracking()
             .Where(b => b.BookmarkId == bookmarkId)
