@@ -54,7 +54,11 @@ public class PersonManager : IPersonManager
 
         foreach (var coActor in coActors) {
             CoActorResult r = _mapper.Map<CoActorResult>(coActor);
-            r.Id = await _personRepository.GetPersonIdByImdbIdAsync(coActor.CoActorImdbId) ?? 0;
+            int? tmpId = await _personRepository.GetPersonIdByImdbIdAsync(coActor.CoActorImdbId);
+            if(tmpId == null)
+                continue;
+            r.Id = tmpId.Value;
+            result.Add(r);
         }
             
         return result;
