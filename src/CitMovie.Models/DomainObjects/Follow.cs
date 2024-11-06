@@ -1,6 +1,5 @@
 namespace CitMovie.Models.DomainObjects;
 
-
 [Table("following")]
 public class Follow
 {
@@ -9,14 +8,14 @@ public class Follow
     public int FollowingId { get; set; }
 
     [Required, Column("user_id")]
-    public int UserId { get; set; }
-
-    [ForeignKey("UserId")]
-    public User User { get; set; }
+    public required int UserId { get; set; }
 
     [Column("person_id")]
-    public int PersonId { get; set; }
+    public required int PersonId { get; set; }
 
     [Column("followed_since")]
     public DateTime FollowedSince { get; set; } = DateTime.Now;
+
+    [ForeignKey("UserId")]
+    public User? User { get; set; }
 }

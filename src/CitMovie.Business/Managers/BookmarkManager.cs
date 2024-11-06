@@ -3,37 +3,31 @@ namespace CitMovie.Business;
 public class BookmarkManager : IBookmarkManager
 {
     private readonly IBookmarkRepository _bookmarkRepository;
-    private readonly IUserRepository _userRepository;
+    private readonly IMapper _mapper;
 
-    public BookmarkManager(IBookmarkRepository bookmarkRepository, IUserRepository userRepository)
+    public BookmarkManager(IBookmarkRepository bookmarkRepository, IMapper mapper)
     {
         _bookmarkRepository = bookmarkRepository;
-        _userRepository = userRepository;
+        _mapper = mapper;
     }
 
-    public async Task<BookmarkDto> CreateBookmarkAsync(CreateBookmarkDto createBookmarkDto)
+    public async Task<BookmarkResult> CreateBookmarkAsync(int userId, BookmarkCreateRequest createBookmarkDto)
     {
         // Call the database function to add a bookmark
-        await _bookmarkRepository.BookmarkMediaAsync(createBookmarkDto.UserId, createBookmarkDto.MediaId, createBookmarkDto.Note);
-
-        // Return a DTO representing the newly created bookmark
-        return new BookmarkDto
-        {
-            UserId = createBookmarkDto.UserId,
-            MediaId = createBookmarkDto.MediaId,
-            Note = createBookmarkDto.Note
-        };
+        Bookmark result = await _bookmarkRepository.BookmarkMediaAsync(userId, createBookmarkDto.MediaId, createBookmarkDto.Note);
+        return _mapper.Map<BookmarkResult>(result);
     }
 
-    public async Task<BookmarkDto> UpdateBookmarkAsync(int bookmarkId, string? note)
+    public async Task<BookmarkResult?> UpdateBookmarkAsync(int bookmarkId, string? note)
     {
         var existingBookmark = await _bookmarkRepository.GetBookmarkByIdAsync(bookmarkId);
-        if (existingBookmark == null) return null;
+        if (existingBookmark == null) 
+            return null;
 
         // Calls the updated repository method, which uses EF to update the note
         existingBookmark = await _bookmarkRepository.UpdateBookmarkAsync(bookmarkId, note);
 
-        return new BookmarkDto
+        return new BookmarkResult
         {
             BookmarkId = existingBookmark.BookmarkId,
             UserId = existingBookmark.UserId,
@@ -42,19 +36,15 @@ public class BookmarkManager : IBookmarkManager
         };
     }
 
+    public async Task<BookmarkResult> GetBookmarkAsync(int bookmarkId) {
+        Bookmark result = await _bookmarkRepository.GetBookmarkByIdAsync(bookmarkId);
+        return _mapper.Map<BookmarkResult>(result);
+    }
 
-    public async Task<BookmarkDto> GetBookmarkAsync(int bookmarkId) =>
-        await TransformToBookmarkDto(await _bookmarkRepository.GetBookmarkByIdAsync(bookmarkId));
-
-    public async Task<IEnumerable<BookmarkDto>> GetUserBookmarksAsync(int userId, int page, int pageSize) =>
-        (await _bookmarkRepository.GetUserBookmarksAsync(userId, page, pageSize))
-            .Select(b => new BookmarkDto
-            {
-                BookmarkId = b.BookmarkId,
-                UserId = b.UserId,
-                MediaId = b.MediaId,
-                Note = b.Note
-            });
+    public async Task<IEnumerable<BookmarkResult>> GetUserBookmarksAsync(int userId, int page, int pageSize) {
+        IEnumerable<Bookmark> result = await _bookmarkRepository.GetUserBookmarksAsync(userId, page, pageSize);
+        return _mapper.Map<IEnumerable<BookmarkResult>>(result);
+    }
 
     public async Task<bool> DeleteBookmarkAsync(int bookmarkId)
     {
@@ -64,17 +54,6 @@ public class BookmarkManager : IBookmarkManager
         // Call the database function to remove the bookmark
         await _bookmarkRepository.UnbookmarkMediaAsync(bookmark.UserId, bookmark.MediaId);
         return true;
-    }
-
-    private async Task<BookmarkDto> TransformToBookmarkDto(Bookmark bookmark)
-    {
-        return bookmark == null ? null : new BookmarkDto
-        {
-            BookmarkId = bookmark.BookmarkId,
-            UserId = bookmark.UserId,
-            MediaId = bookmark.MediaId,
-            Note = bookmark.Note
-        };
     }
 
     public async Task<int> GetTotalUserBookmarksCountAsync(int userId)

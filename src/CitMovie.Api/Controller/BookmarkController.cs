@@ -1,11 +1,9 @@
-using System.Security.Claims;
-using CitMovie.Models;
-
 namespace CitMovie.Api;
 
 [ApiController]
 [Route("api/users/{userId}/bookmarks")]
 [Authorize(Policy = "user_scope")]
+[Tags("User")]
 public class BookmarkController : ControllerBase
 {
     private readonly IBookmarkManager _bookmarkManager;
@@ -21,29 +19,21 @@ public class BookmarkController : ControllerBase
         _pagingHelper = pagingHelper;
     }
 
-    private int GetUserId() =>
-       int.Parse(User.FindFirstValue("user_id") ?? throw new UnauthorizedAccessException("User ID not found"));
 
     [HttpPost]
-    public async Task<IActionResult> CreateBookmark(int userId, [FromBody] CreateBookmarkDto createBookmarkDto)
+    public async Task<IActionResult> CreateBookmark(int userId, [FromBody] BookmarkCreateRequest createBookmarkDto)
     {
-        if (userId != GetUserId())
-            return Forbid();
-
         if (createBookmarkDto == null)
             return BadRequest("Bookmark data is required.");
 
-        createBookmarkDto.UserId = userId;
-        await _bookmarkManager.CreateBookmarkAsync(createBookmarkDto);
-        return Created("Bookmark created successfully.", createBookmarkDto);
+        var createdBookmark = await _bookmarkManager.CreateBookmarkAsync(userId, createBookmarkDto);
+        createdBookmark.Links = AddBookmarkLinks(createdBookmark);
+        return CreatedAtAction(nameof(GetBookmark), new { userId, id = createdBookmark.BookmarkId }, createdBookmark);
     }
 
     [HttpGet("{id}", Name = nameof(GetBookmark))]
     public async Task<IActionResult> GetBookmark(int userId, int id)
     {
-        if (userId != GetUserId())
-            return Forbid();
-
         var bookmark = await _bookmarkManager.GetBookmarkAsync(id);
         if (bookmark == null)
             return NotFound();
@@ -51,26 +41,21 @@ public class BookmarkController : ControllerBase
         if (bookmark.UserId != userId)
             return Forbid();
 
-        await AddBookmarkLinks(bookmark);
+        bookmark.Links = AddBookmarkLinks(bookmark);
 
         return Ok(bookmark);
     }
 
     [HttpGet(Name = nameof(GetUserBookmarks))]
-    public async Task<IActionResult> GetUserBookmarks(int userId, int page = 0, int pageSize = 10)
+    public async Task<IActionResult> GetUserBookmarks(int userId, [FromQuery] PageQueryParameter page)
     {
-        if (userId != GetUserId())
-            return Forbid();
-
-        var bookmarks = await _bookmarkManager.GetUserBookmarksAsync(userId, page, pageSize);
+        var bookmarks = await _bookmarkManager.GetUserBookmarksAsync(userId, page.Number, page.Count);
         var totalItems = await _bookmarkManager.GetTotalUserBookmarksCountAsync(userId);
 
         foreach (var bookmark in bookmarks)
-        {
-            await AddBookmarkLinks(bookmark);
-        }
+            bookmark.Links = AddBookmarkLinks(bookmark);
 
-        var result = _pagingHelper.CreatePaging(nameof(GetUserBookmarks), page, pageSize, totalItems, bookmarks, new { userId });
+        var result = _pagingHelper.CreatePaging(nameof(GetUserBookmarks), page.Number, page.Count, totalItems, bookmarks, new { userId });
 
         return Ok(result);
     }
@@ -78,9 +63,6 @@ public class BookmarkController : ControllerBase
     [HttpPatch("{id}")]
     public async Task<IActionResult> UpdateBookmark(int userId, int id, [FromBody] string? note)
     {
-        if (userId != GetUserId())
-            return Forbid();
-
         if (note == null)
             return BadRequest("Note content is required.");
 
@@ -98,9 +80,6 @@ public class BookmarkController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteBookmark(int userId, int id)
     {
-        if (userId != GetUserId())
-            return Forbid();
-
         var bookmark = await _bookmarkManager.GetBookmarkAsync(id);
         if (bookmark == null) 
             return NotFound();
@@ -112,35 +91,22 @@ public class BookmarkController : ControllerBase
         return NoContent();
     }
 
-    private async Task AddBookmarkLinks(BookmarkDto bookmark)
-    {
-        bookmark.Links.Add(new Link
-        {
-            Href = _pagingHelper.GetResourceLink(nameof(GetBookmark), new { userId = bookmark.UserId, id = bookmark.BookmarkId }) ?? string.Empty,
-            Rel = "self",
-            Method = "GET"
-        });
-
-        var user = await _userManager.GetUserAsync(bookmark.UserId);
-        if (user != null)
-        {
-            bookmark.Links.Add(new Link
-            {
+    private List<Link> AddBookmarkLinks(BookmarkResult bookmark)
+        => [
+            new Link {
+                Href = _pagingHelper.GetResourceLink(nameof(GetBookmark), new { userId = bookmark.UserId, id = bookmark.BookmarkId }) ?? string.Empty,
+                Rel = "self",
+                Method = "GET"
+            },
+            new Link {
                 Href = _pagingHelper.GetResourceLink(nameof(UserController.GetUser), new { userId = bookmark.UserId }) ?? string.Empty,
                 Rel = "user",
                 Method = "GET"
-            });
-        }
-
-        var media = _mediaManager.Get(bookmark.MediaId);
-        if (media != null)
-        {
-            bookmark.Links.Add(new Link
-            {
+            },
+            new Link {
                 Href = _pagingHelper.GetResourceLink(nameof(MediaController.Get), new { id = bookmark.MediaId }) ?? string.Empty,
                 Rel = "media",
                 Method = "GET"
-            });
-        }
-    }
+            }
+        ];
 }

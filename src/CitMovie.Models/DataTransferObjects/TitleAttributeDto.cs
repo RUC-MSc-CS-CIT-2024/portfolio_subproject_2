@@ -2,6 +2,6 @@ namespace CitMovie.Models.DataTransferObjects;
 
 public class TitleAttributeResult
 {
-    public int TitleAttributeId { get; set; }
-    public string Name { get; set; }
+    public required int TitleAttributeId { get; set; }
+    public required string Name { get; set; }
 }

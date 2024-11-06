@@ -14,8 +14,7 @@ public class PersonRepository : IPersonRepository
         return await _dataContext.People
             .AsNoTracking()
             .OrderBy(p => p.PersonId)
-            .Skip(page * pageSize)
-            .Take(pageSize)
+            .Pagination(page, pageSize)
             .ToListAsync();
     }
     public async Task<int> GetTotalPersonsCountAsync()
@@ -42,8 +41,7 @@ public class PersonRepository : IPersonRepository
             .OrderBy(m => m.Id);
 
         return await mediaQuery
-            .Skip(page * pageSize)
-            .Take(pageSize)
+            .Pagination(page, pageSize)
             .ToListAsync();
     }
 
@@ -70,28 +68,28 @@ public class PersonRepository : IPersonRepository
     }
     public async Task<int?> GetPersonIdByImdbIdAsync(string imdbId)
     {
-        var personId = await _dataContext.People
-            .Where(p => p.ImdbId == imdbId)
-            .Select(p => p.PersonId)
-            .FirstOrDefaultAsync();
+        var person = await _dataContext.People
+            .AsNoTracking()
+            .FirstOrDefaultAsync(p => p.ImdbId == imdbId);
 
-        return personId;
+        return person?.PersonId;
     }
 
-    public async Task<IEnumerable<CoActor>> GetFrequentCoActorsAsync(string actorName, int page, int pageSize)
+    public async Task<IEnumerable<CoActor>> GetFrequentCoActorsAsync(int id, int page, int pageSize)
     {
-        var coActors = await _dataContext.GetFrequentCoActors(actorName)
+        Person p = _dataContext.People.First(x => x.PersonId == id);
+        var coActors = await _dataContext.GetFrequentCoActors(p.Name)
             .AsNoTracking()
-            .Skip(page * pageSize)
-            .Take(pageSize)
+            .Pagination(page, pageSize)
             .ToListAsync();
 
         return coActors;
     }
 
-    public async Task<int> GetFrequentCoActorsCountAsync(string actorName)
+    public async Task<int> GetFrequentCoActorsCountAsync(int id)
     {
-        var count = await _dataContext.GetFrequentCoActors(actorName)
+        Person p = _dataContext.People.First(x => x.PersonId == id);
+        var count = await _dataContext.GetFrequentCoActors(p.Name)
             .AsNoTracking()
             .CountAsync();
 

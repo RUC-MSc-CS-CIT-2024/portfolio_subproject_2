@@ -1,10 +1,8 @@
-using CitMovie.Models;
-using CitMovie.Models.DomainObjects;
-
 namespace CitMovie.Api;
 
 [ApiController]
 [Route("api/media")]
+[Tags("Media")]
 public class MediaController : ControllerBase
 {
     private readonly IMediaManager _mediaManager;
@@ -22,7 +20,7 @@ public class MediaController : ControllerBase
     public IActionResult Get([FromQuery] MediaQueryParameter queryParameter)
     {
         IEnumerable<MediaBasicResult> mediaResult;
-        if (queryParameter.QueryType == MediaQueryType.Basic)
+        if (queryParameter.QueryType == MediaQueryType.All)
             mediaResult = _mediaManager.GetAllMedia(queryParameter.Page);
         else
             mediaResult = _mediaManager.Search(queryParameter, GetUserId());

@@ -10,7 +10,7 @@ public class UserScoreResult : BaseResult
 
 public record UserScoreCreateRequest
 {
-    public string ImdbId { get; set; }
-    public int Score { get; set; }
+    public required int MediaId { get; set; }
+    public required int Score { get; set; }
     public string? ReviewText { get; set; }
 }

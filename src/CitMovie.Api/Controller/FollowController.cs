@@ -1,10 +1,9 @@
-using CitMovie.Models;
-
 namespace CitMovie.Api;
 
 [ApiController]
 [Authorize(Policy = "user_scope")]
 [Route("api/users/{userId}/following")]
+[Tags("User")]
 public class FollowController : ControllerBase
 {
     private readonly IFollowManager _followManager;
@@ -19,17 +18,15 @@ public class FollowController : ControllerBase
     }
 
     [HttpGet(Name = nameof(GetFollowings))]
-    public async Task<IActionResult> GetFollowings(int userId, int page = 0, int pageSize = 10)
+    public async Task<IActionResult> GetFollowings(int userId, [FromQuery] PageQueryParameter page)
     {
-        var followings = await _followManager.GetFollowingsAsync(userId, page, pageSize);
+        var followings = await _followManager.GetFollowingsAsync(userId, page.Number, page.Count);
         var totalItems = await _followManager.GetTotalFollowingsCountAsync(userId);
 
         foreach (var following in followings)
-        {
-            await AddFollowingLinks(following);
-        }
+            following.Links = AddFollowingLinks(following);
 
-        var result = _pagingHelper.CreatePaging(nameof(GetFollowings), page, pageSize, totalItems, followings, new { userId });
+        var result = _pagingHelper.CreatePaging(nameof(GetFollowings), page.Number, page.Count, totalItems, followings, new { userId });
         return Ok(result);
     }
 
@@ -38,6 +35,7 @@ public class FollowController : ControllerBase
     public async Task<ActionResult<FollowResult>> CreateFollow(int userId, [FromBody] FollowCreateRequest followCreateRequest)
     {
         var follow = await _followManager.CreateFollowAsync(userId, followCreateRequest.PersonId);
+        follow.Links = AddFollowingLinks(follow);
         return CreatedAtAction(nameof(GetFollowings), new { userId }, follow);
     }
 
@@ -50,19 +48,11 @@ public class FollowController : ControllerBase
 
         return NoContent();
     }
-    private async Task AddFollowingLinks(FollowResult followResult)
-    {
-
-        var person = await _personManager.GetPersonByIdAsync(followResult.PersonId);
-        if (person != null)
-        {
-            followResult.Links.Add(new Link
-            {
+    private List<Link> AddFollowingLinks(FollowResult followResult)
+        => [ new Link {
                 Href = _pagingHelper.GetResourceLink(nameof(PersonController.GetPersonById), new { id = followResult.PersonId }) ?? string.Empty,
                 Rel = "person",
                 Method = "GET"
-            });
-        }
-    }
-
+            }
+        ];
 }

@@ -31,7 +31,7 @@ public class JwtTokenGenerator : IJwtTokenGenerator {
             _config.Audience,
             new(claims),
             notBefore: now,
-            expires: DateTime.UtcNow.AddMinutes(15),
+            expires: DateTime.UtcNow.AddMinutes(120),
             issuedAt: now,
             signingCredentials: creds
         );

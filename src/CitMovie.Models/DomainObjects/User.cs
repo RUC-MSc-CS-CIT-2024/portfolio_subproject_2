@@ -17,9 +17,9 @@ public class User
     [MaxLength(100), Column("email")]
     public required string Email { get; set; }
 
-    public ICollection<SearchHistory> SearchHistories { get; } = new List<SearchHistory>();
-    public ICollection<Bookmark> Bookmarks { get; } = new List<Bookmark>();
-    public ICollection<Completed> Completeds { get; } = new List<Completed>();
-    public ICollection<UserScore> UserScores { get; } = new List<UserScore>();
-    public ICollection<Follow> Followings { get; } = new List<Follow>();
+    public List<SearchHistory> SearchHistories { get; } = [];
+    public List<Bookmark> Bookmarks { get; } = [];
+    public List<Completed> Completeds { get; } = [];
+    public List<UserScore> UserScores { get; } = [];
+    public List<Follow> Followings { get; } = [];
 }

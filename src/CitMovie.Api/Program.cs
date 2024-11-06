@@ -137,18 +137,4 @@ app.MapControllers();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapGet("/test-connection", async (FrameworkContext context) =>
-{
-    try
-    {
-        var userCount = await context.Users.CountAsync();
-        return Results.Ok($"Connection successful! User count: {userCount}");
-    }
-    catch (Exception ex)
-    {
-        return Results.Problem("Connection test failed: " + ex.Message);
-    }
-})
-.WithTags("Authentication and connection");
-
 app.Run();

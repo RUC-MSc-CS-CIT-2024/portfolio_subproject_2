@@ -13,8 +13,7 @@ public class TitleAttributeRepository : ITitleAttributeRepository
     {
         return await _context.TitleAttributes
             .Include(x => x.Titles)
-            .Skip(pageSize * page)
-            .Take(pageSize)
+            .Pagination(page, pageSize)
             .ToListAsync();
     }
     

@@ -12,7 +12,7 @@ public class RelatedMedia
     [Column("type", TypeName = "varchar(50)")]
     public required RelatedMediaType Type { get; set; }
     
-    public Media Primary { get; set; } = null!;
-    public Media Related { get; set; } = null!;
+    public Media? Primary { get; set; }
+    public Media? Related { get; set; }
 
 }

@@ -12,8 +12,7 @@ public class JobCategoryRepository : IJobCategoryRepository
     {
         return await _context.JobCategories
             .AsNoTracking()
-            .Skip(page * pageSize)
-            .Take(pageSize)
+            .Pagination(page, pageSize)
             .ToListAsync();
     }
 
