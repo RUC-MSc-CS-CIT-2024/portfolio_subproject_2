@@ -1,5 +1,3 @@
-using System.Text.Json.Serialization;
-
 namespace CitMovie.Models.DataTransferObjects;
 
 public record CrewResult {

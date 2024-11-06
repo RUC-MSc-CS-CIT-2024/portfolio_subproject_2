@@ -1,5 +1,3 @@
-using CitMovie.Models;
-
 namespace CitMovie.Api;
 
 [ApiController]
@@ -26,9 +24,7 @@ public class SearchHistoryController : ControllerBase
         var total_items = await _searchHistoryManager.GetUsersTotalSearchHistoriesCountAsync(userId);
 
         foreach (var searchHistory in searchHistories)
-        {
-            await AddSearchHistoryUserLink(searchHistory);
-        }
+            searchHistory.Links = AddSearchHistoryUserLink(searchHistory);
 
         var result = _pagingHelper.CreatePaging(nameof(GetUserSearchHistories), page.Number, page.Count, total_items, searchHistories, new { userId });
 
@@ -46,17 +42,13 @@ public class SearchHistoryController : ControllerBase
         return NotFound();
     }
 
-    private async Task AddSearchHistoryUserLink(SearchHistoryResult searchHistoryResult)
-    {
-        var user = await _userManager.GetUserAsync(searchHistoryResult.UserId);
-        if (user != null)
-        {
-            searchHistoryResult.Links.Add(new Link
+    private List<Link> AddSearchHistoryUserLink(SearchHistoryResult searchHistoryResult)
+        => [ new Link
             {
                 Href = _pagingHelper.GetResourceLink(nameof(UserController.GetUser), new { userId = searchHistoryResult.UserId }) ?? string.Empty,
                 Rel = "user",
                 Method = "GET"
-            });
-        }
-    }
+            }
+        ];
+    
 }

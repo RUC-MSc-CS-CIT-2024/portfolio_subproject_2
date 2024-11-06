@@ -9,5 +9,5 @@ public class Episode : Media
     [Column("season_id")]
     public required int SeasonId { get; set; }
     
-    public Media Season { get; set; } = null!;
+    public Media? Season { get; set; }
 }

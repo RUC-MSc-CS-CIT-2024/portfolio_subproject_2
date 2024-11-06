@@ -2,13 +2,13 @@ namespace CitMovie.Models.DataTransferObjects;
 
 public class FollowResult : BaseResult
 {
-    public int FollowingId { get; set; }
-    public int PersonId { get; set; }
-    public DateTime FollowedSince { get; set; }
+    public required int FollowingId { get; set; }
+    public required int PersonId { get; set; }
+    public required DateTime FollowedSince { get; set; }
 };
 
 public class FollowCreateRequest
 {
-    public int UserId { get; set; }
-    public int PersonId { get; set; }
+    public required int UserId { get; set; }
+    public required int PersonId { get; set; }
 }

@@ -23,9 +23,9 @@ public class UserScoreController : ControllerBase
     public async Task<ActionResult<IEnumerable<UserScoreResult>>> GetUserScores(
         int userId,
         [FromQuery] PageQueryParameter page,
-        [FromQuery] string mediaType = null,
+        [FromQuery] string? mediaType = null,
         [FromQuery] int? mediaId = null,
-        [FromQuery] string mediaName = null)
+        [FromQuery] string? mediaName = null)
     {
         var totalCount = await _userScoreManager.GetTotalUserScoresCountAsync(userId);
         var scores = await _userScoreManager.GetScoresByUserIdAsync(userId, page.Number, page.Count, mediaType, mediaId, mediaName);

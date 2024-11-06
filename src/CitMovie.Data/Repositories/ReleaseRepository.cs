@@ -78,9 +78,9 @@ public class ReleaseRepository : IReleaseRepository
             .FirstAsync(x => x.ReleaseId == releaseId);;
     }
 
-    public async Task<int> GetReleasesCountAsync(int mediaId)
+    public Task<int> GetReleasesCountAsync(int mediaId)
     {
-        return _context.Releases.Count(x => x.MediaId == mediaId);
+        return _context.Releases.CountAsync(x => x.MediaId == mediaId);
     }
 
     private async Task ValidateMediaAsync(int mediaId)

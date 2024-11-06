@@ -2,8 +2,8 @@ namespace CitMovie.Models.DataTransferObjects;
 
 public class PersonResult : BaseResult
 {
-    public int Id { get; set; }
-    public string Name { get; set; }
+    public required int Id { get; set; }
+    public required string Name { get; set; }
     public string? Description { get; set; }
     public decimal? Score { get; set; }
     public decimal? NameRating { get; set; }
@@ -13,7 +13,7 @@ public class PersonResult : BaseResult
 
 public class CoActorResult : BaseResult
 {
-    public string Id { get; set; }
-    public string ActorName { get; set; }
-    public int Frequency { get; set; }
+    public required int Id { get; set; }
+    public required string ActorName { get; set; }
+    public required int Frequency { get; set; }
 }

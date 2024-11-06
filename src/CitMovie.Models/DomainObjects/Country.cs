@@ -8,13 +8,12 @@ public class Country
     [Column("imdb_country_code")]
     public string? ImdbCountryCode { get; set; }
     [Column("iso_code")]
-    public string IsoCode { get; set; }
+    public string? IsoCode { get; set; }
     [Column("name")]
-    public string Name { get; set; }
+    public required string Name { get; set; }
 
-    public ICollection<Title> Titles { get; } = new List<Title>();
-    public ICollection<Release> Releases { get; } = new List<Release>();
-
+    public List<Title> Titles { get; } = [];
+    public List<Release> Releases { get; } = [];
     public List<Media> Media { get; } = [];
 
 }

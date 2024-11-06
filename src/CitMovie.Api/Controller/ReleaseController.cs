@@ -1,6 +1,5 @@
-using CitMovie.Models;
-
 namespace CitMovie.Api;
+
 [ApiController]
 [Route("/api/media/{mediaId}/releases")]
 [Tags("Media")]
@@ -26,9 +25,7 @@ public class ReleaseController : ControllerBase
             var totalItems = await _releaseManager.GetReleasesCountAsync(mediaId);
 
             foreach (var release in releases)
-            {
-                AddReleaseLinks(release);
-            }
+                release.Links = AddReleaseLinks(release);
 
             var result = _pageHelper.CreatePaging(nameof(GetReleasesOfMedia), page.Number, page.Count, totalItems, releases, new { mediaId });
 
@@ -48,10 +45,9 @@ public class ReleaseController : ControllerBase
             var release = await _releaseManager.GetReleaseOfMediaByIdAsync(mediaId, id);
 
             if (release == null)
-            {
                 return NotFound();
-            }
-            AddReleaseLinks(release);
+            
+            release.Links = AddReleaseLinks(release);
 
             return Ok(release);
         }
@@ -82,6 +78,7 @@ public class ReleaseController : ControllerBase
         try
         {
             var result = await _releaseManager.CreateReleaseForMediaAsync(mediaId, request);
+            result.Links = AddReleaseLinks(result);
             return Ok(result);
         }
         catch (Exception e)
@@ -96,6 +93,7 @@ public class ReleaseController : ControllerBase
         try
         {
             var result = await _releaseManager.UpdateReleaseForMediaAsync(mediaId, id, request);
+            result.Links = AddReleaseLinks(result);
             return Ok(result);
         }
         catch (Exception e)
@@ -104,24 +102,16 @@ public class ReleaseController : ControllerBase
         }
     }
 
-    private void AddReleaseLinks(ReleaseResult release)
-    {
-        release.Links.Add(new Link
-        {
-            Href = _pageHelper.GetResourceLink(nameof(GetReleaseOfMediaById), new { mediaId = release.MediaId, id = release.ReleaseId }) ?? string.Empty,
-            Rel = "self",
-            Method = "GET"
-        });
-
-        var media = _mediaManager.Get(release.MediaId);
-        if (media != null)
-        {
-            release.Links.Add(new Link
-            {
-                Href = _pageHelper.GetResourceLink(nameof(MediaController.Get), new { id = media.Id }) ?? string.Empty,
+    private List<Link> AddReleaseLinks(ReleaseResult release)
+        => [ new Link {
+                Href = _pageHelper.GetResourceLink(nameof(GetReleaseOfMediaById), new { mediaId = release.MediaId, id = release.ReleaseId }) ?? string.Empty,
+                Rel = "self",
+                Method = "GET"
+            },
+            new Link {
+                Href = _pageHelper.GetResourceLink(nameof(MediaController.Get), new { id = release.MediaId }) ?? string.Empty,
                 Rel = "media",
                 Method = "GET"
-            });
-        }
-    }
+            }
+        ];
 }

@@ -47,25 +47,21 @@ public class PersonManager : IPersonManager
         return await _personRepository.GetMediaByPersonIdCountAsync(id);
     }
 
-    public async Task<string?> GetActorNameByIdAsync(int id)
+    public async Task<IEnumerable<CoActorResult>> GetFrequentCoActorsAsync(int id, int page, int pageSize)
     {
-        return await _personRepository.GetActorNameByIdAsync(id);
-    }
+        var coActors = await _personRepository.GetFrequentCoActorsAsync(id, page, pageSize);
+        List<CoActorResult> result = [];
 
-    public async Task<int?> GetPersonIdByImdbIdAsync(string imdbId)
-    {
-        return await _personRepository.GetPersonIdByImdbIdAsync(imdbId);
-    }
-
-    public async Task<IEnumerable<CoActorResult>> GetFrequentCoActorsAsync(string actorName, int page, int pageSize)
-    {
-        var coActors = await _personRepository.GetFrequentCoActorsAsync(actorName, page, pageSize);
-        return _mapper.Map<IEnumerable<CoActorResult>>(coActors);
+        foreach (var coActor in coActors) {
+            CoActorResult r = _mapper.Map<CoActorResult>(coActor);
+            r.Id = await _personRepository.GetPersonIdByImdbIdAsync(coActor.CoActorImdbId) ?? 0;
+        }
+            
+        return result;
     }
 
     public async Task<int> GetFrequentCoActorsCountAsync(int id)
     {
-        var actorName = await GetActorNameByIdAsync(id);
-        return await _personRepository.GetFrequentCoActorsCountAsync(actorName);
+        return await _personRepository.GetFrequentCoActorsCountAsync(id);
     }
 }

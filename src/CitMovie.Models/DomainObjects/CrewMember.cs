@@ -3,6 +3,7 @@ namespace CitMovie.Models.DomainObjects;
 public abstract class CrewBase
 {
     public abstract int Id { get; set; }
+    
     [Column("role")]
     public required string Role { get; set; }
     [Column("person_id")]
@@ -13,7 +14,6 @@ public abstract class CrewBase
     public Media? Media { get; set; }
     public Person? Person { get; set; }
 }
-
 
 [Table("crew_member")]
 public class CrewMember : CrewBase

@@ -1,7 +1,7 @@
 namespace CitMovie.Models.DataTransferObjects;
 
 public record LanguageResult {
-    public int LanguageId { get; set; }
-    public string Name { get; set; }
-    public string IsoCode { get; set; }
+    public required int LanguageId { get; set; }
+    public required string Name { get; set; }
+    public required string IsoCode { get; set; }
 }

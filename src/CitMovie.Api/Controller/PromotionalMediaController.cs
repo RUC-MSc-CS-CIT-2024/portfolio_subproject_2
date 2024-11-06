@@ -1,5 +1,3 @@
-using CitMovie.Models;
-
 namespace CitMovie.Api;
 
 [ApiController]
@@ -21,26 +19,17 @@ public class PromotionalMediaController : ControllerBase
     {
         try
         {
-            var promotionalMedia = await _manager.GetPromotionalMediaOfMediaAsync(mediaId, page.Number, page.Count);
+            var items = await _manager.GetPromotionalMediaOfMediaAsync(mediaId, page.Number, page.Count);
             var totalItems = await _manager.GetPromotionalMediaCountAsync(mediaId, "media");
 
-            var updatedItems = promotionalMedia.Select(item =>
-            {
-                var result = new PromotionalMediaMinimalInfoResult
-                {
-                    PromotionalMediaId = _pagingHelper.GetResourceLink(nameof(GetPromotionalMediaById), new { mediaId = item.MediaId, releaseId = item.ReleaseId, id = item.PromotionalMediaId }) ?? string.Empty,
-                    Type = item.Type,
-                    Uri = item.Uri
-                };
-                AddPromotionalMediaLinks(result, item.MediaId, item.ReleaseId);
-                return result;
-            }).ToList();
+            foreach (var promotionalMedia in items)
+                promotionalMedia.Links = AddPromotionalMediaLinks(promotionalMedia, mediaId, promotionalMedia.ReleaseId);
 
             var result = _pagingHelper.CreatePaging(
                 nameof(GetPromotionalMediaofMedia),
                 page.Number, page.Count,
                 totalItems,
-                updatedItems,
+                items,
                 new { mediaId }
             );
 
@@ -57,26 +46,17 @@ public class PromotionalMediaController : ControllerBase
     {
         try
         {
-            var promotionalMedia = await _manager.GetPromotionalMediaOfReleaseAsync(mediaId, releaseId, page.Number, page.Count);
+            var items = await _manager.GetPromotionalMediaOfReleaseAsync(mediaId, releaseId, page.Number, page.Count);
             var totalItems = await _manager.GetPromotionalMediaCountAsync(releaseId, "release");
 
-            var updatedItems = promotionalMedia.Select(item =>
-           {
-               var result = new PromotionalMediaMinimalInfoResult
-               {
-                   PromotionalMediaId = _pagingHelper.GetResourceLink(nameof(GetPromotionalMediaById), new { mediaId = item.MediaId, releaseId = item.ReleaseId, id = item.PromotionalMediaId }) ?? string.Empty,
-                   Type = item.Type,
-                   Uri = item.Uri
-               };
-               AddPromotionalMediaLinks(result, item.MediaId, item.ReleaseId);
-               return result;
-           }).ToList();
+            foreach (var promotionalMedia in items)
+                promotionalMedia.Links = AddPromotionalMediaLinks(promotionalMedia, mediaId, promotionalMedia.ReleaseId);
 
             var result = _pagingHelper.CreatePaging(
                 nameof(GetPromotionalMediaOfRelease),
                 page.Number, page.Count,
                 totalItems,
-                updatedItems,
+                items,
                 new { mediaId, releaseId }
             );
 
@@ -90,19 +70,13 @@ public class PromotionalMediaController : ControllerBase
     }
 
     [HttpGet("{id}", Name = nameof(GetPromotionalMediaById))]
-    public async Task<IActionResult> GetPromotionalMediaById(int id, int? mediaId, int? releaseId)
+    public async Task<IActionResult> GetPromotionalMediaById(int id, int mediaId, int releaseId)
     {
-
         try
         {
-            var promotionalMedia = await _manager.GetPromotionalMediaByIdAsync(id, mediaId, releaseId);
-            var result = new PromotionalMediaMinimalInfoResult
-            {
-                PromotionalMediaId = _pagingHelper.GetResourceLink(nameof(GetPromotionalMediaOfRelease), new { mediaId = promotionalMedia.MediaId, releaseId = promotionalMedia.ReleaseId, promotionalMediaId = promotionalMedia.PromotionalMediaId }) ?? string.Empty,
-                Type = promotionalMedia.Type,
-                Uri = promotionalMedia.Uri
-            };
-            AddPromotionalMediaLinks(result, promotionalMedia.MediaId, promotionalMedia.ReleaseId);
+            var result = await _manager.GetPromotionalMediaByIdAsync(id, mediaId, releaseId);
+
+            result.Links = AddPromotionalMediaLinks(result, mediaId, releaseId);
             return Ok(result);
         }
         catch (Exception e)
@@ -133,14 +107,8 @@ public class PromotionalMediaController : ControllerBase
         try
         {
             var response = await _manager.CreatePromotionalMediaAsync(mediaId, releaseId, model);
-
-            var result = new PromotionalMediaMinimalInfoResult
-            {
-                PromotionalMediaId = _pagingHelper.GetResourceLink(nameof(GetPromotionalMediaById), new { mediaId = response.MediaId, releaseId = response.ReleaseId, promotionalMediaId = response.PromotionalMediaId }) ?? string.Empty,
-                Type = response.Type,
-                Uri = response.Uri
-            };
-            return CreatedAtAction(nameof(CreatePromotionalMedia), result);
+            response.Links = AddPromotionalMediaLinks(response, mediaId, releaseId);
+            return CreatedAtAction(nameof(CreatePromotionalMedia), response);
         }
         catch (Exception e)
         {
@@ -148,20 +116,21 @@ public class PromotionalMediaController : ControllerBase
         }
     }
 
-    private void AddPromotionalMediaLinks(PromotionalMediaMinimalInfoResult promotionalMedia, int mediaId, int releaseId)
-    {
-        promotionalMedia.Links.Add(new Link
-        {
-            Href = _pagingHelper.GetResourceLink(nameof(MediaController.Get), new { id = mediaId }) ?? string.Empty,
-            Rel = "media",
-            Method = "GET"
-        });
-
-        promotionalMedia.Links.Add(new Link
-        {
-            Href = _pagingHelper.GetResourceLink(nameof(ReleaseController.GetReleaseOfMediaById), new { mediaId, id = releaseId }) ?? string.Empty,
-            Rel = "release",
-            Method = "GET"
-        });
-    }
+    private List<Link> AddPromotionalMediaLinks(PromotionalMediaResult promotionalMedia, int mediaId, int releaseId)
+        => [ new Link {
+                Href = _pagingHelper.GetResourceLink(nameof(MediaController.Get), new { id = mediaId }) ?? string.Empty,
+                Rel = "media",
+                Method = "GET"
+            },
+            new Link {
+                Href = _pagingHelper.GetResourceLink(nameof(ReleaseController.GetReleaseOfMediaById), new { mediaId, id = releaseId }) ?? string.Empty,
+                Rel = "release",
+                Method = "GET"
+            },
+            new Link {
+                Href = _pagingHelper.GetResourceLink(nameof(GetPromotionalMediaOfRelease), new { mediaId, releaseId, promotionalMediaId = promotionalMedia.PromotionalMediaId }) ?? string.Empty,
+                Rel = "self",
+                Method = "GET"
+            }
+        ];
 }

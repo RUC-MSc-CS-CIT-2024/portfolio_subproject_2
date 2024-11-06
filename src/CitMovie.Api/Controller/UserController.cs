@@ -24,7 +24,7 @@ public class UserController : ControllerBase
         try
         {
             UserResult user = await _userManager.GetUserAsync(userId);
-            await AddUserkLinks(user);
+            user.Links = AddUserkLinks(user);
             return Ok(user);
         }
         catch (Exception ex)
@@ -83,13 +83,11 @@ public class UserController : ControllerBase
         }
     }
 
-    private async Task AddUserkLinks(UserResult user)
-    {
-        user.Links.Add(new Link
-        {
-            Href = _pagingHelper.GetResourceLink(nameof(GetUser), new { userId = user.Id }) ?? string.Empty,
-            Rel = "self",
-            Method = "GET"
-        });
-    }
+    private List<Link> AddUserkLinks(UserResult user)
+        => [ new Link {
+                Href = _pagingHelper.GetResourceLink(nameof(GetUser), new { userId = user.Id }) ?? string.Empty,
+                Rel = "self",
+                Method = "GET"
+            }
+        ];
 }

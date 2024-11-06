@@ -42,8 +42,11 @@ public class ReleaseManager : IReleaseManager
     {
         var createObject = _mapper.Map<Release>(release);
         createObject.MediaId = mediaId;
-        createObject.SpokenLanguages = await _languageRepository.GetLanguagesAsync(release.SpokenLanguages);
-
+        if (release.SpokenLanguages != null) {
+            IEnumerable<Language> langs = await _languageRepository.GetLanguagesAsync(release.SpokenLanguages);
+            createObject.SpokenLanguages.AddRange(langs);
+        }
+        
         var resultObject = await _releaseRepository.CreateReleaseForMediaAsync(mediaId, createObject);
         return _mapper.Map<ReleaseResult>(resultObject);
     }
@@ -51,12 +54,13 @@ public class ReleaseManager : IReleaseManager
     public async Task<ReleaseResult> UpdateReleaseForMediaAsync(int mediaId, int releaseId, ReleaseUpdateRequest release)
     {
         var updateObject = _mapper.Map<Release>(release);
-        if (updateObject.MediaId == 0)
-        {
-            updateObject.MediaId = mediaId;
-        }
+        updateObject.MediaId = mediaId;
         updateObject.ReleaseId = releaseId;
-        updateObject.SpokenLanguages = await _languageRepository.GetLanguagesAsync(release.SpokenLanguages);
+
+        if (release.SpokenLanguages != null) {
+            IEnumerable<Language> langs = await _languageRepository.GetLanguagesAsync(release.SpokenLanguages);
+            updateObject.SpokenLanguages.AddRange(langs);
+        }
 
         var resultObject = await _releaseRepository.UpdateReleaseForMediaAsync(mediaId, releaseId, updateObject);
         return _mapper.Map<ReleaseResult>(resultObject);

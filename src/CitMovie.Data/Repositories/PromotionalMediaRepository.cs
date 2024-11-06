@@ -14,7 +14,7 @@ public class PromotionalMediaRepository : IPromotionalMediaRepository
         await ReleaseIdAndMediaIdValidator(mediaId, null);
         return await _context.PromotionalMedia
             .Include(pm => pm.Release)
-            .Where(pm => pm.Release.MediaId == mediaId)
+            .Where(pm => pm.Release!.MediaId == mediaId)
             .Pagination(page, pageSize)
             .ToListAsync();
     }
@@ -25,7 +25,7 @@ public class PromotionalMediaRepository : IPromotionalMediaRepository
         return await _context.PromotionalMedia
             .Include(pm => pm.Release)
             .Where(pm => pm.ReleaseId == releaseId)
-            .Where(pm => pm.Release.MediaId == mediaId)
+            .Where(pm => pm.Release!.MediaId == mediaId)
             .Pagination(page, pageSize)
             .ToListAsync();
     }
@@ -42,7 +42,7 @@ public class PromotionalMediaRepository : IPromotionalMediaRepository
         return await _context.PromotionalMedia
             .Include(pm => pm.Release)
             .Where(pm => pm.ReleaseId == releaseId)
-            .Where(pm => pm.Release.MediaId == mediaId)
+            .Where(pm => pm.Release!.MediaId == mediaId)
             .FirstAsync(p => p.PromotionalMediaId == id);
         
     }
@@ -54,7 +54,7 @@ public class PromotionalMediaRepository : IPromotionalMediaRepository
             PromotionalMedia promotionalMediaToDelete = _context.PromotionalMedia
                 .Include(pm => pm.Release)
                 .Where(pm => pm.ReleaseId == releaseId)
-                .Where(pm => pm.Release.MediaId == mediaId)
+                .Where(pm => pm.Release!.MediaId == mediaId)
                 .First(x => x.PromotionalMediaId == id);
             
             _context.PromotionalMedia.Remove(promotionalMediaToDelete);
@@ -76,11 +76,15 @@ public class PromotionalMediaRepository : IPromotionalMediaRepository
 
     public async Task<int> GetPromotionalMediaCountAsync(int id, string parameter)
     { 
-        return parameter == "release"
-            ? await _context.PromotionalMedia.CountAsync(r => r.ReleaseId == id)
-            : parameter == "media"
-                ? await _context.PromotionalMedia.CountAsync(r => r.Release.MediaId == id)
-                : throw new Exception("Invalid parameter");
+        return parameter switch {
+            "release" => await _context.PromotionalMedia
+                                        .Include(x => x.Release)
+                                        .CountAsync(r => r.ReleaseId == id),
+            "media" => await _context.PromotionalMedia
+                                        .Include(x => x.Release)
+                                        .CountAsync(r => r.Release!.MediaId == id),
+            _ => throw new ArgumentException("Invalid parameter", nameof(parameter))
+        };
     }
 
     private async Task ReleaseIdAndMediaIdValidator(int mediaId, int? releaseId)
