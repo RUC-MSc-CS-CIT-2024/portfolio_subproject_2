@@ -76,6 +76,29 @@ public class CompletedController : ControllerBase
         return Ok(result);
     }
 
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateCompleted(int userId, int id, [FromBody] UpdateCompletedDto updateCompletedDto)
+    {
+        if (userId != GetUserId())
+            return Forbid();
+
+        if (updateCompletedDto == null)
+            return BadRequest("Update data is required.");
+
+        var updatedCompleted = await _completedManager.UpdateCompletedAsync(id, updateCompletedDto);
+        return updatedCompleted == null ? NotFound() : Ok(updatedCompleted);
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteCompleted(int userId, int id)
+    {
+        if (userId != GetUserId())
+            return Forbid();
+
+        var deleted = await _completedManager.DeleteCompletedAsync(id);
+        return deleted ? NoContent() : NotFound();
+    }
+
     private async Task AddCompletedLinks(CompletedDto completed)
     {
         completed.Links.Add(new Link

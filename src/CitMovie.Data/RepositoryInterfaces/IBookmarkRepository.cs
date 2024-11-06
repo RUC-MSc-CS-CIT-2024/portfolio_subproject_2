@@ -1,3 +1,4 @@
+namespace CitMovie.Data;
 public interface IBookmarkRepository
 {
     Task BookmarkMediaAsync(int userId, int mediaId, string? note = null);

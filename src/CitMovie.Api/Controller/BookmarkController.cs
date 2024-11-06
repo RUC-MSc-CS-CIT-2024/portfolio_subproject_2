@@ -35,7 +35,7 @@ public class BookmarkController : ControllerBase
 
         createBookmarkDto.UserId = userId;
         await _bookmarkManager.CreateBookmarkAsync(createBookmarkDto);
-        return Ok("Bookmark created successfully.");
+        return Created("Bookmark created successfully.", createBookmarkDto);
     }
 
     [HttpGet("{id}", Name = nameof(GetBookmark))]
