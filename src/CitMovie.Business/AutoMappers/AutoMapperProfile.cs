@@ -113,5 +113,9 @@ public class AutoMapperProfile : Profile
             .ForMember(dest => dest.JobCategory, opt => opt.MapFrom(src => src.JobCategory!.Name));
         CreateMap<CastMember, CrewResult>()
             .ForMember(dest => dest.JobCategory, opt => opt.MapFrom(src => "Actor"));
+
+        // Bookmark & Completed
+        CreateMap<Bookmark, BookmarkResult>();
+        CreateMap<Completed, CompletedResult>();
     }
 }

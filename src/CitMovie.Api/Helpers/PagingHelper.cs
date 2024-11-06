@@ -38,11 +38,11 @@ public class PagingHelper
 
         var curPage = GetLink(linkName, routeValues) ?? string.Empty;
 
-        var nextPage = page < numberOfPages - 1
+        var nextPage = page < numberOfPages
             ? GetLink(linkName, MergeObjects(routeValues, new { page = page + 1 })) ?? string.Empty
             : null;
 
-        var prevPage = page > 0
+        var prevPage = page > 1
             ? GetLink(linkName, MergeObjects(routeValues, new { page = page - 1 })) ?? string.Empty
             : null;
 
