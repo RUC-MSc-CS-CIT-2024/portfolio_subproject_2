@@ -109,7 +109,7 @@ public class BookmarkController : ControllerBase
             return Forbid();
 
         await _bookmarkManager.DeleteBookmarkAsync(id);
-        return Ok("Bookmark deleted successfully.");
+        return NoContent();
     }
 
     private async Task AddBookmarkLinks(BookmarkDto bookmark)
