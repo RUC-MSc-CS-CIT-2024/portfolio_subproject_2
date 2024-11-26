@@ -12,6 +12,7 @@ public static class CitMovieServiceCollectionExtensions
         services.AddAutoMapper(typeof(AutoMapperProfile));
 
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
+        services.AddScoped<IPasswordHelper, PasswordHelper>();
 
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IMediaRepository, MediaRepository>();

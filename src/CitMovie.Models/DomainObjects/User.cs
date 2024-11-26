@@ -8,13 +8,15 @@ public class User
     [Column("user_id")]
     public int Id { get; set; }
 
-    [MaxLength(50), Column("username")]
+    [Column("username")]
     public required string Username { get; set; }
 
-    [MaxLength(255), Column("password")]
-    public required string Password { get; set; }
+    [Column("hashed_password")]
+    public required string HashedPassword { get; set; }
+    [Column("salt")]
+    public required string Salt { get; set; }
 
-    [MaxLength(100), Column("email")]
+    [Column("email")]
     public required string Email { get; set; }
 
     public List<SearchHistory> SearchHistories { get; } = [];

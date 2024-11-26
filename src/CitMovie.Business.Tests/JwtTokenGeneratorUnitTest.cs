@@ -16,7 +16,8 @@ public class JwtTokenGeneratorUnitTest
         User user = new() {
             Username = A.Dummy<string>(),
             Email = A.Dummy<string>(),
-            Password = A.Dummy<string>()
+            HashedPassword = A.Dummy<string>(),
+            Salt = A.Dummy<string>()
         };
 
         JwtTokenGenerator generator = new(jwtSettings);
@@ -36,7 +37,8 @@ public class JwtTokenGeneratorUnitTest
         User user = new() {
             Username = A.Dummy<string>(),
             Email = A.Dummy<string>(),
-            Password = A.Dummy<string>()
+            HashedPassword = A.Dummy<string>(),
+            Salt = A.Dummy<string>()
         };
 
         JwtTokenGenerator generator = new(jwtSettings);
@@ -55,7 +57,8 @@ public class JwtTokenGeneratorUnitTest
         User user = new() {
             Username = A.Dummy<string>(),
             Email = A.Dummy<string>(),
-            Password = A.Dummy<string>()
+            HashedPassword = A.Dummy<string>(),
+            Salt = A.Dummy<string>()
         };
 
         JwtTokenGenerator generator = new(jwtSettings);
@@ -76,7 +79,8 @@ public class JwtTokenGeneratorUnitTest
         User user = new() {
             Username = A.Dummy<string>(),
             Email = A.Dummy<string>(),
-            Password = A.Dummy<string>()
+            HashedPassword = A.Dummy<string>(),
+            Salt = A.Dummy<string>()
         };
 
         JwtTokenGenerator generator = new(jwtSettings);
@@ -96,7 +100,8 @@ public class JwtTokenGeneratorUnitTest
         User user = new() {
             Username = A.Dummy<string>(),
             Email = A.Dummy<string>(),
-            Password = A.Dummy<string>()
+            HashedPassword = A.Dummy<string>(),
+            Salt = A.Dummy<string>()
         };
 
         JwtTokenGenerator generator = new(jwtSettings);
