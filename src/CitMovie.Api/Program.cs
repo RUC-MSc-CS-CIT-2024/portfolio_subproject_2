@@ -10,6 +10,15 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(builder =>
+    {
+        builder.WithOrigins("http://localhost:3000", "https://localhost:3000")
+            .AllowAnyMethod()
+            .AllowAnyHeader();
+    });
+});
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -126,7 +135,7 @@ else
 {
     app.UseHsts();
 }
-
+app.UseCors();
 app.MapControllers();
 
 app.UseHttpsRedirection();
