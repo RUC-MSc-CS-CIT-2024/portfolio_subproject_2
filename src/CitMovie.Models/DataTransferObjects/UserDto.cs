@@ -10,7 +10,13 @@ public class UserResult : BaseResult
 public record UserCreateRequest {
     public required string Username { get; set; }
     public required string Email { get; set; }
+    [MinLength(15), MaxLength(64)]
     public required string Password { get; set; }
 }
 
-public record UserUpdateRequest(string? Username, string? Email, string? Password);
+public record UserUpdateRequest {
+    public string? Username { get; set; }
+    public string? Email { get; set; }
+    [MinLength(15), MaxLength(64)]
+    public string? Password { get; set; }
+};
