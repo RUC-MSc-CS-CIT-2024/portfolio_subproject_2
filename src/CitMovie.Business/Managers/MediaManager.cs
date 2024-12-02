@@ -84,6 +84,7 @@ public class MediaManager : IMediaManager {
         IEnumerable<MediaBasicResult> seasons = _mapper.Map<IEnumerable<MediaBasicResult>>(result.OfType<Season>());
 
         return basicMedia.Concat(episodes).Concat(seasons)
+            .DistinctBy(x => x.Id)
             .OrderBy(x => x.Id)
             .ThenBy(x => x.Title);
     }
