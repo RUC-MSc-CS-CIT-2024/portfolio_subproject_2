@@ -5,7 +5,7 @@ public class Release
     [Key, Column("release_id")]
     public int ReleaseId { get; set; }
     [Column("release_date")]
-    public required DateTime ReleaseDate { get; set; }
+    public DateTime? ReleaseDate { get; set; }
     [Column("rated")]
     public string? Rated { get; set; }
     [Column("type")]
