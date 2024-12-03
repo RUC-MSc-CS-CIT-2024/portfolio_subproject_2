@@ -78,14 +78,14 @@ public class MediaManager : IMediaManager {
             MediaQueryType.Structured => _mediaRepository.SearchStructured(query.Title, query.Plot, query.Character, query.PersonName, userId ?? -1, pageQuery.Number, pageQuery.Count),
             _ => []
         };
-        
+
         IEnumerable<MediaBasicResult> basicMedia = _mapper.Map<IEnumerable<MediaBasicResult>>(result.OfType<Media>());
         IEnumerable<MediaBasicResult> episodes = _mapper.Map<IEnumerable<MediaBasicResult>>(result.OfType<Episode>());
-        IEnumerable<MediaBasicResult> seasons = _mapper.Map<IEnumerable<MediaBasicResult>>(result.OfType<Season>());
-
-        return basicMedia.Concat(episodes).Concat(seasons)
+        
+        return basicMedia.Concat(episodes)
+            .DistinctBy(x => x.Id)
             .OrderBy(x => x.Id)
-            .ThenBy(x => x.Title);
+            .ThenBy(x => x.Title); 
     }
 
     public async Task<int> GetTotalRelatedMediaCountAsync(int id)
