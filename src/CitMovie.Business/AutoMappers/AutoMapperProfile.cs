@@ -9,9 +9,6 @@ public class AutoMapperProfile : Profile
         CreateMap<UserUpdateRequest, User>();
         CreateMap<User, UserResult>();
 
-        // Follow
-        CreateMap<Follow, FollowResult>();
-
         // Country
         CreateMap<Country, CountryResult>();
 
@@ -114,10 +111,32 @@ public class AutoMapperProfile : Profile
         CreateMap<CastMember, CrewResult>()
             .ForMember(dest => dest.JobCategory, opt => opt.MapFrom(src => "Actor"));
 
-        // Bookmark & Completed
+        // Bookmark
         CreateMap<Bookmark, BookmarkResult>();
-        CreateMap<Completed, CompletedResult>();
+        CreateMap<Media, BookmarkResult.BookmarkMediaResult>()
+            .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.PrimaryInformation!.Title!.Name))
+            .ForMember(dest => dest.ReleaseDate, opt => {
+                opt.AllowNull();
+                opt.MapFrom(src => src.PrimaryInformation!.Release!.ReleaseDate);
+            })
+            .ForMember(dest => dest.PosterUri, opt => {
+                opt.AllowNull();
+                opt.MapFrom(src => src.PrimaryInformation!.PromotionalMedia!.Uri);
+            });
 
+        // Completed
+        CreateMap<Completed, CompletedResult>();
+        CreateMap<Media, CompletedResult.CompletedMediaResult>()
+            .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.PrimaryInformation!.Title!.Name))
+            .ForMember(dest => dest.PosterUri, opt => {
+                opt.AllowNull();
+                opt.MapFrom(src => src.PrimaryInformation!.PromotionalMedia!.Uri);
+            });
         CreateMap<CompletedCreateRequest, Completed>();
+
+        // Follow
+        CreateMap<Follow, FollowResult>();
+        CreateMap<Person, FollowResult.FollowPersonResult>()
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.PersonId));
     }
 }

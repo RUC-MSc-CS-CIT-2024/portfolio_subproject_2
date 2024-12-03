@@ -3,11 +3,15 @@ namespace CitMovie.Business;
 public class BookmarkManager : IBookmarkManager
 {
     private readonly IBookmarkRepository _bookmarkRepository;
+    private readonly IMediaRepository _mediaRepository;
+
     private readonly IMapper _mapper;
 
-    public BookmarkManager(IBookmarkRepository bookmarkRepository, IMapper mapper)
+    public BookmarkManager(IBookmarkRepository bookmarkRepository, IMediaRepository mediaRepository, IMapper mapper)
     {
         _bookmarkRepository = bookmarkRepository;
+        _mediaRepository = mediaRepository;
+
         _mapper = mapper;
     }
 
@@ -27,23 +31,28 @@ public class BookmarkManager : IBookmarkManager
         // Calls the updated repository method, which uses EF to update the note
         existingBookmark = await _bookmarkRepository.UpdateBookmarkAsync(bookmarkId, note);
 
-        return new BookmarkResult
-        {
-            BookmarkId = existingBookmark.BookmarkId,
-            UserId = existingBookmark.UserId,
-            MediaId = existingBookmark.MediaId,
-            Note = existingBookmark.Note
-        };
+        return _mapper.Map<BookmarkResult>(existingBookmark);
     }
 
     public async Task<BookmarkResult> GetBookmarkAsync(int bookmarkId) {
         Bookmark result = await _bookmarkRepository.GetBookmarkByIdAsync(bookmarkId);
-        return _mapper.Map<BookmarkResult>(result);
+        
+        BookmarkResult bookmark = _mapper.Map<BookmarkResult>(result);
+        Media? media = _mediaRepository.GetDetailed(bookmark.MediaId);
+        if (media != null) 
+            bookmark.Media = _mapper.Map<BookmarkResult.BookmarkMediaResult>(media);
+        return bookmark;
     }
 
     public async Task<IEnumerable<BookmarkResult>> GetUserBookmarksAsync(int userId, int page, int pageSize) {
         IEnumerable<Bookmark> result = await _bookmarkRepository.GetUserBookmarksAsync(userId, page, pageSize);
-        return _mapper.Map<IEnumerable<BookmarkResult>>(result);
+        IEnumerable<BookmarkResult> bookmarks = _mapper.Map<IEnumerable<BookmarkResult>>(result);
+        foreach (BookmarkResult bookmark in bookmarks) {
+            Media? media = _mediaRepository.GetDetailed(bookmark.MediaId);
+            if (media != null) 
+                bookmark.Media = _mapper.Map<BookmarkResult.BookmarkMediaResult>(media);
+        }
+        return bookmarks;
     }
 
     public async Task<bool> DeleteBookmarkAsync(int bookmarkId)
