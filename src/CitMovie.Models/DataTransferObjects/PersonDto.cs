@@ -9,6 +9,7 @@ public class PersonResult : BaseResult
     public decimal? NameRating { get; set; }
     public DateTime? BirthDate { get; set; }
     public DateTime? DeathDate { get; set; }
+    public string? ImdbId { get; set; }
 }
 
 public class CoActorResult : BaseResult

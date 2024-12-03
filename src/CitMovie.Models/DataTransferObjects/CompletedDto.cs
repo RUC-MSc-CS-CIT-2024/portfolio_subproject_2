@@ -13,6 +13,15 @@ public class CompletedResult : BaseResult
     public DateTime? CompletedDate { get; set; }
     public int Rewatchability { get; set; }
     public string? Note { get; set; }
+    public CompletedMediaResult? Media { get; set; }
+
+    public class CompletedMediaResult {
+        public required int Id { get; set; }
+        public required string Type { get; set; }
+        public required string Title { get; set; }
+        public string? PosterUri { get; set; }
+        public string? ImdbId { get; set; }
+    } 
 }
 
 public class CompletedCreateRequest
