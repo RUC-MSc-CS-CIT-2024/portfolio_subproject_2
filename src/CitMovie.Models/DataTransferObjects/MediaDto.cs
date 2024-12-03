@@ -22,6 +22,7 @@ public class MediaResult : BaseResult {
     public int? BoxOffice { get; set; }
     public int? Budget { get; set; }
     public string? AwardText { get; set; }
+    public string? ImdbId { get; set; }
     public List<GenreResult> Genres { get; set; } = [];
     public List<ScoreResult> Scores { get; set; } = [];
     public List<MediaProductionCompanyResult> ProductionCompanies { get; set; } = [];
