@@ -85,7 +85,7 @@ public class MediaManager : IMediaManager {
         return basicMedia.Concat(episodes)
             .DistinctBy(x => x.Id)
             .OrderBy(x => x.Id)
-            .ThenBy(x => x.Title);
+            .ThenBy(x => x.Title); 
     }
 
     public async Task<int> GetTotalRelatedMediaCountAsync(int id)
