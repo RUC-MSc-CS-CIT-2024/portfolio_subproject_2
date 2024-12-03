@@ -4,15 +4,20 @@ public class CompletedManager : ICompletedManager
 {
     private readonly ICompletedRepository _completedRepository;
     private readonly IBookmarkRepository _bookmarkRepository;
+    private readonly IMediaRepository _mediaRepository;
+
     private readonly IMapper _mapper;
 
     public CompletedManager(
         ICompletedRepository completedRepository, 
         IBookmarkRepository bookmarkRepository,
+        IMediaRepository mediaRepository,
         IMapper mapper)
     {
         _completedRepository = completedRepository;
         _bookmarkRepository = bookmarkRepository;
+        _mediaRepository = mediaRepository;
+
         _mapper = mapper;
     }
 
@@ -28,14 +33,27 @@ public class CompletedManager : ICompletedManager
 
     public async Task<CompletedResult?> GetCompletedAsync(int completedId)
     {
-        var completed = await _completedRepository.GetCompletedByIdAsync(completedId);
-        return completed == null ? null : MapToDto(completed);
+        Completed? completed = await _completedRepository.GetCompletedByIdAsync(completedId);
+        if (completed == null) 
+            return null;
+
+        CompletedResult result = _mapper.Map<CompletedResult>(completed);
+        Media? media = _mediaRepository.GetDetailed(completed.MediaId);
+        if (media != null) 
+            result.Media = _mapper.Map<CompletedResult.CompletedMediaResult>(media);
+        return result;
     }
 
     public async Task<IEnumerable<CompletedResult>> GetUserCompletedItemsAsync(int userId, int page, int pageSize)
     {
-        var completedItems = await _completedRepository.GetUserCompletedItemsAsync(userId, page, pageSize);
-        return completedItems.Select(MapToDto);
+        IEnumerable<Completed> completedItems = await _completedRepository.GetUserCompletedItemsAsync(userId, page, pageSize);
+        IEnumerable<CompletedResult> result = _mapper.Map<IEnumerable<CompletedResult>>(completedItems);
+        foreach (CompletedResult completed in result) {
+            Media? media = _mediaRepository.GetDetailed(completed.MediaId);
+            if (media != null) 
+                completed.Media = _mapper.Map<CompletedResult.CompletedMediaResult>(media);
+        }
+        return result;
     }
 
     public async Task<CompletedResult?> UpdateCompletedAsync(int completedId, UpdateCompletedDto updateCompletedDto)
@@ -53,22 +71,12 @@ public class CompletedManager : ICompletedManager
             completed.Note = updateCompletedDto.Note;
 
         var updated = await _completedRepository.UpdateCompletedAsync(completed);
-        return MapToDto(updated);
+        return _mapper.Map<CompletedResult>(updated);
     }
 
     public async Task<bool> DeleteCompletedAsync(int completedId) =>
         await _completedRepository.DeleteCompletedAsync(completedId);
 
-    private static CompletedResult MapToDto(Completed completed) =>
-        new()
-        {
-            CompletedId = completed.CompletedId,
-            UserId = completed.UserId,
-            MediaId = completed.MediaId,
-            CompletedDate = completed.CompletedDate,
-            Rewatchability = completed.Rewatchability,
-            Note = completed.Note
-        };
 
     public async Task<int> GetTotalUserCompletedCountAsync(int userId)
     {
