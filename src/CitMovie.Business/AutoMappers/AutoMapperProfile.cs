@@ -132,6 +132,8 @@ public class AutoMapperProfile : Profile
                 opt.AllowNull();
                 opt.MapFrom(src => src.PrimaryInformation!.PromotionalMedia!.Uri);
             });
+        CreateMap<UserScore, CompletedResult.CompletedScoreResult>()
+            .ForMember(dest => dest.Value, opt => opt.MapFrom(src => src.ScoreValue));
         CreateMap<CompletedCreateRequest, Completed>();
 
         // Follow
