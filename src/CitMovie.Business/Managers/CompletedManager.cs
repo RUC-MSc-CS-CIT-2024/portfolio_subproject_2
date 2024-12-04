@@ -5,19 +5,20 @@ public class CompletedManager : ICompletedManager
     private readonly ICompletedRepository _completedRepository;
     private readonly IBookmarkRepository _bookmarkRepository;
     private readonly IMediaRepository _mediaRepository;
-
+    private readonly IUserScoreRepository _scoreRepository;
     private readonly IMapper _mapper;
 
     public CompletedManager(
         ICompletedRepository completedRepository, 
         IBookmarkRepository bookmarkRepository,
         IMediaRepository mediaRepository,
+        IUserScoreRepository scoreRepository,
         IMapper mapper)
     {
         _completedRepository = completedRepository;
         _bookmarkRepository = bookmarkRepository;
         _mediaRepository = mediaRepository;
-
+        _scoreRepository = scoreRepository;
         _mapper = mapper;
     }
 
@@ -41,6 +42,9 @@ public class CompletedManager : ICompletedManager
         Media? media = _mediaRepository.GetDetailed(completed.MediaId);
         if (media != null) 
             result.Media = _mapper.Map<CompletedResult.CompletedMediaResult>(media);
+        IEnumerable<UserScore> score = await _scoreRepository.GetUserScoresAsync(completed.UserId, 1, 1, null, completed.MediaId, null);
+        if (score.Any())
+            result.Score = _mapper.Map<CompletedResult.CompletedScoreResult>(score.First());
         return result;
     }
 
@@ -52,6 +56,9 @@ public class CompletedManager : ICompletedManager
             Media? media = _mediaRepository.GetDetailed(completed.MediaId);
             if (media != null) 
                 completed.Media = _mapper.Map<CompletedResult.CompletedMediaResult>(media);
+            IEnumerable<UserScore> score = await _scoreRepository.GetUserScoresAsync(completed.UserId, 1, 1, null, completed.MediaId, null);
+            if (score.Any())
+                completed.Score = _mapper.Map<CompletedResult.CompletedScoreResult>(score.First());
         }
         return result;
     }

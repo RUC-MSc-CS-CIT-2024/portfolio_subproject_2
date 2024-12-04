@@ -14,6 +14,7 @@ public class CompletedResult : BaseResult
     public int Rewatchability { get; set; }
     public string? Note { get; set; }
     public CompletedMediaResult? Media { get; set; }
+    public CompletedScoreResult? Score { get; set; }
 
     public class CompletedMediaResult {
         public required int Id { get; set; }
@@ -21,7 +22,12 @@ public class CompletedResult : BaseResult
         public required string Title { get; set; }
         public string? PosterUri { get; set; }
         public string? ImdbId { get; set; }
-    } 
+    }
+
+    public class CompletedScoreResult {
+        public int Value { get; set; }
+        public string? ReviewText { get; set; }
+    }
 }
 
 public class CompletedCreateRequest

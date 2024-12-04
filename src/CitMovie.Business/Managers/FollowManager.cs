@@ -25,7 +25,7 @@ public class FollowManager : IFollowManager
             if (person != null)
                 result.Person = _mapper.Map<FollowResult.FollowPersonResult>(person);
         }
-        return _mapper.Map<IEnumerable<FollowResult>>(followings);
+        return results;
     }
 
     public async Task<FollowResult> CreateFollowAsync(int userId, int personId)
