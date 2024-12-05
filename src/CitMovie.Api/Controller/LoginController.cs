@@ -62,7 +62,7 @@ public class LoginController : ControllerBase {
                 SameSite = SameSiteMode.Lax,
                 Expires = DateTimeOffset.UtcNow.AddSeconds(result.ExpiresIn)
             });
-            return Ok(refreshToken);
+            return Ok(result);
         } catch (Exception ex) {
             _logger.LogInformation(ex, "Login failed");
             return Unauthorized("Refresh token is invalid");

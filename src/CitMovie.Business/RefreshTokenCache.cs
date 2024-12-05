@@ -21,11 +21,12 @@ public class RefreshTokenCache : IRefreshTokenCache
     public string Generate(int userId)
     {
         string refreshToken = Guid.NewGuid().ToString();
-        _items.Add(refreshToken, new() {
+        RefreshToken token = new() {
             Value = _jwtTokenGenerator.GenerateRefreshToken(refreshToken, userId),
             Expires = DateTimeOffset.UtcNow.AddSeconds(_jwtOptions.RefreshTokenLifetimeSeconds)
-        });
-        return refreshToken;
+        };
+        _items.Add(refreshToken, token);
+        return token.Value;
     }
 
     public bool IsValid(string refreshToken)
