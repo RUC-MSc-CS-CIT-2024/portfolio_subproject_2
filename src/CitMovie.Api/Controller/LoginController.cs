@@ -70,7 +70,7 @@ public class LoginController : ControllerBase {
     }
 
     [HttpPost("revoke-token"), RequireHttps]
-    public ActionResult RevokeToken([FromBody] string refreshToken) {
+    public ActionResult RevokeToken([FromQuery] string refreshToken) {
         try {
             _loginService.RevokeRefreshToken(refreshToken);
             return Ok();
