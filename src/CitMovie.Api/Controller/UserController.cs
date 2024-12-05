@@ -9,12 +9,14 @@ public class UserController : ControllerBase
     private readonly ILogger<UserController> _logger;
     private readonly PagingHelper _pagingHelper;
     private readonly IUserManager _userManager;
+    private readonly ILoginManager _loginService;
 
-    public UserController(ILogger<UserController> logger, PagingHelper pagingHelper, IUserManager userManager)
+    public UserController(ILogger<UserController> logger, PagingHelper pagingHelper, IUserManager userManager, ILoginManager loginService)
     {
         _logger = logger;
         _pagingHelper = pagingHelper;
         _userManager = userManager;
+        _loginService = loginService;
     }
 
     
@@ -34,14 +36,21 @@ public class UserController : ControllerBase
         }
     }
 
-    [HttpPost]
+    [HttpPost("register")]
     [AllowAnonymous]
     public async Task<ActionResult> CreateUser([FromBody] UserCreateRequest user)
     {
         try
         {
             UserResult newUser = await _userManager.CreateUserAsync(user);
-            return CreatedAtAction(nameof(GetUser), new { userId = newUser.Id }, newUser);
+            TokenDto token = await _loginService.AuthenticateAsync(newUser.Username, user.Password);
+            Response.Cookies.Append("access-token", token.AccessToken, new () {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Lax,
+                Expires = DateTimeOffset.UtcNow.AddSeconds(token.ExpiresIn)
+            });
+            return Ok(token);
         }
         catch (Exception ex)
         {
