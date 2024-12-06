@@ -17,35 +17,66 @@ public class LoginController : ControllerBase {
     
     [HttpPost("generate-token"), RequireHttps]
     public async Task<ActionResult> Login([FromHeader(Name = "Authorization")] string? authorizationHeader) {
-        if (authorizationHeader == null) {
+        if (authorizationHeader == null)
             return BadRequest("Authorization header is missing");
-        }
+
         string[] authStatement = authorizationHeader.Split(' ');
-        if (authStatement.Length != 2) {
+        if (authStatement.Length != 2)
             return BadRequest("Authorization header is invalid");
-        }
 
         string authType = authStatement[0];
         string authValue = authStatement[1];
 
-        if (authType != "Basic") {
+        if (authType != "Basic")
             return BadRequest("Authorization header is invalid");
-        }
 
         string[] credentialParts = Encoding.UTF8.GetString(Convert.FromBase64String(authValue)).Split(':');
-        if (credentialParts.Length != 2) {
+        if (credentialParts.Length != 2)
             return BadRequest("Authorization header is invalid");
-        }
 
         string username = credentialParts[0];
         string password = credentialParts[1];
 
         try {
-            string token = await _loginService.LoginAsync(username, password);
+            TokenDto token = await _loginService.AuthenticateAsync(username, password);
+            Response.Cookies.Append("access-token", token.AccessToken, new () {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Lax,
+                Expires = DateTimeOffset.UtcNow.AddSeconds(token.ExpiresIn)
+            });
             return Ok(token);
         } catch (Exception ex) {
             _logger.LogInformation(ex, "Login failed");
             return Unauthorized("Invalid username or password");
+        }
+    }
+
+    [HttpPost("refresh-token"), RequireHttps]
+    public async Task<ActionResult> RefreshToken([FromQuery] string refreshToken) {
+        try {
+            TokenDto result = await _loginService.AuthenticateAsync(refreshToken);
+            Response.Cookies.Append("access-token", result.AccessToken, new () {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Lax,
+                Expires = DateTimeOffset.UtcNow.AddSeconds(result.ExpiresIn)
+            });
+            return Ok(result);
+        } catch (Exception ex) {
+            _logger.LogInformation(ex, "Login failed");
+            return Unauthorized("Refresh token is invalid");
+        }
+    }
+
+    [HttpPost("revoke-token"), RequireHttps]
+    public ActionResult RevokeToken([FromQuery] string refreshToken) {
+        try {
+            _loginService.RevokeRefreshToken(refreshToken);
+            return Ok();
+        } catch (Exception ex) {
+            _logger.LogInformation(ex, "Revoke token failed");
+            return StatusCode(StatusCodes.Status500InternalServerError);
         }
     }
 }

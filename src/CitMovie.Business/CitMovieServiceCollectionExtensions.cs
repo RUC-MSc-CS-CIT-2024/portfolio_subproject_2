@@ -62,6 +62,9 @@ public static class CitMovieServiceCollectionExtensions
                 options.Audience = configuration.GetValue<string>("JWT_AUDIENCE") ?? options.Audience;
                 options.SigningKey = configuration.GetValue<string>("JWT_SIGNING_KEY") ?? options.SigningKey;
             });
+        
+        services.AddKeyedSingleton<Dictionary<string, RefreshToken>>("refreshTokenCache");
+        services.AddScoped<IRefreshTokenCache, RefreshTokenCache>();
         return services;
     }
 }
