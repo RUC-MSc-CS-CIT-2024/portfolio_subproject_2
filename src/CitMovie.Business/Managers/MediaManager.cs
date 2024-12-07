@@ -97,4 +97,20 @@ public class MediaManager : IMediaManager {
     {
         return await _mediaRepository.GetTotalSimilarMediaCountAsync(id);
     }
+    
+    public int GetSearchResultsCount(MediaQueryParameter query)
+    {
+        return query.QueryType switch {
+            MediaQueryType.ExactMatch => _mediaRepository.GetExactMatchSearchResultsCount(query.Keywords ?? []),
+            MediaQueryType.BestMatch => _mediaRepository.GetBestMatchSearchResultsCount(query.Keywords ?? []),
+            MediaQueryType.Simple => _mediaRepository.GetSimpleSearchResultsCount(query.Query ?? ""),
+            MediaQueryType.Structured => _mediaRepository.GetStructuredSearchResultsCount(query.Title, query.Plot, query.Character, query.PersonName),
+            _ => 0
+        };
+    }
+    
+    public int GetTotalMediaCount()
+    {
+        return _mediaRepository.GetTotalMediaCount();
+    }
 }

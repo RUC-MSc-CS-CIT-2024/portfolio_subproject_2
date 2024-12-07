@@ -1,6 +1,7 @@
 namespace CitMovie.Data;
 
-public class MediaRepository : IMediaRepository {
+public class MediaRepository : IMediaRepository
+{
     private readonly DataContext _context;
 
     public MediaRepository(DataContext context)
@@ -26,23 +27,23 @@ public class MediaRepository : IMediaRepository {
             .Include(m => m.MediaProductionCompany)
             .Include(m => m.Countries)
             .Include(x => x.PrimaryInformation!)
-                .ThenInclude(x => x.Title)
+            .ThenInclude(x => x.Title)
             .Include(x => x.PrimaryInformation!)
-                .ThenInclude(x => x.Release)
+            .ThenInclude(x => x.Release)
             .Include(x => x.PrimaryInformation!)
-                .ThenInclude(x => x.PromotionalMedia)
+            .ThenInclude(x => x.PromotionalMedia)
             .FirstOrDefault(m => m.Id == id);
 
     public IEnumerable<Media> GetRelated(int id, int page, int pageSize)
     {
         IQueryable<Media> related = _context.Media
             .Include(x => x.RelatedMedia)
-                .ThenInclude(x => x.Related)
+            .ThenInclude(x => x.Related)
             .Where(x => x.Id == id)
             .SelectMany(x => x.RelatedMedia.Select(y => y.Related!));
 
         IQueryable<Media> withIncludes = GetMultipleWithInclude(related);
-        
+
         return withIncludes
             .OrderBy(x => x.Id)
             .ThenBy(x => x.PrimaryInformation!.Title!.Name)
@@ -51,36 +52,38 @@ public class MediaRepository : IMediaRepository {
     }
 
     public IEnumerable<Media> GetSimilar(int id, int page, int pageSize)
-    {        
+    {
         IQueryable<MatchSearchResult> searchResult = _context.GetSimilarMedia(id);
         return GetMediaFromSearchQuery(searchResult, page, pageSize);
     }
 
-    public IEnumerable<Media> SearchBestMatch(string[] keywords, int page, int pageSize) 
-    {        
+    public IEnumerable<Media> SearchBestMatch(string[] keywords, int page, int pageSize)
+    {
         IQueryable<MatchSearchResult> searchResult = _context.BestMatchSearch(keywords);
         return GetMediaFromSearchQuery(searchResult, page, pageSize);
     }
 
-    public IEnumerable<Media> SearchExactMatch(string[] keywords, int page, int pageSize) 
+    public IEnumerable<Media> SearchExactMatch(string[] keywords, int page, int pageSize)
     {
         IQueryable<MatchSearchResult> searchResult = _context.ExactMatchSearch(keywords);
         return GetMediaFromSearchQuery(searchResult, page, pageSize);
     }
-        
-    public IEnumerable<Media> SearchSimple(string query, int userId, int page, int pageSize) 
+
+    public IEnumerable<Media> SearchSimple(string query, int userId, int page, int pageSize)
     {
         IQueryable<MatchSearchResult> searchResult = _context.SimpleSearch(query, userId);
         return GetMediaFromSearchQuery(searchResult, page, pageSize);
     }
 
-    public IEnumerable<Media> SearchStructured(string? title, string? plot, string? character, string? person, int userId, int page, int pageSize)
+    public IEnumerable<Media> SearchStructured(string? title, string? plot, string? character, string? person,
+        int userId, int page, int pageSize)
     {
         IQueryable<MatchSearchResult> searchResult = _context.StructuredSearch(title, plot, character, person, userId);
         return GetMediaFromSearchQuery(searchResult, page, pageSize);
     }
 
-    private IEnumerable<Media> GetMediaFromSearchQuery(IQueryable<MatchSearchResult> query, int page, int pageSize) {
+    private IEnumerable<Media> GetMediaFromSearchQuery(IQueryable<MatchSearchResult> query, int page, int pageSize)
+    {
         IQueryable<int> ids = query
             .OrderBy(x => x.Id)
             .ThenBy(x => x.Title)
@@ -92,19 +95,32 @@ public class MediaRepository : IMediaRepository {
             .Where(x => ids.Contains(x.Id))
             .ToList();
     }
+    
+    private IEnumerable<Media> GetMediaFromSearchQuery(IQueryable<MatchSearchResult> query)
+    {
+        IQueryable<int> ids = query
+            .OrderBy(x => x.Id)
+            .ThenBy(x => x.Title)
+            .Select(x => x.Id)
+            .Distinct();
+
+        return GetMultipleWithInclude()
+            .Where(x => ids.Contains(x.Id))
+            .ToList();
+    }
 
     private IQueryable<Media> GetMultipleWithInclude()
         => GetMultipleWithInclude(_context.Media);
-    
+
     private IQueryable<Media> GetMultipleWithInclude(IQueryable<Media> media)
         => media
             .AsNoTracking()
             .Include(x => x.PrimaryInformation!)
-                .ThenInclude(x => x.Title)
+            .ThenInclude(x => x.Title)
             .Include(x => x.PrimaryInformation!)
-                .ThenInclude(x => x.Release)
+            .ThenInclude(x => x.Release)
             .Include(x => x.PrimaryInformation!)
-                .ThenInclude(x => x.PromotionalMedia);
+            .ThenInclude(x => x.PromotionalMedia);
 
 
     public async Task<int> GetTotalRelatedMediaCountAsync(int id)
@@ -113,7 +129,35 @@ public class MediaRepository : IMediaRepository {
             .Where(x => x.Id == id)
             .SelectMany(x => x.RelatedMedia.Select(y => y.Related))
             .CountAsync();
-    
+
     public async Task<int> GetTotalSimilarMediaCountAsync(int id)
         => await _context.GetSimilarMedia(id).CountAsync();
+    
+    public int GetSimpleSearchResultsCount(string query)
+    {
+        IQueryable<MatchSearchResult> searchResults = _context.SimpleSearch(query, -1);
+        return GetMediaFromSearchQuery(searchResults).Count();
+    }
+    
+    public int GetBestMatchSearchResultsCount(string[] keywords)
+    {
+        IQueryable<MatchSearchResult> searchResults = _context.BestMatchSearch(keywords);
+        return GetMediaFromSearchQuery(searchResults).Count();
+    }
+    
+    public int GetExactMatchSearchResultsCount(string[] keywords)
+    {
+        IQueryable<MatchSearchResult> searchResults = _context.ExactMatchSearch(keywords);
+        return GetMediaFromSearchQuery(searchResults).Count();
+    }
+    
+    public int GetStructuredSearchResultsCount(string? title, string? plot, string? character, string? person)
+    {
+        IQueryable<MatchSearchResult> searchResults = _context.StructuredSearch(title, plot, character, person, -1);
+        return GetMediaFromSearchQuery(searchResults).Count();
+    }
+    
+    public int GetTotalMediaCount()
+        => _context.Media.Count();
+
 }

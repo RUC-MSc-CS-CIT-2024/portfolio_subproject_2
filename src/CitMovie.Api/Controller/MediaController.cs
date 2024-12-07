@@ -20,15 +20,30 @@ public class MediaController : ControllerBase
     public IActionResult Get([FromQuery] MediaQueryParameter queryParameter)
     {
         IEnumerable<MediaBasicResult> mediaResult;
+        int totalItems = 0;
         if (queryParameter.QueryType == MediaQueryType.All)
+        {
             mediaResult = _mediaManager.GetAllMedia(queryParameter.Page);
+            totalItems = _mediaManager.GetTotalMediaCount();
+        }
         else
+        {
             mediaResult = _mediaManager.Search(queryParameter, GetUserId());
+            totalItems = _mediaManager.GetSearchResultsCount(queryParameter);
+        }
+
 
         foreach (var media in mediaResult)
             media.Links = GenerateLinks(media.Id);
 
-        return Ok(mediaResult);
+        var results = _pagingHelper.CreatePaging(
+            nameof(Get),
+            queryParameter.Page.Number,
+            queryParameter.Page.Count,
+            totalItems,
+            mediaResult);
+
+        return Ok(results);
     }
 
     [HttpGet("{id}", Name = nameof(Get))]
