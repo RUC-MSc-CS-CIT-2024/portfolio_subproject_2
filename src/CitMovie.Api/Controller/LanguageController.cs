@@ -15,13 +15,13 @@ public class LanguageController : ControllerBase
     }
 
     [HttpGet(Name = nameof(GetLanguages))]
-    public async Task<IActionResult> GetLanguages([FromQuery] PageQueryParameter page)
+    public async Task<IActionResult> GetLanguages([FromQuery] int page, [FromQuery] int count)
     {
 
-        var languages = await _languageManager.GetLanguagesAsync(page.Number, page.Count);
+        var languages = await _languageManager.GetLanguagesAsync(page, count);
         var total_items = await _languageManager.GetTotalLanguageCountAsync();
 
-        var result = _pagingHelper.CreatePaging(nameof(GetLanguages), page.Number, page.Count, total_items, languages);
+        var result = _pagingHelper.CreatePaging(nameof(GetLanguages), page, count, total_items, languages);
 
         return Ok(result);
     }
