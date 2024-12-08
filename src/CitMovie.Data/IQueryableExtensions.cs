@@ -19,13 +19,19 @@ public static class IQueryableExtensions {
             }
 
         if (query.IsoCode is not null)
-            mediaResults = mediaResults.Where(x => x.Countries.Any(c => c.IsoCode == query.IsoCode));
-
+            foreach (var iso in query.IsoCode)
+            {
+                mediaResults = mediaResults.Where(x => x.Countries.Any(c => c.IsoCode == iso));
+            }
+        
         if (query.Year is not null)
             mediaResults = mediaResults.Where(x => x.PrimaryInformation!.Release!.ReleaseDate!.Value.Year == query.Year);
 
         if (query.Company is not null)
-            mediaResults = mediaResults.Where(x => x.MediaProductionCompany.Any(c => c.ProductionCompany!.Name == query.Company));
+            foreach (var company in query.Company)
+            {
+                mediaResults = mediaResults.Where(x => x.MediaProductionCompany.Any(c => c.ProductionCompany!.Name == company));
+            }
         
         return mediaResults;
     }

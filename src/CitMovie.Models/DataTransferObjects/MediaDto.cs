@@ -85,10 +85,10 @@ public class FilterParameters {
     public string[]? Genre { get; init; }
     
     [FromQuery(Name = "iso_code")]
-    public string? IsoCode { get; set; }
+    public string[]? IsoCode { get; set; }
     
     [FromQuery(Name = "company")]
-    public string? Company { get; init; }
+    public string[]? Company { get; init; }
 }
 
 public class MediaQueryParameter {
