@@ -1,5 +1,3 @@
-using System.Text.Json;
-
 namespace CitMovie.Business;
 
 public class MediaManager : IMediaManager {
@@ -31,9 +29,14 @@ public class MediaManager : IMediaManager {
             return _mapper.Map<MediaResult>(media);
     }
 
-    public IEnumerable<MediaBasicResult> GetAllMedia(PageQueryParameter page)
+    public IEnumerable<MediaBasicResult> GetAllMedia(PageQueryParameter page, FilterParameters? parameters = null)
     {
-        IEnumerable<Media> result = _mediaRepository.GetAll(page.Number, page.Count);
+        IEnumerable<Media> result = new List<Media>();
+        if (parameters == null) 
+            result = _mediaRepository.GetAll(page.Number, page.Count, null);
+
+        if (parameters != null)
+            result = _mediaRepository.GetAll(page.Number, page.Count, parameters);
         return _mapper.Map<IEnumerable<MediaBasicResult>>(result);
     }
 
@@ -72,10 +75,10 @@ public class MediaManager : IMediaManager {
     {
         PageQueryParameter pageQuery = query.Page;
         IEnumerable<Media> result = query.QueryType switch {
-            MediaQueryType.ExactMatch => _mediaRepository.SearchExactMatch(query.Keywords ?? [], pageQuery.Number, pageQuery.Count),
-            MediaQueryType.BestMatch => _mediaRepository.SearchBestMatch(query.Keywords ?? [], pageQuery.Number, pageQuery.Count),
-            MediaQueryType.Simple => _mediaRepository.SearchSimple(query.Query ?? "", userId ?? -1, pageQuery.Number, pageQuery.Count),
-            MediaQueryType.Structured => _mediaRepository.SearchStructured(query.Title, query.Plot, query.Character, query.PersonName, userId ?? -1, pageQuery.Number, pageQuery.Count),
+            MediaQueryType.ExactMatch => _mediaRepository.SearchExactMatch(query.Keywords ?? [], pageQuery.Number, pageQuery.Count, query.Filter),
+            MediaQueryType.BestMatch => _mediaRepository.SearchBestMatch(query.Keywords ?? [], pageQuery.Number, pageQuery.Count, query.Filter),
+            MediaQueryType.Simple => _mediaRepository.SearchSimple(query.Query ?? "", userId ?? -1, pageQuery.Number, pageQuery.Count, query.Filter),
+            MediaQueryType.Structured => _mediaRepository.SearchStructured(query.Title, query.Plot, query.Character, query.PersonName, userId ?? -1, pageQuery.Number, pageQuery.Count, query.Filter),
             _ => []
         };
 
@@ -101,33 +104,16 @@ public class MediaManager : IMediaManager {
     public int GetSearchResultsCount(MediaQueryParameter query)
     {
         return query.QueryType switch {
-            MediaQueryType.ExactMatch => _mediaRepository.GetExactMatchSearchResultsCount(query.Keywords ?? []),
-            MediaQueryType.BestMatch => _mediaRepository.GetBestMatchSearchResultsCount(query.Keywords ?? []),
-            MediaQueryType.Simple => _mediaRepository.GetSimpleSearchResultsCount(query.Query ?? ""),
-            MediaQueryType.Structured => _mediaRepository.GetStructuredSearchResultsCount(query.Title, query.Plot, query.Character, query.PersonName),
+            MediaQueryType.ExactMatch => _mediaRepository.GetExactMatchSearchResultsCount(query.Keywords ?? [], query.Filter),
+            MediaQueryType.BestMatch => _mediaRepository.GetBestMatchSearchResultsCount(query.Keywords ?? [], query.Filter),
+            MediaQueryType.Simple => _mediaRepository.GetSimpleSearchResultsCount(query.Query ?? "", query.Filter),
+            MediaQueryType.Structured => _mediaRepository.GetStructuredSearchResultsCount(query.Title, query.Plot, query.Character, query.PersonName, query.Filter),
             _ => 0
         };
     }
     
-    public int GetTotalMediaCount()
+    public int GetTotalMediaCount(FilterParameters? parameters = null)
     {
-        return _mediaRepository.GetTotalMediaCount();
-    }
-    
-    public IEnumerable<MediaBasicResult> FilterResults(IEnumerable<MediaBasicResult> mediaResults, MediaQueryParameter? query = null)
-    {
-        if (query == null)
-            return mediaResults;
-        
-        if (query.Type is not null)
-            mediaResults = mediaResults.Where(x => x.Type == query.Type);
-        
-        if (query.Genre is not null)
-            mediaResults = mediaResults.Where(x => x.Genres.Any(g => g.Name == query.Genre));
-        
-        if (query.Country is not null)
-            mediaResults = mediaResults.Where(x => x.ProductionCountries.Any(c => c.Name == query.Country));
-        
-        return mediaResults;
+        return _mediaRepository.GetTotalMediaCount(parameters);
     }
 }

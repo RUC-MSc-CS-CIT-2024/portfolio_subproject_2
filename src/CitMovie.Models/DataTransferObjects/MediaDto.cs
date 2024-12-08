@@ -74,6 +74,23 @@ public enum MediaQueryType {
     Structured
 }
 
+public class FilterParameters {
+    [FromQuery(Name = "type")]
+    public string? Type { get; init; }
+    
+    [FromQuery(Name = "year")]
+    public int? Year { get; init; }
+    
+    [FromQuery(Name = "genre")]
+    public string? Genre { get; init; }
+    
+    [FromQuery(Name = "iso_code")]
+    public string? IsoCode { get; set; }
+    
+    [FromQuery(Name = "company")]
+    public string? Company { get; init; }
+}
+
 public class MediaQueryParameter {
     public PageQueryParameter Page { get; init; } = new PageQueryParameter();
 
@@ -97,16 +114,6 @@ public class MediaQueryParameter {
 
     [FromQuery(Name = "person")]
     public string? PersonName { get; init; }
-    
-    [FromQuery(Name = "type")]
-    public string? Type { get; init; }
-    
-    [FromQuery(Name = "year")]
-    public int? Year { get; init; }
-    
-    [FromQuery(Name = "genre")]
-    public string? Genre { get; init; }
-    
-    [FromQuery(Name = "country")]
-    public string? Country { get; init; }    
+
+    public FilterParameters? Filter { get; init; } = null;
 }

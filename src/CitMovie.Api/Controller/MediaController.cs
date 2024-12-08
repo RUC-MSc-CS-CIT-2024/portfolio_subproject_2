@@ -23,8 +23,8 @@ public class MediaController : ControllerBase
         int totalItems = 0;
         if (queryParameter.QueryType == MediaQueryType.All)
         {
-            mediaResult = _mediaManager.GetAllMedia(queryParameter.Page);
-            totalItems = _mediaManager.GetTotalMediaCount();
+            mediaResult = _mediaManager.GetAllMedia(queryParameter.Page, queryParameter.Filter);
+            totalItems = _mediaManager.GetTotalMediaCount(queryParameter.Filter);
         }
         else
         {
