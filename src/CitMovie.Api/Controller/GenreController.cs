@@ -15,12 +15,12 @@ public class GenreController : ControllerBase
     }
 
     [HttpGet(Name = nameof(GetAllGenres))]
-    public async Task<ActionResult<IEnumerable<GenreResult>>> GetAllGenres([FromQuery] PageQueryParameter page)
+    public async Task<ActionResult<IEnumerable<GenreResult>>> GetAllGenres([FromQuery] int page, [FromQuery] int count)
     {
         var totalItems = await _genreManager.GetTotalGenresCountAsync();
-        var genres = await _genreManager.GetAllGenresAsync(page.Number, page.Count);
+        var genres = await _genreManager.GetAllGenresAsync(page, count);
 
-        var result = _pagingHelper.CreatePaging(nameof(GetAllGenres), page.Number, page.Count, totalItems, genres);
+        var result = _pagingHelper.CreatePaging(nameof(GetAllGenres), page, count, totalItems, genres);
 
         return Ok(result);
     }

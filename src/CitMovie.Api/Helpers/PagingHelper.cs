@@ -28,7 +28,7 @@ public class PagingHelper
         var routeValues = new Dictionary<string, object>
         {
             { "page", page },
-            { "pageSize", pageSize }
+            { "count", pageSize }
         };
 
         if (additionalRouteValues != null)

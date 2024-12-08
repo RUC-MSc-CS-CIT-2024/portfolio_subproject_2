@@ -16,12 +16,13 @@ public class CountryController : ControllerBase
     }
 
     [HttpGet(Name = nameof(GetAllCountries))]
-    public async Task<ActionResult<IEnumerable<CountryResult>>> GetAllCountries([FromQuery] PageQueryParameter page)
+    public async Task<ActionResult> GetAllCountries([FromQuery] int page, [FromQuery] int count)
     {
+        Console.WriteLine("Page: " + page + " Count: " + count);
         var totalItems = await _countryManager.GetTotalCountriesCountAsync();
-        var countries = await _countryManager.GetAllCountriesAsync(page.Number, page.Count);
+        var countries = await _countryManager.GetAllCountriesAsync(page, count);
 
-        var result = _pagingHelper.CreatePaging(nameof(GetAllCountries), page.Number, page.Count, totalItems, countries);
+        var result = _pagingHelper.CreatePaging(nameof(GetAllCountries), page, count, totalItems, countries);
 
         return Ok(result);
     }
