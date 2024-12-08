@@ -82,7 +82,7 @@ public class FilterParameters {
     public int? Year { get; init; }
     
     [FromQuery(Name = "genre")]
-    public string? Genre { get; init; }
+    public string[]? Genre { get; init; }
     
     [FromQuery(Name = "iso_code")]
     public string? IsoCode { get; set; }

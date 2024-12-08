@@ -13,13 +13,16 @@ public static class IQueryableExtensions {
             mediaResults = mediaResults.Where(x => x.Type == query.Type);
 
         if (query.Genre is not null)
-            mediaResults = mediaResults.Where(x => x.Genres.Any(g => g.Name == CapitalizeEachWord(query.Genre)));
+            foreach (var genre in query.Genre)
+            {
+                mediaResults = mediaResults.Where(x => x.Genres.Any(g => g.Name == CapitalizeEachWord(genre)));
+            }
 
         if (query.IsoCode is not null)
             mediaResults = mediaResults.Where(x => x.Countries.Any(c => c.IsoCode == query.IsoCode));
 
         if (query.Year is not null)
-            return mediaResults;
+            mediaResults = mediaResults.Where(x => x.PrimaryInformation!.Release!.ReleaseDate!.Value.Year == query.Year);
 
         if (query.Company is not null)
             mediaResults = mediaResults.Where(x => x.MediaProductionCompany.Any(c => c.ProductionCompany!.Name == query.Company));
