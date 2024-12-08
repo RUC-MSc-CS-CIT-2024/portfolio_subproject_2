@@ -127,6 +127,19 @@ public class MediaRepository : IMediaRepository
             .Filter(parameter)
             .ToList();
     }
+    
+    private IEnumerable<Media> GetMediaFromSearchQuery(IQueryable<MatchSearchResult> query)
+    {
+        IQueryable<int> ids = query
+            .OrderBy(x => x.Id)
+            .ThenBy(x => x.Title)
+            .Select(x => x.Id)
+            .Distinct();
+
+        return GetMultipleWithInclude()
+            .Where(x => ids.Contains(x.Id))
+            .ToList();
+    }
 
     private IQueryable<Media> GetMultipleWithInclude()
         => GetMultipleWithInclude(_context.Media);
@@ -184,5 +197,4 @@ public class MediaRepository : IMediaRepository
         => _context.Media
             .Filter(parameters)
             .Count();
-
 }
