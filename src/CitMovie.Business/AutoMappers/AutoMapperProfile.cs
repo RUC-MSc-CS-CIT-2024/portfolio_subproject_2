@@ -11,12 +11,14 @@ public class AutoMapperProfile : Profile
 
         // Country
         CreateMap<Country, CountryResult>();
+        CreateMap<Country, CountryNameResult>();
 
         // Language
         CreateMap<Language, LanguageResult>();
 
         // Genre
         CreateMap<Genre, GenreResult>();
+        CreateMap<Genre, GenreNameResult>();
 
         // TitleType
         CreateMap<TitleType, TitleTypeResult>();
@@ -27,14 +29,19 @@ public class AutoMapperProfile : Profile
         // Media
         CreateMap<Media, MediaBasicResult>()
             .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.PrimaryInformation!.Title!.Name))
-            .ForMember(dest => dest.ReleaseDate, opt => {
+            .ForMember(dest => dest.ReleaseDate, opt =>
+            {
                 opt.AllowNull();
                 opt.MapFrom(src => src.PrimaryInformation!.Release!.ReleaseDate);
             })
-            .ForMember(dest => dest.PosterUri, opt => {
+            .ForMember(dest => dest.PosterUri, opt =>
+            {
                 opt.AllowNull();
                 opt.MapFrom(src => src.PrimaryInformation!.PromotionalMedia!.Uri);
-            });
+            })
+            .ForMember(dest => dest.ProductionCountries, opt => opt.MapFrom(src => src.Countries))
+            .ForMember(dest => dest.ProductionCompanies, opt => opt.MapFrom(src => src.MediaProductionCompany.Select(mpc => mpc.ProductionCompany)))
+            .ForMember(dest => dest.Genres, opt => opt.MapFrom(src => src.Genres));
 
 
         CreateMap<Media, MediaResult>()
@@ -64,6 +71,9 @@ public class AutoMapperProfile : Profile
 
         CreateMap<Score, MediaResult.ScoreResult>();
         CreateMap<ProductionCompany, MediaResult.MediaProductionCompanyResult>();
+        CreateMap<ProductionCompany, MediaBasicResult.MediaProductionCompanyNameResult>();
+        CreateMap<MediaProductionCompany, MediaResult.MediaProductionCompanyResult>()
+            .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.ProductionCompany));;
         
         //Release
         CreateMap<ReleaseUpdateRequest, Release>()

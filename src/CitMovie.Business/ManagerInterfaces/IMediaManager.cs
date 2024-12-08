@@ -1,7 +1,7 @@
 namespace CitMovie.Business;
 
 public interface IMediaManager {
-    IEnumerable<MediaBasicResult> GetAllMedia(PageQueryParameter page);
+    IEnumerable<MediaBasicResult> GetAllMedia(PageQueryParameter page, FilterParameters? query);
     IEnumerable<MediaBasicResult> Search(MediaQueryParameter queryParameter, int? userId);
     MediaResult Get(int id);
     IEnumerable<MediaBasicResult> GetSimilar(int id, PageQueryParameter page);
@@ -11,5 +11,5 @@ public interface IMediaManager {
     Task<int> GetTotalRelatedMediaCountAsync(int id);
     Task<int> GetTotalSimilarMediaCountAsync(int id);
     int GetSearchResultsCount(MediaQueryParameter query);
-    int GetTotalMediaCount();
+    int GetTotalMediaCount(FilterParameters? query);
 }
