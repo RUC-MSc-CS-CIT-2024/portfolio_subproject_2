@@ -113,4 +113,21 @@ public class MediaManager : IMediaManager {
     {
         return _mediaRepository.GetTotalMediaCount();
     }
+    
+    public IEnumerable<MediaBasicResult> FilterResults(IEnumerable<MediaBasicResult> mediaResults, MediaQueryParameter? query = null)
+    {
+        if (query == null)
+            return mediaResults;
+        
+        if (query.Type is not null)
+            mediaResults = mediaResults.Where(x => x.Type == query.Type);
+        
+        if (query.Genre is not null)
+            mediaResults = mediaResults.Where(x => x.Genres.Any(g => g.Name == query.Genre));
+        
+        if (query.Country is not null)
+            mediaResults = mediaResults.Where(x => x.ProductionCountries.Any(c => c.Name == query.Country));
+        
+        return mediaResults;
+    }
 }

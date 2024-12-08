@@ -5,3 +5,7 @@ public class CountryResult {
     public required string IsoCode { get; set; }
     public required string Name { get; set; }
 }
+
+public class CountryNameResult {
+    public required string Name { get; set; }
+}

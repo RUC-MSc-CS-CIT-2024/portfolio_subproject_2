@@ -120,7 +120,11 @@ public class MediaRepository : IMediaRepository
             .Include(x => x.PrimaryInformation!)
             .ThenInclude(x => x.Release)
             .Include(x => x.PrimaryInformation!)
-            .ThenInclude(x => x.PromotionalMedia);
+            .ThenInclude(x => x.PromotionalMedia)
+            .Include(x=> x.MediaProductionCompany)
+            .ThenInclude(x=> x.ProductionCompany)
+            .Include(x => x.Genres)
+            .Include(x => x.Countries);
 
 
     public async Task<int> GetTotalRelatedMediaCountAsync(int id)

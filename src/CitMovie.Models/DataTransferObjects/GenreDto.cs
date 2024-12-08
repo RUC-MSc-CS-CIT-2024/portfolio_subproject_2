@@ -4,3 +4,7 @@ public class GenreResult {
     public required int GenreId { get; set; }
     public required string Name { get; set; }
 }
+
+public class GenreNameResult {
+    public required string Name { get; set; }
+}

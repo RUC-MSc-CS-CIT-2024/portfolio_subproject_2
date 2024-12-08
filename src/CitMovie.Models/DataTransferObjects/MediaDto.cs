@@ -8,6 +8,14 @@ public class MediaBasicResult : BaseResult {
     public required string Title { get; set; }
     public DateTime? ReleaseDate { get; set; }
     public string? PosterUri { get; set; }
+    public List<GenreNameResult> Genres { get; set; } = [];
+    public List<CountryNameResult> ProductionCountries { get; set; } = [];
+    public List<MediaProductionCompanyNameResult> ProductionCompanies { get; set; } = [];
+    
+    public class MediaProductionCompanyNameResult {
+        public required string Name { get; set; }
+    }
+    
 }
 
 public class MediaResult : BaseResult {
@@ -89,4 +97,16 @@ public class MediaQueryParameter {
 
     [FromQuery(Name = "person")]
     public string? PersonName { get; init; }
+    
+    [FromQuery(Name = "type")]
+    public string? Type { get; init; }
+    
+    [FromQuery(Name = "year")]
+    public int? Year { get; init; }
+    
+    [FromQuery(Name = "genre")]
+    public string? Genre { get; init; }
+    
+    [FromQuery(Name = "country")]
+    public string? Country { get; init; }    
 }
