@@ -18,7 +18,6 @@ public class CountryController : ControllerBase
     [HttpGet(Name = nameof(GetAllCountries))]
     public async Task<ActionResult> GetAllCountries([FromQuery(Name = "")] PageQueryParameter page)
     {
-        Console.WriteLine("Page: " + page.Number + " Count: " + page.Count);
         var totalItems = await _countryManager.GetTotalCountriesCountAsync();
         var countries = await _countryManager.GetAllCountriesAsync(page.Number, page.Count);
 
