@@ -1,5 +1,3 @@
-using System.Text.Json;
-
 namespace CitMovie.Business;
 
 public class MediaManager : IMediaManager {
@@ -88,14 +86,20 @@ public class MediaManager : IMediaManager {
     }
 
     public async Task<int> GetTotalRelatedMediaCountAsync(int id)
-    {
-        return await _mediaRepository.GetTotalRelatedMediaCountAsync(id);
-    }
+        => await _mediaRepository.GetTotalRelatedMediaCountAsync(id);
 
     public async Task<int> GetTotalSimilarMediaCountAsync(int id)
-    {
-        return await _mediaRepository.GetTotalSimilarMediaCountAsync(id);
-    }
+        => await _mediaRepository.GetTotalSimilarMediaCountAsync(id);
+
+    public int GetTotalMediaCount()
+        => _mediaRepository.GetTotalMediaCount();
+
+
+    public Task<int> GetTotalCrewCountAsync(int id)
+        => _crewRepository.GetTotalCrewCountAsync(id);
+
+    public Task<int> GetTotalCastCountAsync(int id)
+        =>  _crewRepository.GetTotalCastCountAsync(id);
     
     public int GetSearchResultsCount(MediaQueryParameter query)
     {
@@ -108,8 +112,4 @@ public class MediaManager : IMediaManager {
         };
     }
     
-    public int GetTotalMediaCount()
-    {
-        return _mediaRepository.GetTotalMediaCount();
-    }
 }

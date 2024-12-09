@@ -1,6 +1,6 @@
 namespace CitMovie.Models.DataTransferObjects;
 
-public record CrewResult {
+public class CrewResult : BaseResult {
     public required int Id { get; set; }
     public required string Role { get; set; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]

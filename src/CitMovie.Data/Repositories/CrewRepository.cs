@@ -32,5 +32,21 @@ public class CrewRepository : ICrewRepository
             .ThenBy(x => x.Person!.Name)
             .Pagination(page, pageCount)
             .ToListAsync();
-        
+
+    public Task<int> GetTotalCrewCountAsync(int id)
+        => _context.Media
+            .AsNoTracking()
+            .Include(x => x.CrewMembers)
+            .Where(x => x.Id == id)
+            .SelectMany(x => x.CrewMembers)
+            .CountAsync();
+
+    public Task<int> GetTotalCastCountAsync(int id)
+        => _context.Media
+            .AsNoTracking()
+            .Include(x => x.CastMembers)
+            .Where(x => x.Id == id)
+            .SelectMany(x => x.CastMembers)
+            .CountAsync();
+
 }

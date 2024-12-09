@@ -110,11 +110,17 @@ public class MediaController : ControllerBase
         }
     }
 
-    [HttpGet("{id}/crew")]
+    [HttpGet("{id}/crew", Name = nameof(GetCrew))]
     public async Task<ActionResult> GetCrew(int id, [FromQuery(Name = "")] PageQueryParameter pageQuery) {
         
         try {
-            return Ok(await _mediaManager.GetCrewAsync(id, pageQuery));
+            IEnumerable<CrewResult> crewResult = await _mediaManager.GetCrewAsync(id, pageQuery);
+            foreach (var media in crewResult)
+                media.Links = GenerateLinks(media.Id);
+
+            int totalItems = await _mediaManager.GetTotalCrewCountAsync(id);
+            var result = _pagingHelper.CreatePaging(nameof(GetRelated), pageQuery.Number, pageQuery.Count, totalItems, crewResult, new { id });
+            return Ok(result);
         } catch (KeyNotFoundException) {
             return NotFound();
         } catch (Exception e) {
@@ -123,10 +129,16 @@ public class MediaController : ControllerBase
         }
     }
 
-    [HttpGet("{id}/cast")]
+    [HttpGet("{id}/cast", Name = nameof(GetCast))]
     public async Task<IActionResult> GetCast(int id, [FromQuery(Name = "")] PageQueryParameter pageQuery) {
         try {
-            return Ok(await _mediaManager.GetCastAsync(id, pageQuery));
+            IEnumerable<CrewResult> castResult = await _mediaManager.GetCastAsync(id, pageQuery);
+            foreach (var media in castResult)
+                media.Links = GenerateLinks(media.Id);
+
+            int totalItems = await _mediaManager.GetTotalCastCountAsync(id);
+            var result = _pagingHelper.CreatePaging(nameof(GetRelated), pageQuery.Number, pageQuery.Count, totalItems, castResult, new { id });
+            return Ok();
         } catch (KeyNotFoundException) {
             return NotFound();
         } catch (Exception e) {

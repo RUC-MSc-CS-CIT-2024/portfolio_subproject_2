@@ -10,6 +10,8 @@ public interface IMediaManager {
     Task<IEnumerable<CrewResult>> GetCastAsync(int mediaId, PageQueryParameter page);
     Task<int> GetTotalRelatedMediaCountAsync(int id);
     Task<int> GetTotalSimilarMediaCountAsync(int id);
+    Task<int> GetTotalCrewCountAsync(int id);
+    Task<int> GetTotalCastCountAsync(int id);
     int GetSearchResultsCount(MediaQueryParameter query);
     int GetTotalMediaCount();
 }
