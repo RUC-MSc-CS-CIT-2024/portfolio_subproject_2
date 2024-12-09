@@ -68,9 +68,8 @@ public class MediaManager : IMediaManager {
         return _mapper.Map<IEnumerable<MediaBasicResult>>(result);
     }
 
-    public IEnumerable<MediaBasicResult> Search(MediaQueryParameter query, int? userId)
+    public IEnumerable<MediaBasicResult> Search(MediaQueryParameter query, PageQueryParameter pageQuery, int? userId)
     {
-        PageQueryParameter pageQuery = query.Page;
         IEnumerable<Media> result = query.QueryType switch {
             MediaQueryType.ExactMatch => _mediaRepository.SearchExactMatch(query.Keywords ?? [], pageQuery.Number, pageQuery.Count),
             MediaQueryType.BestMatch => _mediaRepository.SearchBestMatch(query.Keywords ?? [], pageQuery.Number, pageQuery.Count),

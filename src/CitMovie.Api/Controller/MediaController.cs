@@ -17,18 +17,18 @@ public class MediaController : ControllerBase
     }
 
     [HttpGet]
-    public IActionResult Get([FromQuery] MediaQueryParameter queryParameter)
+    public IActionResult Get([FromQuery] MediaQueryParameter queryParameter, [FromQuery(Name = "")] PageQueryParameter pageQuery)
     {
         IEnumerable<MediaBasicResult> mediaResult;
         int totalItems = 0;
         if (queryParameter.QueryType == MediaQueryType.All)
         {
-            mediaResult = _mediaManager.GetAllMedia(queryParameter.Page);
+            mediaResult = _mediaManager.GetAllMedia(pageQuery);
             totalItems = _mediaManager.GetTotalMediaCount();
         }
         else
         {
-            mediaResult = _mediaManager.Search(queryParameter, GetUserId());
+            mediaResult = _mediaManager.Search(queryParameter, pageQuery, GetUserId());
             totalItems = _mediaManager.GetSearchResultsCount(queryParameter);
         }
 
@@ -38,8 +38,8 @@ public class MediaController : ControllerBase
 
         var results = _pagingHelper.CreatePaging(
             nameof(Get),
-            queryParameter.Page.Number,
-            queryParameter.Page.Count,
+            pageQuery.Number,
+            pageQuery.Count,
             totalItems,
             mediaResult);
 
@@ -61,7 +61,7 @@ public class MediaController : ControllerBase
     }
 
     [HttpGet("{id}/similar_media", Name = nameof(GetSimilar))]
-    public async Task<IActionResult> GetSimilar(int id, [FromQuery] PageQueryParameter pageQuery)
+    public async Task<IActionResult> GetSimilar(int id, [FromQuery(Name = "")] PageQueryParameter pageQuery)
     {
         try
         {
@@ -86,7 +86,7 @@ public class MediaController : ControllerBase
     }
 
     [HttpGet("{id}/related_media", Name = nameof(GetRelated))]
-    public async Task<IActionResult> GetRelated(int id, [FromQuery] PageQueryParameter pageQuery)
+    public async Task<IActionResult> GetRelated(int id, [FromQuery(Name = "")] PageQueryParameter pageQuery)
     {
         try
         {
@@ -111,7 +111,7 @@ public class MediaController : ControllerBase
     }
 
     [HttpGet("{id}/crew")]
-    public async Task<ActionResult> GetCrew(int id, [FromQuery] PageQueryParameter pageQuery) {
+    public async Task<ActionResult> GetCrew(int id, [FromQuery(Name = "")] PageQueryParameter pageQuery) {
         
         try {
             return Ok(await _mediaManager.GetCrewAsync(id, pageQuery));
@@ -124,7 +124,7 @@ public class MediaController : ControllerBase
     }
 
     [HttpGet("{id}/cast")]
-    public async Task<IActionResult> GetCast(int id, [FromQuery] PageQueryParameter pageQuery) {
+    public async Task<IActionResult> GetCast(int id, [FromQuery(Name = "")] PageQueryParameter pageQuery) {
         try {
             return Ok(await _mediaManager.GetCastAsync(id, pageQuery));
         } catch (KeyNotFoundException) {
