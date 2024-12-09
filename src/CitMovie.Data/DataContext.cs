@@ -65,8 +65,11 @@ public class DataContext : DbContext
             .HasName("structured_string_search");
         modelBuilder.HasDbFunction(() => GetSimilarMedia(default))
             .HasName("get_similar_movies");
+
+        modelBuilder.HasDbFunction(() => PersonSearch(default!, default!))
+            .HasName("structured_string_search_name");
         modelBuilder.HasDbFunction(() => GetFrequentCoActors(default!))
-             .HasName("get_frequent_coplaying_actors");
+            .HasName("get_frequent_coplaying_actors");
 
         modelBuilder.Entity<Media>()
             .HasMany(e => e.Genres)
@@ -121,6 +124,9 @@ public class DataContext : DbContext
 
     public IQueryable<MatchSearchResult> GetSimilarMedia(int id)
         => FromExpression(() => GetSimilarMedia(id));
+
+    public IQueryable<MatchSearchResult> PersonSearch(string name, int? userId)
+        => FromExpression(() => PersonSearch(name, userId));
 
     public IQueryable<CoActor> GetFrequentCoActors(string actorName)
         => FromExpression(() => GetFrequentCoActors(actorName));
