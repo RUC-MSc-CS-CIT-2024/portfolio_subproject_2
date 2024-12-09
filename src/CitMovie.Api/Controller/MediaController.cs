@@ -16,8 +16,8 @@ public class MediaController : ControllerBase
         _pagingHelper = pagingHelper;
     }
 
-    [HttpGet]
-    public IActionResult Get([FromQuery] MediaQueryParameter queryParameter, [FromQuery(Name = "")] PageQueryParameter pageQuery)
+    [HttpGet(Name = nameof(Query))]
+    public IActionResult Query([FromQuery] MediaQueryParameter queryParameter, [FromQuery(Name = "")] PageQueryParameter pageQuery)
     {
         IEnumerable<MediaBasicResult> mediaResult;
         int totalItems = 0;
@@ -37,7 +37,7 @@ public class MediaController : ControllerBase
             media.Links = GenerateLinks(media.Id);
 
         var results = _pagingHelper.CreatePaging(
-            nameof(Get),
+            nameof(Query),
             pageQuery.Number,
             pageQuery.Count,
             totalItems,
