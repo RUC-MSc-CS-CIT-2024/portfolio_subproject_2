@@ -69,10 +69,10 @@ public class MediaManager : IMediaManager {
     public IEnumerable<MediaBasicResult> Search(MediaQueryParameter query, PageQueryParameter pageQuery, int? userId)
     {
         IEnumerable<Media> result = query.QueryType switch {
-            MediaQueryType.ExactMatch => _mediaRepository.SearchExactMatch(query.Keywords ?? [], pageQuery.Number, pageQuery.Count),
-            MediaQueryType.BestMatch => _mediaRepository.SearchBestMatch(query.Keywords ?? [], pageQuery.Number, pageQuery.Count),
-            MediaQueryType.Simple => _mediaRepository.SearchSimple(query.Query ?? "", userId ?? -1, pageQuery.Number, pageQuery.Count),
-            MediaQueryType.Structured => _mediaRepository.SearchStructured(query.Title, query.Plot, query.Character, query.PersonName, userId ?? -1, pageQuery.Number, pageQuery.Count),
+            MediaQueryType.ExactMatch => _mediaRepository.SearchExactMatch(query.Keywords ?? [], userId, pageQuery.Number, pageQuery.Count),
+            MediaQueryType.BestMatch => _mediaRepository.SearchBestMatch(query.Keywords ?? [], userId, pageQuery.Number, pageQuery.Count),
+            MediaQueryType.Simple => _mediaRepository.SearchSimple(query.Query ?? "", userId, pageQuery.Number, pageQuery.Count),
+            MediaQueryType.Structured => _mediaRepository.SearchStructured(query.Title, query.Plot, query.Character, query.PersonName, userId, pageQuery.Number, pageQuery.Count),
             _ => []
         };
 

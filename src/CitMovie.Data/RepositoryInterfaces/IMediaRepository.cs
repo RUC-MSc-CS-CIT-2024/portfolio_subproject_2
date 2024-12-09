@@ -1,14 +1,12 @@
-using Microsoft.AspNetCore.Mvc.RazorPages;
-
 namespace CitMovie.Data;
 
 public interface IMediaRepository
 {
-    IEnumerable<Media> SearchBestMatch(string[] keywords, int page, int pageSize);
-    IEnumerable<Media> SearchExactMatch(string[] keywords, int page, int pageSize);
-    IEnumerable<Media> SearchSimple(string query, int userId, int page, int pageSize);
+    IEnumerable<Media> SearchBestMatch(string[] keywords, int? userId, int page, int pageSize);
+    IEnumerable<Media> SearchExactMatch(string[] keywords, int? userId, int page, int pageSize);
+    IEnumerable<Media> SearchSimple(string query, int? userId, int page, int pageSize);
 
-    IEnumerable<Media> SearchStructured(string? title, string? plot, string? character, string? person, int userId,
+    IEnumerable<Media> SearchStructured(string? title, string? plot, string? character, string? person, int? userId,
         int page, int pageSize);
 
     IEnumerable<Media> GetAll(int page, int pageSize);

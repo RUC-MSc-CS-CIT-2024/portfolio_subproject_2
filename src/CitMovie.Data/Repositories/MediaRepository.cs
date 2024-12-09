@@ -57,26 +57,26 @@ public class MediaRepository : IMediaRepository
         return GetMediaFromSearchQuery(searchResult, page, pageSize);
     }
 
-    public IEnumerable<Media> SearchBestMatch(string[] keywords, int page, int pageSize)
+    public IEnumerable<Media> SearchBestMatch(string[] keywords, int? userId, int page, int pageSize)
     {
-        IQueryable<MatchSearchResult> searchResult = _context.BestMatchSearch(keywords);
+        IQueryable<MatchSearchResult> searchResult = _context.BestMatchSearch(keywords, userId);
         return GetMediaFromSearchQuery(searchResult, page, pageSize);
     }
 
-    public IEnumerable<Media> SearchExactMatch(string[] keywords, int page, int pageSize)
+    public IEnumerable<Media> SearchExactMatch(string[] keywords, int? userId, int page, int pageSize)
     {
-        IQueryable<MatchSearchResult> searchResult = _context.ExactMatchSearch(keywords);
+        IQueryable<MatchSearchResult> searchResult = _context.ExactMatchSearch(keywords, userId);
         return GetMediaFromSearchQuery(searchResult, page, pageSize);
     }
 
-    public IEnumerable<Media> SearchSimple(string query, int userId, int page, int pageSize)
+    public IEnumerable<Media> SearchSimple(string query, int? userId, int page, int pageSize)
     {
         IQueryable<MatchSearchResult> searchResult = _context.SimpleSearch(query, userId);
         return GetMediaFromSearchQuery(searchResult, page, pageSize);
     }
 
     public IEnumerable<Media> SearchStructured(string? title, string? plot, string? character, string? person,
-        int userId, int page, int pageSize)
+        int? userId, int page, int pageSize)
     {
         IQueryable<MatchSearchResult> searchResult = _context.StructuredSearch(title, plot, character, person, userId);
         return GetMediaFromSearchQuery(searchResult, page, pageSize);
@@ -85,8 +85,6 @@ public class MediaRepository : IMediaRepository
     private IEnumerable<Media> GetMediaFromSearchQuery(IQueryable<MatchSearchResult> query, int page, int pageSize)
     {
         IQueryable<int> ids = query
-            .OrderBy(x => x.Id)
-            .ThenBy(x => x.Title)
             .Pagination(page, pageSize)
             .Select(x => x.Id)
             .Distinct();
@@ -135,25 +133,25 @@ public class MediaRepository : IMediaRepository
     
     public int GetSimpleSearchResultsCount(string query)
     {
-        IQueryable<MatchSearchResult> searchResults = _context.SimpleSearch(query, -1);
+        IQueryable<MatchSearchResult> searchResults = _context.SimpleSearch(query, null);
         return GetMediaFromSearchQuery(searchResults).Count();
     }
     
     public int GetBestMatchSearchResultsCount(string[] keywords)
     {
-        IQueryable<MatchSearchResult> searchResults = _context.BestMatchSearch(keywords);
+        IQueryable<MatchSearchResult> searchResults = _context.BestMatchSearch(keywords, null);
         return GetMediaFromSearchQuery(searchResults).Count();
     }
     
     public int GetExactMatchSearchResultsCount(string[] keywords)
     {
-        IQueryable<MatchSearchResult> searchResults = _context.ExactMatchSearch(keywords);
+        IQueryable<MatchSearchResult> searchResults = _context.ExactMatchSearch(keywords, null);
         return GetMediaFromSearchQuery(searchResults).Count();
     }
     
     public int GetStructuredSearchResultsCount(string? title, string? plot, string? character, string? person)
     {
-        IQueryable<MatchSearchResult> searchResults = _context.StructuredSearch(title, plot, character, person, -1);
+        IQueryable<MatchSearchResult> searchResults = _context.StructuredSearch(title, plot, character, person, null);
         return GetMediaFromSearchQuery(searchResults).Count();
     }
     
