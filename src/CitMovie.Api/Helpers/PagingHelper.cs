@@ -1,3 +1,5 @@
+using Newtonsoft.Json;
+
 namespace CitMovie.Api;
 
 public class PagingHelper
@@ -11,50 +13,32 @@ public class PagingHelper
         _httpContextAccessor = httpContextAccessor;
     }
 
-    public string? GetLink(string linkName, object routeValues)
-    {
-        var uri = _linkGenerator.GetUriByName(
-            _httpContextAccessor.HttpContext!,
-            linkName,
-            routeValues
-        );
-        return uri;
-    }
+    private string? GetLink(string linkName, object routeValues)
+        => _linkGenerator.GetUriByName(_httpContextAccessor.HttpContext!, linkName, routeValues);
 
-    public object CreatePaging<T>(string linkName, int page, int pageSize, int total, IEnumerable<T?> items, object? additionalRouteValues = null)
+    public PagingResult<T> CreatePaging<T>(string linkName, int page, int pageSize, int total, IEnumerable<T> items, object? additionalRouteValues = null)
     {
-        var numberOfPages = (int)Math.Ceiling(total / (double)pageSize);
-
-        var routeValues = new Dictionary<string, object>
-        {
-            { "page", page },
-            { "count", pageSize }
+        Dictionary<string, object> routeValues = new() {
+            ["page"] = page,
+            ["count"] = pageSize
         };
 
         if (additionalRouteValues != null)
-        {
             routeValues = MergeObjects(routeValues, additionalRouteValues);
-        }
 
-        var curPage = GetLink(linkName, routeValues) ?? string.Empty;
-
-        var nextPage = page < numberOfPages
-            ? GetLink(linkName, MergeObjects(routeValues, new { page = page + 1 })) ?? string.Empty
-            : null;
-
-        var prevPage = page > 1
-            ? GetLink(linkName, MergeObjects(routeValues, new { page = page - 1 })) ?? string.Empty
-            : null;
-
-        var result = new
-        {
-            CurPage = curPage,
-            NextPage = nextPage,
-            PrevPage = prevPage,
+        PagingResult<T> result = new() {
+            CurPage = GetLink(linkName, routeValues),
+            NumberPages = (int)Math.Ceiling(total / (double)pageSize),
             NumberOfItems = total,
-            NumberPages = numberOfPages,
             Items = items
         };
+        
+        if (page < result.NumberPages)
+            result.NextPage = GetLink(linkName, MergeObjects(routeValues, new { page = page + 1 }));
+
+        if (page > 1)
+            result.PrevPage = GetLink(linkName, MergeObjects(routeValues, new { page = page - 1 }));
+
         return result;
     }
 
@@ -72,7 +56,5 @@ public class PagingHelper
     }
 
     public string? GetResourceLink(string routeName, object routeValues)
-    {
-        return GetLink(routeName, routeValues);
-    }
+        => GetLink(routeName, routeValues);
 }
