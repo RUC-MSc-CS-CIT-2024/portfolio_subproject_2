@@ -15,7 +15,7 @@ public class PromotionalMediaController : ControllerBase
     }
 
     [HttpGet("/api/media/{mediaId}/promotional_media", Name = nameof(GetPromotionalMediaofMedia))]
-    public async Task<IActionResult> GetPromotionalMediaofMedia(int mediaId, [FromQuery] PageQueryParameter page)
+    public async Task<IActionResult> GetPromotionalMediaofMedia(int mediaId, [FromQuery(Name = "")] PageQueryParameter page)
     {
         try
         {
@@ -42,7 +42,7 @@ public class PromotionalMediaController : ControllerBase
     }
 
     [HttpGet(Name = nameof(GetPromotionalMediaOfRelease))]
-    public async Task<IActionResult> GetPromotionalMediaOfRelease(int mediaId, int releaseId, [FromQuery] PageQueryParameter page)
+    public async Task<IActionResult> GetPromotionalMediaOfRelease(int mediaId, int releaseId, [FromQuery(Name = "")] PageQueryParameter page)
     {
         try
         {

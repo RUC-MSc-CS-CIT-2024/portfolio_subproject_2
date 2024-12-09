@@ -18,7 +18,7 @@ public class FollowController : ControllerBase
     }
 
     [HttpGet(Name = nameof(GetFollowings))]
-    public async Task<IActionResult> GetFollowings(int userId, [FromQuery] PageQueryParameter page)
+    public async Task<IActionResult> GetFollowings(int userId, [FromQuery(Name = "")] PageQueryParameter page)
     {
         var followings = await _followManager.GetFollowingsAsync(userId, page.Number, page.Count);
         var totalItems = await _followManager.GetTotalFollowingsCountAsync(userId);

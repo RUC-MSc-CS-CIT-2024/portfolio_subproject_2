@@ -14,7 +14,7 @@ public class TitleController : ControllerBase {
     }
 
     [HttpGet]
-    public IActionResult GetAll(int mediaId, [FromQuery] PageQueryParameter page) {
+    public IActionResult GetAll(int mediaId, [FromQuery(Name = "")] PageQueryParameter page) {
         try {
             return Ok(_titleManager.GetAllForMedia(mediaId, page));
         } catch (KeyNotFoundException) {

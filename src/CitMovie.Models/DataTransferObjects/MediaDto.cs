@@ -67,6 +67,7 @@ public enum MediaQueryType {
 }
 
 public class MediaQueryParameter {
+    [FromQuery(Name = "")]
     public PageQueryParameter Page { get; init; } = new PageQueryParameter();
 
     [FromQuery(Name = "query_type"), DefaultValue(MediaQueryType.All)]

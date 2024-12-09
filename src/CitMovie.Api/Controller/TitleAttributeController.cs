@@ -15,7 +15,7 @@ public class TitleAttributeController : ControllerBase
     }
     
     [HttpGet(Name = nameof(GetTitleAttributesAsync))]
-    public async Task<IActionResult> GetTitleAttributesAsync([FromQuery] PageQueryParameter page)
+    public async Task<IActionResult> GetTitleAttributesAsync([FromQuery(Name = "")] PageQueryParameter page)
     {
         var list = await _titleAttributeManager.GetTitleAttributesAsync(page.Number, page.Count);
         var totalItems = await _titleAttributeManager.GetTotalTitleAttributesCountAsync();

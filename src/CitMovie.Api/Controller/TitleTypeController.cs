@@ -15,7 +15,7 @@ public class TitleTypeController : ControllerBase
     }
 
     [HttpGet(Name = nameof(GetTitleTypes))]
-    public async Task<IActionResult> GetTitleTypes([FromQuery] PageQueryParameter page)
+    public async Task<IActionResult> GetTitleTypes([FromQuery(Name = "")] PageQueryParameter page)
     {
         var titleTypes = await _titleTypeManager.GetTytleTypesAsync(page.Number, page.Count);
         var total_items = await _titleTypeManager.GetTotalTitleTypeCountAsync();

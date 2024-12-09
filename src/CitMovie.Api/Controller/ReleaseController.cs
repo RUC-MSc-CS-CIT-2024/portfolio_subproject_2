@@ -17,7 +17,7 @@ public class ReleaseController : ControllerBase
     }
 
     [HttpGet(Name = nameof(GetReleasesOfMedia))]
-    public async Task<IActionResult> GetReleasesOfMedia(int mediaId, [FromQuery] PageQueryParameter page)
+    public async Task<IActionResult> GetReleasesOfMedia(int mediaId, [FromQuery(Name = "")] PageQueryParameter page)
     {
         try
         {

@@ -18,7 +18,7 @@ public class SearchHistoryController : ControllerBase
     }
 
     [HttpGet(Name = nameof(GetUserSearchHistories))]
-    public async Task<IActionResult> GetUserSearchHistories(int userId, [FromQuery] PageQueryParameter page)
+    public async Task<IActionResult> GetUserSearchHistories(int userId, [FromQuery(Name = "")] PageQueryParameter page)
     {
         var searchHistories = await _searchHistoryManager.GetUserSearchHistoriesAsync(userId, page.Number, page.Count);
         var total_items = await _searchHistoryManager.GetUsersTotalSearchHistoriesCountAsync(userId);
