@@ -16,19 +16,19 @@ public class MediaController : ControllerBase
         _pagingHelper = pagingHelper;
     }
 
-    [HttpGet]
-    public IActionResult Get([FromQuery] MediaQueryParameter queryParameter)
+    [HttpGet(Name = nameof(Query))]
+    public IActionResult Query([FromQuery] MediaQueryParameter queryParameter, [FromQuery(Name = "")] PageQueryParameter pageQuery)
     {
         IEnumerable<MediaBasicResult> mediaResult;
         int totalItems = 0;
         if (queryParameter.QueryType == MediaQueryType.All)
         {
-            mediaResult = _mediaManager.GetAllMedia(queryParameter.Page);
+            mediaResult = _mediaManager.GetAllMedia(pageQuery);
             totalItems = _mediaManager.GetTotalMediaCount();
         }
         else
         {
-            mediaResult = _mediaManager.Search(queryParameter, GetUserId());
+            mediaResult = _mediaManager.Search(queryParameter, pageQuery, GetUserId());
             totalItems = _mediaManager.GetSearchResultsCount(queryParameter);
         }
 
@@ -37,9 +37,9 @@ public class MediaController : ControllerBase
             media.Links = GenerateLinks(media.Id);
 
         var results = _pagingHelper.CreatePaging(
-            nameof(Get),
-            queryParameter.Page.Number,
-            queryParameter.Page.Count,
+            nameof(Query),
+            pageQuery.Number,
+            pageQuery.Count,
             totalItems,
             mediaResult);
 
@@ -61,7 +61,7 @@ public class MediaController : ControllerBase
     }
 
     [HttpGet("{id}/similar_media", Name = nameof(GetSimilar))]
-    public async Task<IActionResult> GetSimilar(int id, [FromQuery] PageQueryParameter pageQuery)
+    public async Task<IActionResult> GetSimilar(int id, [FromQuery(Name = "")] PageQueryParameter pageQuery)
     {
         try
         {
@@ -86,7 +86,7 @@ public class MediaController : ControllerBase
     }
 
     [HttpGet("{id}/related_media", Name = nameof(GetRelated))]
-    public async Task<IActionResult> GetRelated(int id, [FromQuery] PageQueryParameter pageQuery)
+    public async Task<IActionResult> GetRelated(int id, [FromQuery(Name = "")] PageQueryParameter pageQuery)
     {
         try
         {
@@ -110,11 +110,17 @@ public class MediaController : ControllerBase
         }
     }
 
-    [HttpGet("{id}/crew")]
-    public async Task<ActionResult> GetCrew(int id, [FromQuery] PageQueryParameter pageQuery) {
+    [HttpGet("{id}/crew", Name = nameof(GetCrew))]
+    public async Task<ActionResult> GetCrew(int id, [FromQuery(Name = "")] PageQueryParameter pageQuery) {
         
         try {
-            return Ok(await _mediaManager.GetCrewAsync(id, pageQuery));
+            IEnumerable<CrewResult> crewResult = await _mediaManager.GetCrewAsync(id, pageQuery);
+            foreach (var media in crewResult)
+                media.Links = GenerateLinks(media.Id);
+
+            int totalItems = await _mediaManager.GetTotalCrewCountAsync(id);
+            var result = _pagingHelper.CreatePaging(nameof(GetRelated), pageQuery.Number, pageQuery.Count, totalItems, crewResult, new { id });
+            return Ok(result);
         } catch (KeyNotFoundException) {
             return NotFound();
         } catch (Exception e) {
@@ -123,10 +129,16 @@ public class MediaController : ControllerBase
         }
     }
 
-    [HttpGet("{id}/cast")]
-    public async Task<IActionResult> GetCast(int id, [FromQuery] PageQueryParameter pageQuery) {
+    [HttpGet("{id}/cast", Name = nameof(GetCast))]
+    public async Task<IActionResult> GetCast(int id, [FromQuery(Name = "")] PageQueryParameter pageQuery) {
         try {
-            return Ok(await _mediaManager.GetCastAsync(id, pageQuery));
+            IEnumerable<CrewResult> castResult = await _mediaManager.GetCastAsync(id, pageQuery);
+            foreach (var media in castResult)
+                media.Links = GenerateLinks(media.Id);
+
+            int totalItems = await _mediaManager.GetTotalCastCountAsync(id);
+            var result = _pagingHelper.CreatePaging(nameof(GetRelated), pageQuery.Number, pageQuery.Count, totalItems, castResult, new { id });
+            return Ok();
         } catch (KeyNotFoundException) {
             return NotFound();
         } catch (Exception e) {

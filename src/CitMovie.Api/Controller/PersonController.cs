@@ -17,7 +17,7 @@ public class PersonController : ControllerBase
     }
 
     [HttpGet(Name = nameof(GetPersons))]
-    public async Task<ActionResult<IEnumerable<PersonResult>>> GetPersons([FromQuery] PageQueryParameter page)
+    public async Task<ActionResult<IEnumerable<PersonResult>>> GetPersons([FromQuery(Name = "")] PageQueryParameter page)
     {
         var persons = await _personManager.GetPersonsAsync(page.Number, page.Count);
         var totalCount = await _personManager.GetTotalPersonsCountAsync();
@@ -49,7 +49,7 @@ public class PersonController : ControllerBase
     }
 
     [HttpGet("{id}/media", Name = nameof(GetMediaByPersonId))]
-    public async Task<ActionResult<IEnumerable<MediaBasicResult>>> GetMediaByPersonId(int id, [FromQuery] PageQueryParameter page)
+    public async Task<ActionResult<IEnumerable<MediaBasicResult>>> GetMediaByPersonId(int id, [FromQuery(Name = "")] PageQueryParameter page)
     {
         var media = await _personManager.GetMediaByPersonIdAsync(id, page.Number, page.Count);
         var totalCount = await _personManager.GetMediaByPersonIdCountAsync(id);
@@ -69,7 +69,7 @@ public class PersonController : ControllerBase
     }
 
     [HttpGet("{id}/coactors", Name = nameof(GetFrequentCoActors))]
-    public async Task<ActionResult<IEnumerable<CoActorResult>>> GetFrequentCoActors(int id, [FromQuery] PageQueryParameter page)
+    public async Task<ActionResult<IEnumerable<CoActorResult>>> GetFrequentCoActors(int id, [FromQuery(Name = "")] PageQueryParameter page)
     {
         var coActor = await _personManager.GetFrequentCoActorsAsync(id, page.Number, page.Count);
         var totalCount = await _personManager.GetFrequentCoActorsCountAsync(id);

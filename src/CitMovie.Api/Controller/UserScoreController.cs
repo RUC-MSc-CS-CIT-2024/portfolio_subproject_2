@@ -22,7 +22,7 @@ public class UserScoreController : ControllerBase
     [HttpGet(Name = nameof(GetUserScores))]
     public async Task<ActionResult<IEnumerable<UserScoreResult>>> GetUserScores(
         int userId,
-        [FromQuery] PageQueryParameter page,
+        [FromQuery(Name = "")] PageQueryParameter page,
         [FromQuery] string? mediaType = null,
         [FromQuery] int? mediaId = null,
         [FromQuery] string? mediaName = null)

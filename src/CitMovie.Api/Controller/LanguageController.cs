@@ -15,7 +15,7 @@ public class LanguageController : ControllerBase
     }
 
     [HttpGet(Name = nameof(GetLanguages))]
-    public async Task<IActionResult> GetLanguages([FromQuery] PageQueryParameter page)
+    public async Task<IActionResult> GetLanguages([FromQuery(Name = "")] PageQueryParameter page)
     {
 
         var languages = await _languageManager.GetLanguagesAsync(page.Number, page.Count);

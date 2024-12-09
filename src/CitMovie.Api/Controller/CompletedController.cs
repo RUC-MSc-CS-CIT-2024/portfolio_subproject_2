@@ -46,7 +46,7 @@ public class CompletedController : ControllerBase
     }
 
     [HttpGet(Name = nameof(GetUserCompleted))]
-    public async Task<IActionResult> GetUserCompleted(int userId, [FromQuery] PageQueryParameter page)
+    public async Task<IActionResult> GetUserCompleted(int userId, [FromQuery(Name = "")] PageQueryParameter page)
     {
         var completedItems = await _completedManager.GetUserCompletedItemsAsync(userId, page.Number, page.Count);
         var totalItems = await _completedManager.GetTotalUserCompletedCountAsync(userId);

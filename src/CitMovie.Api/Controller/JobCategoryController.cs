@@ -15,7 +15,7 @@ public class JobCategoryController : ControllerBase
     }
 
     [HttpGet(Name = nameof(GetAllJobCategories))]
-    public async Task<ActionResult<IEnumerable<JobCategoryResult>>> GetAllJobCategories([FromQuery] PageQueryParameter page)
+    public async Task<ActionResult<IEnumerable<JobCategoryResult>>> GetAllJobCategories([FromQuery(Name = "")] PageQueryParameter page)
     {
         var totalItems = await _jobCategoryManager.GetTotalJobCategoriesCountAsync();
         var jobCategories = await _jobCategoryManager.GetAllJobCategoriesAsync(page.Number, page.Count);

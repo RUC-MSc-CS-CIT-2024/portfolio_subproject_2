@@ -159,5 +159,4 @@ public class MediaRepository : IMediaRepository
     
     public int GetTotalMediaCount()
         => _context.Media.Count();
-
 }

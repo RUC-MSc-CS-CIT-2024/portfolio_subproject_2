@@ -74,7 +74,7 @@ public class BookmarkController : ControllerBase
     }
 
     [HttpGet(Name = nameof(GetUserBookmarks))]
-    public async Task<IActionResult> GetUserBookmarks(int userId, [FromQuery] PageQueryParameter page)
+    public async Task<IActionResult> GetUserBookmarks(int userId, [FromQuery(Name = "")] PageQueryParameter page)
     {
         var bookmarks = await _bookmarkManager.GetUserBookmarksAsync(userId, page.Number, page.Count);
         var totalItems = await _bookmarkManager.GetTotalUserBookmarksCountAsync(userId);
