@@ -55,18 +55,21 @@ public class DataContext : DbContext
             .WithOne(x => x.Primary)
             .HasForeignKey(x => x.PrimaryId);
         
-        modelBuilder.HasDbFunction(() => ExactMatchSearch(default!))
+        modelBuilder.HasDbFunction(() => ExactMatchSearch(default!, default!))
             .HasName("exact_match_titles");
-        modelBuilder.HasDbFunction(() => BestMatchSearch(default!))
+        modelBuilder.HasDbFunction(() => BestMatchSearch(default!, default!))
             .HasName("best_match_titles");
-        modelBuilder.HasDbFunction(() => SimpleSearch(default!, default))
+        modelBuilder.HasDbFunction(() => SimpleSearch(default!, default!))
             .HasName("simple_search");
-        modelBuilder.HasDbFunction(() => StructuredSearch(default, default!, default!, default!, default))
+        modelBuilder.HasDbFunction(() => StructuredSearch(default, default!, default!, default!, default!))
             .HasName("structured_string_search");
         modelBuilder.HasDbFunction(() => GetSimilarMedia(default))
             .HasName("get_similar_movies");
+
+        modelBuilder.HasDbFunction(() => PersonSearch(default!, default!))
+            .HasName("structured_string_search_name");
         modelBuilder.HasDbFunction(() => GetFrequentCoActors(default!))
-             .HasName("get_frequent_coplaying_actors");
+            .HasName("get_frequent_coplaying_actors");
 
         modelBuilder.Entity<Media>()
             .HasMany(e => e.Genres)
@@ -107,20 +110,23 @@ public class DataContext : DbContext
                 l => l.HasOne<Release>().WithMany().HasForeignKey("release_id"));
     }
 
-    public IQueryable<MatchSearchResult> ExactMatchSearch(string[] keywords)
-        => FromExpression(() => ExactMatchSearch(keywords));
+    public IQueryable<MatchSearchResult> ExactMatchSearch(string[] keywords, int? userId)
+        => FromExpression(() => ExactMatchSearch(keywords, userId));
     
-    public IQueryable<MatchSearchResult> BestMatchSearch(string[] keywords)
-        => FromExpression(() => BestMatchSearch(keywords));
+    public IQueryable<MatchSearchResult> BestMatchSearch(string[] keywords, int? userId)
+        => FromExpression(() => BestMatchSearch(keywords, userId));
     
-    public IQueryable<MatchSearchResult> SimpleSearch(string query, int userId)
+    public IQueryable<MatchSearchResult> SimpleSearch(string query, int? userId)
         => FromExpression(() => SimpleSearch(query, userId));
 
-    public IQueryable<MatchSearchResult> StructuredSearch(string? title, string? plot, string? character, string? person, int userId)
+    public IQueryable<MatchSearchResult> StructuredSearch(string? title, string? plot, string? character, string? person, int? userId)
         => FromExpression(() => StructuredSearch(title, plot, character, person, userId));
 
     public IQueryable<MatchSearchResult> GetSimilarMedia(int id)
         => FromExpression(() => GetSimilarMedia(id));
+
+    public IQueryable<MatchSearchResult> PersonSearch(string name, int? userId)
+        => FromExpression(() => PersonSearch(name, userId));
 
     public IQueryable<CoActor> GetFrequentCoActors(string actorName)
         => FromExpression(() => GetFrequentCoActors(actorName));
