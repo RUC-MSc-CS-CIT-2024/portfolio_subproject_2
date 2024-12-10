@@ -17,10 +17,27 @@ public class PersonRepository : IPersonRepository
             .Pagination(page, pageSize)
             .ToListAsync();
     }
-    public async Task<int> GetTotalPersonsCountAsync()
-    {
-        return await _dataContext.People.CountAsync();
+
+    public async Task<IEnumerable<Person>> GetPersonsByNameAsync(string name, int? userId, int page, int pageSize) {
+        IQueryable<int> ids = _dataContext
+            .PersonSearch(name, userId)
+            .Pagination(page, pageSize)
+            .Select(x => x.Id)
+            .Distinct();;
+        
+        return await _dataContext.People
+            .AsNoTracking()
+            .Where(x => ids.Contains(x.PersonId))
+            .ToListAsync();
     }
+
+    public async Task<int> GetTotalPersonsCountAsync()
+        => await _dataContext.People.CountAsync();
+
+    public async Task<int> GetTotalPersonsCountAsync(string name)
+        => await _dataContext
+            .PersonSearch(name, null)
+            .CountAsync();
 
     public async Task<Person?> GetPersonByIdAsync(int id)
     {
@@ -95,4 +112,5 @@ public class PersonRepository : IPersonRepository
 
         return count;
     }
+
 }

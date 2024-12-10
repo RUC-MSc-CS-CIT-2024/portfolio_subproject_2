@@ -12,16 +12,24 @@ public class PersonManager : IPersonManager
     }
 
 
-    public async Task<IEnumerable<PersonResult>> QueryPersonsAsync(PersonQueryParameter queryParameter, PageQueryParameter pageQuery)
+    public async Task<IEnumerable<PersonResult>> QueryPersonsAsync(PersonQueryParameter queryParameter, PageQueryParameter pageQuery, int? userId)
     {
-        var persons = await _personRepository.GetPersonsAsync(pageQuery.Number, pageQuery.Count);
+        IEnumerable<Person> persons;
+        if (queryParameter.Name != null) 
+            persons = await _personRepository.GetPersonsByNameAsync(queryParameter.Name, userId, pageQuery.Number, pageQuery.Count);
+        else 
+            persons = await _personRepository.GetPersonsAsync(pageQuery.Number, pageQuery.Count);
+        
         var PersonResults = _mapper.Map<IEnumerable<PersonResult>>(persons);
         return PersonResults;
     }
 
-    public async Task<int> GetTotalPersonsCountAsync()
+    public async Task<int> GetTotalPersonsCountAsync(PersonQueryParameter queryParameter)
     {
-        return await _personRepository.GetTotalPersonsCountAsync();
+        if (queryParameter.Name != null)
+            return await _personRepository.GetTotalPersonsCountAsync(queryParameter.Name);
+        else
+            return await _personRepository.GetTotalPersonsCountAsync();
     }
 
     public async Task<PersonResult?> GetPersonByIdAsync(int id)

@@ -16,14 +16,15 @@ public class PersonController : ControllerBase
         _pagingHelper = pagingHelper;
     }
 
-    [HttpGet(Name = nameof(Query))]
-    public async Task<ActionResult<IEnumerable<PersonResult>>> Query([FromQuery] PersonQueryParameter queryParameter, [FromQuery(Name = "")] PageQueryParameter page)
+    [HttpGet(Name = nameof(QueryPerson))]
+    public async Task<ActionResult<IEnumerable<PersonResult>>> QueryPerson([FromQuery] PersonQueryParameter queryParameter, [FromQuery(Name = "")] PageQueryParameter page)
     {
-        var persons = await _personManager.QueryPersonsAsync(queryParameter, page);
-        var totalCount = await _personManager.GetTotalPersonsCountAsync();
+        
+        var persons = await _personManager.QueryPersonsAsync(queryParameter, page, GetUserId());
+        var totalCount = await _personManager.GetTotalPersonsCountAsync(queryParameter);
 
         var result = _pagingHelper.CreatePaging(
-            nameof(Query),
+            nameof(QueryPerson),
             page.Number, page.Count,
             totalCount,
             persons
@@ -31,7 +32,6 @@ public class PersonController : ControllerBase
 
         foreach (var person in persons)
             person.Links = AddPersonLinks(person.Id);
-        
 
         return Ok(result);
     }
@@ -86,6 +86,15 @@ public class PersonController : ControllerBase
         );
 
         return Ok(result);
+    }
+
+    private int? GetUserId()
+    {
+        string? userIdString = User.Claims.FirstOrDefault(x => x.Type == "user_id")?.Value;
+        int? userId = null;
+        if (int.TryParse(userIdString, out int parseResult))
+            userId = parseResult;
+        return userId;
     }
 
     private List<Link> AddPersonLinks(int personId)
