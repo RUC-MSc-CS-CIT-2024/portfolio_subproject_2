@@ -46,31 +46,50 @@ public class PersonRepository : IPersonRepository
             .FirstOrDefaultAsync(p => p.PersonId == id);
     }
 
-    public async Task<IEnumerable<Media>> GetMediaByPersonIdAsync(int id, int page, int pageSize)
+    public async Task<IEnumerable<CrewBase>> GetMediaByPersonIdAsync(int id, int page, int pageSize)
     {
-        var mediaQuery = _dataContext.Media
-            .AsNoTracking()
-            .Include(m => m.CrewMembers)
-            .Include(m => m.CastMembers)
-            .Include(m => m.Titles)
-            .Include(m => m.Genres)
-            .Where(m => m.CrewMembers.Any(cm => cm.PersonId == id) || m.CastMembers.Any(cm => cm.PersonId == id))
-            .OrderBy(m => m.Id);
+        // var mediaQuery = _dataContext.Media
+        //     .AsNoTracking()
+        //     .Include(m => m.CrewMembers)
+        //     .Include(m => m.CastMembers)
+        //     .Include(m => m.Titles)
+        //     .Include(m => m.Genres)
+        //     .Where(m => m.CrewMembers.Any(cm => cm.PersonId == id) || m.CastMembers.Any(cm => cm.PersonId == id))
+        //     .OrderBy(m => m.Id);
 
-        return await mediaQuery
+        IQueryable<CrewBase> crew = _dataContext.CrewMembers
+            .AsNoTracking()
+            .Where(cm => cm.PersonId == id);
+        
+        IQueryable<CrewBase> cast = _dataContext.CastMembers
+            .AsNoTracking()
+            .Where(cm => cm.PersonId == id);
+
+        return await crew.Concat(cast)
             .Pagination(page, pageSize)
-            .ToListAsync();
+            .Include(cm => cm.Media!)
+            .ThenInclude(m => m.PrimaryInformation!)
+            .ThenInclude(pi => pi.Title)
+            .Include(cm => cm.Media!)
+            .ThenInclude(m => m.PrimaryInformation!)
+            .ThenInclude(pi => pi.Release)
+            .Include(cm => cm.Media!)
+            .ThenInclude(m => m.PrimaryInformation!)
+            .ThenInclude(pi => pi.PromotionalMedia)
+            .ToArrayAsync();
     }
 
     public async Task<int> GetMediaByPersonIdCountAsync(int id)
     {
-        return await _dataContext.Media
+        IQueryable<CrewBase> crew = _dataContext.CrewMembers
             .AsNoTracking()
-            .Include(m => m.CrewMembers)
-            .Include(m => m.CastMembers)
-            .Include(m => m.Titles)
-            .Where(m => m.CrewMembers.Any(cm => cm.PersonId == id) || m.CastMembers.Any(cm => cm.PersonId == id))
-            .CountAsync();
+            .Where(cm => cm.PersonId == id);
+        
+        IQueryable<CrewBase> cast = _dataContext.CastMembers
+            .AsNoTracking()
+            .Where(cm => cm.PersonId == id);
+        
+        return await crew.Concat(cast).CountAsync();
     }
 
     public async Task<string?> GetActorNameByIdAsync(int id)

@@ -43,10 +43,15 @@ public class PersonManager : IPersonManager
 
     }
 
-    public async Task<IEnumerable<MediaBasicResult>> GetMediaByPersonIdAsync(int id, int page, int pageSize)
+    public async Task<IEnumerable<CrewResult>> GetMediaByPersonIdAsync(int id, int page, int pageSize)
     {
-        var media = await _personRepository.GetMediaByPersonIdAsync(id, page, pageSize);
-        return _mapper.Map<IEnumerable<MediaBasicResult>>(media);
+        IEnumerable<CrewBase> media = await _personRepository.GetMediaByPersonIdAsync(id, page, pageSize);
+
+        IEnumerable<CrewResult> crewResults = _mapper.Map<IEnumerable<CrewResult>>(media.OfType<CrewMember>());
+        IEnumerable<CrewResult> castResults = _mapper.Map<IEnumerable<CrewResult>>(media.OfType<CastMember>());
+
+
+        return crewResults.Concat(castResults);
     }
 
     public async Task<int> GetMediaByPersonIdCountAsync(int id)

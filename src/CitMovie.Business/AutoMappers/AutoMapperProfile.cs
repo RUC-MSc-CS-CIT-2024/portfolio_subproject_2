@@ -110,6 +110,16 @@ public class AutoMapperProfile : Profile
             .ForMember(dest => dest.JobCategory, opt => opt.MapFrom(src => src.JobCategory!.Name));
         CreateMap<CastMember, CrewResult>()
             .ForMember(dest => dest.JobCategory, opt => opt.MapFrom(src => "Actor"));
+        CreateMap<Media, CrewResult.CrewMediaResult>()
+            .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.PrimaryInformation!.Title!.Name))
+            .ForMember(dest => dest.ReleaseDate, opt => {
+                opt.AllowNull();
+                opt.MapFrom(src => src.PrimaryInformation!.Release!.ReleaseDate);
+            })
+            .ForMember(dest => dest.PosterUri, opt => {
+                opt.AllowNull();
+                opt.MapFrom(src => src.PrimaryInformation!.PromotionalMedia!.Uri);
+            });
 
         // Bookmark
         CreateMap<Bookmark, BookmarkResult>();
