@@ -18,3 +18,8 @@ public class CoActorResult : BaseResult
     public required string ActorName { get; set; }
     public required int Frequency { get; set; }
 }
+
+public class PersonQueryParameter {
+    [FromQuery(Name = "name")]
+    public string? Name { get; init; }
+}

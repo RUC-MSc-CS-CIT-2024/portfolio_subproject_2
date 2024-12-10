@@ -12,10 +12,9 @@ public class PersonManager : IPersonManager
     }
 
 
-    public async Task<IEnumerable<PersonResult>> GetPersonsAsync(int page, int pageSize)
-
+    public async Task<IEnumerable<PersonResult>> QueryPersonsAsync(PersonQueryParameter queryParameter, PageQueryParameter pageQuery)
     {
-        var persons = await _personRepository.GetPersonsAsync(page, pageSize);
+        var persons = await _personRepository.GetPersonsAsync(pageQuery.Number, pageQuery.Count);
         var PersonResults = _mapper.Map<IEnumerable<PersonResult>>(persons);
         return PersonResults;
     }

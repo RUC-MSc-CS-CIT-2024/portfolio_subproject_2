@@ -16,14 +16,14 @@ public class PersonController : ControllerBase
         _pagingHelper = pagingHelper;
     }
 
-    [HttpGet(Name = nameof(GetPersons))]
-    public async Task<ActionResult<IEnumerable<PersonResult>>> GetPersons([FromQuery(Name = "")] PageQueryParameter page)
+    [HttpGet(Name = nameof(Query))]
+    public async Task<ActionResult<IEnumerable<PersonResult>>> Query([FromQuery] PersonQueryParameter queryParameter, [FromQuery(Name = "")] PageQueryParameter page)
     {
-        var persons = await _personManager.GetPersonsAsync(page.Number, page.Count);
+        var persons = await _personManager.QueryPersonsAsync(queryParameter, page);
         var totalCount = await _personManager.GetTotalPersonsCountAsync();
 
         var result = _pagingHelper.CreatePaging(
-            nameof(GetPersons),
+            nameof(Query),
             page.Number, page.Count,
             totalCount,
             persons
