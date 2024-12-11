@@ -49,9 +49,9 @@ public class PersonController : ControllerBase
     }
 
     [HttpGet("{id}/media", Name = nameof(GetMediaByPersonId))]
-    public async Task<ActionResult<IEnumerable<CrewResult>>> GetMediaByPersonId(int id, [FromQuery(Name = "")] PageQueryParameter page)
+    public async Task<ActionResult<IEnumerable<PersonCrewResult>>> GetMediaByPersonId(int id, [FromQuery(Name = "")] PageQueryParameter page)
     {
-        IEnumerable<CrewResult> media = await _personManager.GetMediaByPersonIdAsync(id, page.Number, page.Count);
+        IEnumerable<PersonCrewResult> media = await _personManager.GetMediaByPersonIdAsync(id, page.Number, page.Count);
         var totalCount = await _personManager.GetMediaByPersonIdCountAsync(id);
 
         var result = _pagingHelper.CreatePaging(
@@ -62,7 +62,7 @@ public class PersonController : ControllerBase
             new { id }
         );
 
-        foreach (CrewResult m in media) {
+        foreach (PersonCrewResult m in media) {
             if (m.Media is null)
                 continue;
             m.Media.Links = AddMediaLinks(m.Media);
@@ -113,7 +113,7 @@ public class PersonController : ControllerBase
             }
         ];
 
-    private List<Link> AddMediaLinks(CrewResult.CrewMediaResult media)
+    private List<Link> AddMediaLinks(PersonCrewResult.MediaResult media)
         => [ new Link {
                 Href = _pagingHelper.GetResourceLink(nameof(MediaController.Get), new { id = media.Id }) ?? string.Empty,
                 Rel = "self",

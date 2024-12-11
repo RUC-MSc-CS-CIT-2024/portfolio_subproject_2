@@ -48,46 +48,103 @@ public class PersonRepository : IPersonRepository
 
     public async Task<IEnumerable<CrewBase>> GetMediaByPersonIdAsync(int id, int page, int pageSize)
     {
-        // var mediaQuery = _dataContext.Media
-        //     .AsNoTracking()
-        //     .Include(m => m.CrewMembers)
-        //     .Include(m => m.CastMembers)
-        //     .Include(m => m.Titles)
-        //     .Include(m => m.Genres)
-        //     .Where(m => m.CrewMembers.Any(cm => cm.PersonId == id) || m.CastMembers.Any(cm => cm.PersonId == id))
-        //     .OrderBy(m => m.Id);
-
-        IQueryable<CrewBase> crew = _dataContext.CrewMembers
+        var crew = _dataContext.CrewMembers
             .AsNoTracking()
-            .Where(cm => cm.PersonId == id);
-        
-        IQueryable<CrewBase> cast = _dataContext.CastMembers
-            .AsNoTracking()
-            .Where(cm => cm.PersonId == id);
-
-        return await crew.Concat(cast)
-            .Pagination(page, pageSize)
-            .Include(cm => cm.Media!)
-            .ThenInclude(m => m.PrimaryInformation!)
-            .ThenInclude(pi => pi.Title)
             .Include(cm => cm.Media!)
             .ThenInclude(m => m.PrimaryInformation!)
             .ThenInclude(pi => pi.Release)
+            .Where(cm => cm.PersonId == id)
+            .Select(cm => new {
+                cm.Id,
+                Type = "crew",
+                cm.Media!.PrimaryInformation!.Release!.ReleaseDate
+            });
+        
+        var cast = _dataContext.CastMembers
+            .AsNoTracking()
             .Include(cm => cm.Media!)
             .ThenInclude(m => m.PrimaryInformation!)
-            .ThenInclude(pi => pi.PromotionalMedia)
-            .ToArrayAsync();
+            .ThenInclude(pi => pi.Release)
+            .Where(cm => cm.PersonId == id)
+            .Select(cm => new {
+                cm.Id,
+                Type = "cast",
+                cm.Media!.PrimaryInformation!.Release!.ReleaseDate
+            });
+        
+        var ids = crew.Concat(cast)
+            .OrderByDescending(x => x.ReleaseDate)
+            .Pagination(page, pageSize);
+
+        List<CrewBase> result = new();
+        
+        int[] crewIds = ids
+            .Where(x => x.Type == "crew")
+            .Select(cm => cm.Id).ToArray();
+        if (crewIds.Length > 0) {
+            List<CrewMember> crewResult = await _dataContext.CrewMembers
+                .AsNoTracking()
+                .Where(cm => crewIds.Contains(cm.Id))
+                .Include(cm => cm.JobCategory)
+                .Include(cm => cm.Media!)
+                .ThenInclude(m => m.PrimaryInformation!)
+                .ThenInclude(pi => pi.Title)
+                .Include(cm => cm.Media!)
+                .ThenInclude(m => m.PrimaryInformation!)
+                .ThenInclude(pi => pi.Release)
+                .Include(cm => cm.Media!)
+                .ThenInclude(m => m.PrimaryInformation!)
+                .ThenInclude(pi => pi.PromotionalMedia)
+                .ToListAsync();
+            result.AddRange(crewResult);
+        }
+
+
+        int[] castIds = ids
+            .Where(x => x.Type == "cast")
+            .Select(cm => cm.Id).ToArray();
+        if (castIds.Length > 0) {
+            List<CastMember> castResult = await _dataContext.CastMembers
+                .AsNoTracking()
+                .Where(cm => castIds.Contains(cm.Id))
+                .Include(cm => cm.Media!)
+                .ThenInclude(m => m.PrimaryInformation!)
+                .ThenInclude(pi => pi.Title)
+                .Include(cm => cm.Media!)
+                .ThenInclude(m => m.PrimaryInformation!)
+                .ThenInclude(pi => pi.Release)
+                .Include(cm => cm.Media!)
+                .ThenInclude(m => m.PrimaryInformation!)
+                .ThenInclude(pi => pi.PromotionalMedia)
+                .Include(cm => cm.Media!)
+                .ThenInclude(m => m.Scores)
+                .ToListAsync();
+            result.AddRange(castResult);
+        }
+        
+        Console.WriteLine(result.Count);
+        return result
+            .OrderByDescending(x => x.Media!.PrimaryInformation!.Release!.ReleaseDate)
+            .ToList();
     }
 
     public async Task<int> GetMediaByPersonIdCountAsync(int id)
     {
-        IQueryable<CrewBase> crew = _dataContext.CrewMembers
+        var crew = _dataContext.CrewMembers
             .AsNoTracking()
-            .Where(cm => cm.PersonId == id);
+            .Where(cm => cm.PersonId == id)
+            .Select(cm => new {
+                cm.Id,
+                Type = "crew"
+            });
         
-        IQueryable<CrewBase> cast = _dataContext.CastMembers
+        var cast = _dataContext.CastMembers
             .AsNoTracking()
-            .Where(cm => cm.PersonId == id);
+            .Where(cm => cm.PersonId == id)
+            .Select(cm => new {
+                cm.Id,
+                Type = "cast"
+            });
         
         return await crew.Concat(cast).CountAsync();
     }
