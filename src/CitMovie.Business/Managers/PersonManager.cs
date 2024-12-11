@@ -12,17 +12,24 @@ public class PersonManager : IPersonManager
     }
 
 
-    public async Task<IEnumerable<PersonResult>> GetPersonsAsync(int page, int pageSize)
-
+    public async Task<IEnumerable<PersonResult>> QueryPersonsAsync(PersonQueryParameter queryParameter, PageQueryParameter pageQuery, int? userId)
     {
-        var persons = await _personRepository.GetPersonsAsync(page, pageSize);
+        IEnumerable<Person> persons;
+        if (queryParameter.Name != null) 
+            persons = await _personRepository.GetPersonsByNameAsync(queryParameter.Name, userId, pageQuery.Number, pageQuery.Count);
+        else 
+            persons = await _personRepository.GetPersonsAsync(pageQuery.Number, pageQuery.Count);
+        
         var PersonResults = _mapper.Map<IEnumerable<PersonResult>>(persons);
         return PersonResults;
     }
 
-    public async Task<int> GetTotalPersonsCountAsync()
+    public async Task<int> GetTotalPersonsCountAsync(PersonQueryParameter queryParameter)
     {
-        return await _personRepository.GetTotalPersonsCountAsync();
+        if (queryParameter.Name != null)
+            return await _personRepository.GetTotalPersonsCountAsync(queryParameter.Name);
+        else
+            return await _personRepository.GetTotalPersonsCountAsync();
     }
 
     public async Task<PersonResult?> GetPersonByIdAsync(int id)
@@ -36,10 +43,14 @@ public class PersonManager : IPersonManager
 
     }
 
-    public async Task<IEnumerable<MediaBasicResult>> GetMediaByPersonIdAsync(int id, int page, int pageSize)
+    public async Task<IEnumerable<PersonCrewResult>> GetMediaByPersonIdAsync(int id, int page, int pageSize)
     {
-        var media = await _personRepository.GetMediaByPersonIdAsync(id, page, pageSize);
-        return _mapper.Map<IEnumerable<MediaBasicResult>>(media);
+        IEnumerable<CrewBase> media = await _personRepository.GetMediaByPersonIdAsync(id, page, pageSize);
+
+        IEnumerable<PersonCrewResult> crewResults = _mapper.Map<IEnumerable<PersonCrewResult>>(media.OfType<CrewMember>());
+        IEnumerable<PersonCrewResult> castResults = _mapper.Map<IEnumerable<PersonCrewResult>>(media.OfType<CastMember>());
+
+        return crewResults.Concat(castResults);
     }
 
     public async Task<int> GetMediaByPersonIdCountAsync(int id)

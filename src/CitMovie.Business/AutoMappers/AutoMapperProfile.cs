@@ -109,7 +109,23 @@ public class AutoMapperProfile : Profile
         CreateMap<CrewMember, CrewResult>()
             .ForMember(dest => dest.JobCategory, opt => opt.MapFrom(src => src.JobCategory!.Name));
         CreateMap<CastMember, CrewResult>()
-            .ForMember(dest => dest.JobCategory, opt => opt.MapFrom(src => "Actor"));
+            .ForMember(dest => dest.JobCategory, opt => opt.MapFrom(src => "actor"));
+
+        // Person Crew
+        CreateMap<CrewMember, PersonCrewResult>()
+            .ForMember(dest => dest.JobCategory, opt => opt.MapFrom(src => src.JobCategory!.Name));
+        CreateMap<CastMember, PersonCrewResult>()
+            .ForMember(dest => dest.JobCategory, opt => opt.MapFrom(src => "actor"));
+        CreateMap<Media, PersonCrewResult.MediaResult>()
+            .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.PrimaryInformation!.Title!.Name))
+            .ForMember(dest => dest.ReleaseDate, opt => {
+                opt.AllowNull();
+                opt.MapFrom(src => src.PrimaryInformation!.Release!.ReleaseDate);
+            })
+            .ForMember(dest => dest.PosterUri, opt => {
+                opt.AllowNull();
+                opt.MapFrom(src => src.PrimaryInformation!.PromotionalMedia!.Uri);
+            });
 
         // Bookmark
         CreateMap<Bookmark, BookmarkResult>();

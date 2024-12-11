@@ -3,6 +3,8 @@ using CitMovie.Models.DomainObjects;
 using FakeItEasy;
 using AutoMapper;
 using CitMovie.Models.DataTransferObjects;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using CitMovie.Models;
 
 namespace CitMovie.Business.Tests;
 
@@ -23,12 +25,14 @@ public class PersonManagerTest
     public async Task GetPersonsAsync_ValidParameters_CallsRepositoryAndMapsResult()
     {
         // Arrange
+        PageQueryParameter pageQuery = new PageQueryParameter() { Number = 1, Count = 10 };
+        PersonQueryParameter queryParameter = new PersonQueryParameter() { Name = A.Dummy<string>() };
         var persons = new List<Person> { new Person() { Name = A.Dummy<string>() } };
-        A.CallTo(() => _personRepository.GetPersonsAsync(1, 10)).Returns(persons);
+        A.CallTo(() => _personRepository.GetPersonsAsync(A<int>.Ignored, A<int>.Ignored)).Returns(persons);
         A.CallTo(() => _mapper.Map<IEnumerable<PersonResult>>(persons)).Returns(new List<PersonResult>());
 
         // Act
-        var result = await _personManager.GetPersonsAsync(1, 10);
+        var result = await _personManager.QueryPersonsAsync(queryParameter, pageQuery);
 
         // Assert
         A.CallTo(() => _personRepository.GetPersonsAsync(1, 10)).MustHaveHappenedOnceExactly();
