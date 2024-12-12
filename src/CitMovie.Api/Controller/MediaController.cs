@@ -138,7 +138,7 @@ public class MediaController : ControllerBase
 
             int totalItems = await _mediaManager.GetTotalCastCountAsync(id);
             var result = _pagingHelper.CreatePaging(nameof(GetRelated), pageQuery.Number, pageQuery.Count, totalItems, castResult, new { id });
-            return Ok();
+            return Ok(result);
         } catch (KeyNotFoundException) {
             return NotFound();
         } catch (Exception e) {
