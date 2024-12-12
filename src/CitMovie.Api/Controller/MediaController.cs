@@ -28,6 +28,10 @@ public class MediaController : ControllerBase
         }
         else
         {
+            if (queryParameter.Keywords is not null && queryParameter.Keywords.Length > 0)
+                for (int i = 0; i < queryParameter.Keywords.Length; i++)
+                    queryParameter.Keywords[i] = queryParameter.Keywords[i].ToLower();
+
             mediaResult = _mediaManager.Search(queryParameter, pageQuery, GetUserId());
             totalItems = _mediaManager.GetSearchResultsCount(queryParameter);
         }
