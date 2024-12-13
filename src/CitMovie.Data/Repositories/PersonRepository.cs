@@ -95,6 +95,8 @@ public class PersonRepository : IPersonRepository
                 .Include(cm => cm.Media!)
                 .ThenInclude(m => m.PrimaryInformation!)
                 .ThenInclude(pi => pi.PromotionalMedia)
+                .Include(cm => cm.Media!)
+                .ThenInclude(x => (x as Episode)!.Season)
                 .ToListAsync();
             result.AddRange(crewResult);
         }
@@ -117,12 +119,11 @@ public class PersonRepository : IPersonRepository
                 .ThenInclude(m => m.PrimaryInformation!)
                 .ThenInclude(pi => pi.PromotionalMedia)
                 .Include(cm => cm.Media!)
-                .ThenInclude(m => m.Scores)
+                .ThenInclude(x => (x as Episode)!.Season)
                 .ToListAsync();
             result.AddRange(castResult);
         }
         
-        Console.WriteLine(result.Count);
         return result
             .OrderByDescending(x => x.Media!.PrimaryInformation!.Release!.ReleaseDate)
             .ToList();
