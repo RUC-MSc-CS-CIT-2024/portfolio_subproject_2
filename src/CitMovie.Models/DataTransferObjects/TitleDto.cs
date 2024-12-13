@@ -1,6 +1,6 @@
 namespace CitMovie.Models.DataTransferObjects;
 
-public record TitleResult {
+public class TitleResult : BaseResult {
     public int Id { get; set; }
     public required string Name { get; set; }
     public IEnumerable<TitleTypeResult> Types { get; set; } = [];

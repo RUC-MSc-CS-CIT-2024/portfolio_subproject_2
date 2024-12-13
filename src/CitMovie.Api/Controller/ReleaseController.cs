@@ -25,7 +25,7 @@ public class ReleaseController : ControllerBase
             var totalItems = await _releaseManager.GetReleasesCountAsync(mediaId);
 
             foreach (var release in releases)
-                release.Links = AddReleaseLinks(release);
+                release.Links = Url.AddReleaseLinks(mediaId, release.ReleaseId);
 
             var result = _pageHelper.CreatePaging(nameof(GetReleasesOfMedia), page.Number, page.Count, totalItems, releases, new { mediaId });
 
@@ -47,7 +47,7 @@ public class ReleaseController : ControllerBase
             if (release == null)
                 return NotFound();
             
-            release.Links = AddReleaseLinks(release);
+            release.Links = Url.AddReleaseLinks(mediaId, id);
 
             return Ok(release);
         }
@@ -63,7 +63,7 @@ public class ReleaseController : ControllerBase
         try
         {
             var release = await _releaseManager.DeleteReleaseOfMediaAsync(mediaId, id);
-            return Ok(release);
+            return NoContent();
 
         }
         catch (Exception e)
@@ -78,8 +78,8 @@ public class ReleaseController : ControllerBase
         try
         {
             var result = await _releaseManager.CreateReleaseForMediaAsync(mediaId, request);
-            result.Links = AddReleaseLinks(result);
-            return Ok(result);
+            result.Links = Url.AddReleaseLinks(mediaId, result.ReleaseId);
+            return CreatedAtAction(nameof(GetReleaseOfMediaById), new { mediaId, id = result.ReleaseId }, result);
         }
         catch (Exception e)
         {
@@ -93,7 +93,7 @@ public class ReleaseController : ControllerBase
         try
         {
             var result = await _releaseManager.UpdateReleaseForMediaAsync(mediaId, id, request);
-            result.Links = AddReleaseLinks(result);
+            result.Links = Url.AddReleaseLinks(mediaId, id);
             return Ok(result);
         }
         catch (Exception e)
@@ -101,17 +101,4 @@ public class ReleaseController : ControllerBase
             return BadRequest(e.Message);
         }
     }
-
-    private List<Link> AddReleaseLinks(ReleaseResult release)
-        => [ new Link {
-                Href = _pageHelper.GetResourceLink(nameof(GetReleaseOfMediaById), new { mediaId = release.MediaId, id = release.ReleaseId }) ?? string.Empty,
-                Rel = "self",
-                Method = "GET"
-            },
-            new Link {
-                Href = _pageHelper.GetResourceLink(nameof(MediaController.Get), new { id = release.MediaId }) ?? string.Empty,
-                Rel = "media",
-                Method = "GET"
-            }
-        ];
 }

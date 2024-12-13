@@ -24,18 +24,18 @@ public class FollowController : ControllerBase
         var totalItems = await _followManager.GetTotalFollowingsCountAsync(userId);
 
         foreach (var following in followings)
-            following.Links = AddFollowingLinks(following);
+            following.Links = Url.AddFollowLinks(following.PersonId, userId, following.FollowingId);
 
         var result = _pagingHelper.CreatePaging(nameof(GetFollowings), page.Number, page.Count, totalItems, followings, new { userId });
         return Ok(result);
     }
 
 
-    [HttpPost]
+    [HttpPost(Name = nameof(CreateFollow))]
     public async Task<ActionResult<FollowResult>> CreateFollow(int userId, [FromBody] FollowCreateRequest followCreateRequest)
     {
         var follow = await _followManager.CreateFollowAsync(userId, followCreateRequest.PersonId);
-        follow.Links = AddFollowingLinks(follow);
+        follow.Links = Url.AddFollowLinks(follow.PersonId, userId, follow.FollowingId);
         return CreatedAtAction(nameof(GetFollowings), new { userId }, follow);
     }
 
@@ -48,11 +48,4 @@ public class FollowController : ControllerBase
 
         return NoContent();
     }
-    private List<Link> AddFollowingLinks(FollowResult followResult)
-        => [ new Link {
-                Href = _pagingHelper.GetResourceLink(nameof(PersonController.GetPersonById), new { id = followResult.PersonId }) ?? string.Empty,
-                Rel = "person",
-                Method = "GET"
-            }
-        ];
 }

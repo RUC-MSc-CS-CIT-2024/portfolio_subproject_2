@@ -5,4 +5,5 @@ public interface ITitleRepository {
     Title Get(int titleId);
     Task<Title> CreateAsync(Title title);
     Task<bool> DeleteAsync(int  titleId);
+    int GetTotalTitles(int mediaId);
 }

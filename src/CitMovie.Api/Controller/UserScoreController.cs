@@ -31,7 +31,7 @@ public class UserScoreController : ControllerBase
         var scores = await _userScoreManager.GetScoresByUserIdAsync(userId, page.Number, page.Count, mediaType, mediaId, mediaName);
 
         foreach (var score in scores)
-            score.Links = AddUserScoreLinks(score);
+            score.Links = Url.AddUserScoreLinks(userId, score.MediaId);
 
         var result = _pagingHelper.CreatePaging(nameof(GetUserScores), page.Number, page.Count, totalCount, scores, new { userId, mediaType, mediaId, mediaName });
 
@@ -49,18 +49,4 @@ public class UserScoreController : ControllerBase
         await _userScoreManager.CreateUserScoreAsync(userId, userScoreCreateRequest);
         return CreatedAtRoute(nameof(GetUserScores), new { userId }, null);
     }
-
-
-    private List<Link> AddUserScoreLinks(UserScoreResult userScore)
-        => [ new Link {
-                Href = _pagingHelper.GetResourceLink(nameof(UserController.GetUser), new { userId = userScore.UserId }) ?? string.Empty,
-                Rel = "user",
-                Method = "GET"
-            }, 
-            new Link {
-                Href = _pagingHelper.GetResourceLink(nameof(MediaController.Get), new { id = userScore.MediaId }) ?? string.Empty,
-                Rel = "media",
-                Method = "GET"
-            }
-        ];
 }

@@ -1,5 +1,3 @@
-using System.Text.Json;
-
 namespace CitMovie.Data;
 
 public class TitleRepository : ITitleRepository {
@@ -46,4 +44,9 @@ public class TitleRepository : ITitleRepository {
             .Include(x => x.TitleAttributes)
             .Include(x => x.TitleTypes)
             .Where(x => x.MediaId == mediaId);
+
+    public int GetTotalTitles(int mediaId)
+        => _context.Titles
+            .Count(x => x.MediaId == mediaId);
+
 }

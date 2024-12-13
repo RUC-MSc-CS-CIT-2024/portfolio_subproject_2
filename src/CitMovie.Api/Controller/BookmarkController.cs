@@ -1,5 +1,3 @@
-using CitMovie.Api.Controllers;
-
 namespace CitMovie.Api;
 
 [ApiController]
@@ -39,7 +37,7 @@ public class BookmarkController : ControllerBase
             return BadRequest("Bookmark data is required.");
 
         var createdBookmark = await _bookmarkManager.CreateBookmarkAsync(userId, createBookmarkDto);
-        createdBookmark.Links = AddBookmarkLinks(createdBookmark);
+        createdBookmark.Links = Url.AddBookmarkLinks(createdBookmark.BookmarkId, createdBookmark.MediaId, userId);
         return CreatedAtAction(nameof(GetBookmark), new { userId, id = createdBookmark.BookmarkId }, createdBookmark);
     }
 
@@ -51,6 +49,7 @@ public class BookmarkController : ControllerBase
 
         try {
             var completedItem = await _completedManager.MoveBookmarkToCompletedAsync(userId, id, bookmarkMoveRequest);
+            completedItem.Links = Url.AddCompletedLinks(completedItem.CompletedId, completedItem.MediaId, userId);
             return Created($"/api/users/{userId}/completed/{completedItem.CompletedId}", completedItem);
         } catch (Exception e) {
             _logger.LogError(e, "Unexpected error: ");
@@ -68,7 +67,7 @@ public class BookmarkController : ControllerBase
         if (bookmark.UserId != userId)
             return Forbid();
 
-        bookmark.Links = AddBookmarkLinks(bookmark);
+        bookmark.Links = Url.AddBookmarkLinks(id, bookmark.MediaId, userId);
 
         return Ok(bookmark);
     }
@@ -80,7 +79,7 @@ public class BookmarkController : ControllerBase
         var totalItems = await _bookmarkManager.GetTotalUserBookmarksCountAsync(userId);
 
         foreach (var bookmark in bookmarks)
-            bookmark.Links = AddBookmarkLinks(bookmark);
+            bookmark.Links = Url.AddBookmarkLinks(bookmark.BookmarkId, bookmark.MediaId, userId);
 
         var result = _pagingHelper.CreatePaging(nameof(GetUserBookmarks), page.Number, page.Count, totalItems, bookmarks, new { userId });
 
@@ -100,8 +99,12 @@ public class BookmarkController : ControllerBase
         if (bookmark.UserId != userId)
             return Forbid();
 
-        var updatedBookmark = await _bookmarkManager.UpdateBookmarkAsync(id, note);
-        return updatedBookmark == null ? NotFound() : Ok(updatedBookmark);
+        BookmarkResult? updatedBookmark = await _bookmarkManager.UpdateBookmarkAsync(id, note);
+        if (updatedBookmark is null)
+            return NotFound();
+        
+        updatedBookmark.Links = Url.AddBookmarkLinks(id, updatedBookmark.MediaId, userId);
+        return Ok(updatedBookmark);
     }
 
     [HttpDelete("{id}")]
@@ -117,23 +120,4 @@ public class BookmarkController : ControllerBase
         await _bookmarkManager.DeleteBookmarkAsync(id);
         return NoContent();
     }
-
-    private List<Link> AddBookmarkLinks(BookmarkResult bookmark)
-        => [
-            new Link {
-                Href = _pagingHelper.GetResourceLink(nameof(GetBookmark), new { userId = bookmark.UserId, id = bookmark.BookmarkId }) ?? string.Empty,
-                Rel = "self",
-                Method = "GET"
-            },
-            new Link {
-                Href = _pagingHelper.GetResourceLink(nameof(UserController.GetUser), new { userId = bookmark.UserId }) ?? string.Empty,
-                Rel = "user",
-                Method = "GET"
-            },
-            new Link {
-                Href = _pagingHelper.GetResourceLink(nameof(MediaController.Get), new { id = bookmark.MediaId }) ?? string.Empty,
-                Rel = "media",
-                Method = "GET"
-            }
-        ];
 }

@@ -24,7 +24,7 @@ public class SearchHistoryController : ControllerBase
         var total_items = await _searchHistoryManager.GetUsersTotalSearchHistoriesCountAsync(userId);
 
         foreach (var searchHistory in searchHistories)
-            searchHistory.Links = AddSearchHistoryUserLink(searchHistory);
+            searchHistory.Links = Url.AddSearchHistoryUserLink(searchHistory.SearchHistoryId, userId);
 
         var result = _pagingHelper.CreatePaging(nameof(GetUserSearchHistories), page.Number, page.Count, total_items, searchHistories, new { userId });
 
@@ -32,6 +32,7 @@ public class SearchHistoryController : ControllerBase
     }
 
     [HttpDelete(Name = nameof(DeleteUserSearchHistories))]
+    [HttpDelete("{searchHistoryId}", Name = nameof(DeleteUserSearchHistories))]
     public async Task<IActionResult> DeleteUserSearchHistories(int userId, int searchHistoryId)
     {
         var result = await _searchHistoryManager.DeleteUsersSearchHistoriesAsync(userId, searchHistoryId);
@@ -42,13 +43,6 @@ public class SearchHistoryController : ControllerBase
         return NotFound();
     }
 
-    private List<Link> AddSearchHistoryUserLink(SearchHistoryResult searchHistoryResult)
-        => [ new Link
-            {
-                Href = _pagingHelper.GetResourceLink(nameof(UserController.GetUser), new { userId = searchHistoryResult.UserId }) ?? string.Empty,
-                Rel = "user",
-                Method = "GET"
-            }
-        ];
+
     
 }

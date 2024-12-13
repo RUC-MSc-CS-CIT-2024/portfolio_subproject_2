@@ -31,7 +31,7 @@ public class PersonController : ControllerBase
         );
 
         foreach (var person in persons)
-            person.Links = AddPersonLinks(person.Id);
+            person.Links = Url.AddPersonLinks(person.Id);
 
         return Ok(result);
     }
@@ -43,7 +43,7 @@ public class PersonController : ControllerBase
         if (person == null)
             return NotFound();
 
-        person.Links = AddPersonLinks(person.Id);
+        person.Links = Url.AddPersonLinks(id);
 
         return Ok(person);
     }
@@ -65,7 +65,8 @@ public class PersonController : ControllerBase
         foreach (PersonCrewResult m in media) {
             if (m.Media is null)
                 continue;
-            m.Media.Links = AddMediaLinks(m.Media);
+            m.Links = Url.AddCrewAndCastLinks(m.Media.Id, id);
+            m.Media.Links = Url.AddMediaLinks(m.Media.Id);
         }
 
         return Ok(result);
@@ -78,7 +79,7 @@ public class PersonController : ControllerBase
         var totalCount = await _personManager.GetFrequentCoActorsCountAsync(id);
 
         foreach (var ca in coActor)
-            ca.Links = AddPersonLinks(ca.Id);
+            ca.Links = Url.AddPersonLinks(ca.Id);
 
         var result = _pagingHelper.CreatePaging(
             nameof(GetFrequentCoActors),
@@ -99,25 +100,4 @@ public class PersonController : ControllerBase
             userId = parseResult;
         return userId;
     }
-
-    private List<Link> AddPersonLinks(int personId)
-        => [ new Link {
-                Href = _pagingHelper.GetResourceLink(nameof(GetPersonById), new { id = personId }) ?? string.Empty,
-                Rel = "self",
-                Method = "GET"
-            },
-            new Link {
-                Href = _pagingHelper.GetResourceLink(nameof(GetFrequentCoActors), new { id = personId }) ?? string.Empty,
-                Rel = "frequent-coactors",
-                Method = "GET"
-            }
-        ];
-
-    private List<Link> AddMediaLinks(PersonCrewResult.MediaResult media)
-        => [ new Link {
-                Href = _pagingHelper.GetResourceLink(nameof(MediaController.Get), new { id = media.Id }) ?? string.Empty,
-                Rel = "self",
-                Method = "GET"
-            }
-        ];
 }
