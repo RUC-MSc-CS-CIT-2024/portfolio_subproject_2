@@ -50,8 +50,8 @@ public class MediaController : ControllerBase
         return Ok(results);
     }
 
-    [HttpGet("{id}", Name = nameof(Get))]
-    public ActionResult<MediaResult> Get(int id) {
+    [HttpGet("{id}", Name = nameof(GetMedia))]
+    public ActionResult<MediaResult> GetMedia(int id) {
         try {
             MediaResult m = _mediaManager.Get(id);
             m.Links = Url.AddMediaLinks(id);

@@ -4,7 +4,7 @@ public static class IUrlHelperExtensions
     public static List<Link> AddMediaLinks(this IUrlHelper source, int mediaId)
         => [
             new Link {
-                Href = source.Link(nameof(MediaController.Get), new { id = mediaId }) ?? string.Empty,
+                Href = source.Link(nameof(MediaController.GetMedia), new { id = mediaId }) ?? string.Empty,
                 Rel = "self",
                 Method = "GET"
             },
@@ -38,7 +38,7 @@ public static class IUrlHelperExtensions
     public static List<Link> AddCrewAndCastLinks(this IUrlHelper source, int mediaId, int personId)
         => [
             new Link {
-                Href = source.Link(nameof(MediaController.Get), new { id = mediaId }) ?? string.Empty,
+                Href = source.Link(nameof(MediaController.GetMedia), new { id = mediaId }) ?? string.Empty,
                 Rel = "media",
                 Method = "GET"
             },
@@ -101,7 +101,7 @@ public static class IUrlHelperExtensions
                 Method = "GET"
             },
             new Link {
-                Href = source.Link(nameof(MediaController.Get), new { id = mediaId }) ?? string.Empty,
+                Href = source.Link(nameof(MediaController.GetMedia), new { id = mediaId }) ?? string.Empty,
                 Rel = "media",
                 Method = "GET"
             }
@@ -140,7 +140,7 @@ public static class IUrlHelperExtensions
                 Method = "GET"
             },
             new Link {
-                Href = source.Link(nameof(MediaController.Get), new { id = mediaId }) ?? string.Empty,
+                Href = source.Link(nameof(MediaController.GetMedia), new { id = mediaId }) ?? string.Empty,
                 Rel = "media",
                 Method = "GET"
             }
@@ -207,7 +207,7 @@ public static class IUrlHelperExtensions
                 Method = "DELETE"
             },
             new Link {
-                Href = source.Link(nameof(MediaController.Get), new { id = mediaId }) ?? string.Empty,
+                Href = source.Link(nameof(MediaController.GetMedia), new { id = mediaId }) ?? string.Empty,
                 Rel = "media",
                 Method = "GET"
             },
@@ -251,7 +251,7 @@ public static class IUrlHelperExtensions
                 Method = "DELETE"
             },
             new Link {
-                Href = source.Link(nameof(MediaController.Get), new { mediaId }) ?? string.Empty,
+                Href = source.Link(nameof(MediaController.GetMedia), new { mediaId }) ?? string.Empty,
                 Rel = "media",
                 Method = "GET"
             }
@@ -314,7 +314,7 @@ public static class IUrlHelperExtensions
                 Method = "GET"
             },
             new Link {
-                Href = source.Link(nameof(MediaController.Get), new { id = mediaId }) ?? string.Empty,
+                Href = source.Link(nameof(MediaController.GetMedia), new { id = mediaId }) ?? string.Empty,
                 Rel = "media",
                 Method = "GET"
             }
