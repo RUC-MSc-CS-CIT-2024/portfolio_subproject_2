@@ -19,23 +19,24 @@ public class UserController : ControllerBase
         _loginService = loginService;
     }
 
-    [HttpGet("{userId}", Name = nameof(GetUser))]
     [HttpGet("/api/user")]
-    public async Task<ActionResult> GetUser(int? userId)
-    {   
-        if (userId == null) {
-            string? userIdString = User.Claims.FirstOrDefault(x => x.Type == "user_id")?.Value;
-            if (int.TryParse(userIdString, out int parseResult))
-                userId = parseResult;
-        }
+    public async Task<ActionResult<UserResult>> GetCurrentUser() {
+        string? userIdString = User.Claims.FirstOrDefault(x => x.Type == "user_id")?.Value;
+        if (userIdString == null)
+            return NotFound("User not found");
+        if (int.TryParse(userIdString, out int parseResult))
+            return await GetUser(parseResult);
         
-        if (!userId.HasValue)
-            return Unauthorized("User not found");
+        return BadRequest();
+    }
 
+    [HttpGet("{userId}", Name = nameof(GetUser))]
+    public async Task<ActionResult<UserResult>> GetUser(int userId)
+    { 
         try
         {
-            UserResult user = await _userManager.GetUserAsync(userId.Value);
-            user.Links = Url.AddUserLinks(userId.Value);
+            UserResult user = await _userManager.GetUserAsync(userId);
+            user.Links = Url.AddUserLinks(userId);
             return Ok(user);
         }
         catch (Exception ex)

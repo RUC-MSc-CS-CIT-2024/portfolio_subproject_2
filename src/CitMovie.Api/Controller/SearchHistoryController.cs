@@ -32,7 +32,6 @@ public class SearchHistoryController : ControllerBase
     }
 
     [HttpDelete(Name = nameof(DeleteUserSearchHistories))]
-    [HttpDelete("{searchHistoryId}", Name = nameof(DeleteUserSearchHistories))]
     public async Task<IActionResult> DeleteUserSearchHistories(int userId, int searchHistoryId)
     {
         var result = await _searchHistoryManager.DeleteUsersSearchHistoriesAsync(userId, searchHistoryId);
@@ -42,6 +41,10 @@ public class SearchHistoryController : ControllerBase
         }
         return NotFound();
     }
+
+    [HttpDelete("{searchHistoryId}", Name = nameof(DeleteUserSearchHistory))]
+    public async Task<IActionResult> DeleteUserSearchHistory(int userId, int searchHistoryId)
+        => await DeleteUserSearchHistories(userId, searchHistoryId);
 
 
     
