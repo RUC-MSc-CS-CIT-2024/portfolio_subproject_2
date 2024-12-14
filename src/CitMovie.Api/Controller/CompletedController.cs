@@ -1,4 +1,4 @@
-namespace CitMovie.Api.Controllers;
+namespace CitMovie.Api;
 
 [ApiController]
 [Route("api/users/{userId}/completed")]
@@ -40,7 +40,7 @@ public class CompletedController : ControllerBase
         if (completed.UserId != userId)
             return Forbid();
 
-        completed.Links = AddCompletedLinks(completed);
+        completed.Links = Url.AddCompletedLinks(completed.CompletedId, completed.MediaId, userId);
 
         return Ok(completed);
     }
@@ -52,7 +52,7 @@ public class CompletedController : ControllerBase
         var totalItems = await _completedManager.GetTotalUserCompletedCountAsync(userId);
 
         foreach (var completed in completedItems)
-            completed.Links = AddCompletedLinks(completed);
+            completed.Links = Url.AddCompletedLinks(completed.CompletedId, completed.MediaId, userId);
 
         var result = _pagingHelper.CreatePaging(nameof(GetUserCompleted), page.Number, page.Count, totalItems, completedItems, new { userId });
 
@@ -82,22 +82,4 @@ public class CompletedController : ControllerBase
         var deleted = await _completedManager.DeleteCompletedAsync(id);
         return deleted ? NoContent() : NotFound();
     }
-
-    private List<Link> AddCompletedLinks(CompletedResult completed)
-        => [ new Link {
-                Href = _pagingHelper.GetResourceLink(nameof(GetCompleted), new { userId = completed.UserId, id = completed.CompletedId }) ?? string.Empty,
-                Rel = "self",
-                Method = "GET"
-            }, 
-            new Link {
-                Href = _pagingHelper.GetResourceLink(nameof(UserController.GetUser), new { userId = completed.UserId }) ?? string.Empty,
-                Rel = "user",
-                Method = "GET"
-            },
-            new Link {
-                Href = _pagingHelper.GetResourceLink(nameof(MediaController.Get), new { id = completed.MediaId }) ?? string.Empty,
-                Rel = "media",
-                Method = "GET"
-            }
-        ];
 }

@@ -33,6 +33,10 @@ public class PersonCrewResult : BaseResult {
         public required string Title { get; set; }
         public DateTime? ReleaseDate { get; set; }
         public string? PosterUri { get; set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public int? SeasonId { get; set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public int? SeriesId { get; set; }
     }
 }
 

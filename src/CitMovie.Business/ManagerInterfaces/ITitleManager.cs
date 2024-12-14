@@ -5,4 +5,5 @@ public interface ITitleManager {
     TitleResult Get(int mediaId, int titleId);
     Task<TitleResult> CreateAsync(int mediaId, TitleCreateRequest createRequest);
     Task<bool> DeleteAsync(int mediaId, int titleId);
+    int GetTotalTitlesCount(int mediaId);
 }

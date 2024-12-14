@@ -23,7 +23,7 @@ public class PromotionalMediaController : ControllerBase
             var totalItems = await _manager.GetPromotionalMediaCountAsync(mediaId, "media");
 
             foreach (var promotionalMedia in items)
-                promotionalMedia.Links = AddPromotionalMediaLinks(promotionalMedia, mediaId, promotionalMedia.ReleaseId);
+                promotionalMedia.Links = Url.AddPromotionalMediaLinks(promotionalMedia.PromotionalMediaId, mediaId, promotionalMedia.ReleaseId);
 
             var result = _pagingHelper.CreatePaging(
                 nameof(GetPromotionalMediaofMedia),
@@ -50,7 +50,7 @@ public class PromotionalMediaController : ControllerBase
             var totalItems = await _manager.GetPromotionalMediaCountAsync(releaseId, "release");
 
             foreach (var promotionalMedia in items)
-                promotionalMedia.Links = AddPromotionalMediaLinks(promotionalMedia, mediaId, promotionalMedia.ReleaseId);
+                promotionalMedia.Links = Url.AddPromotionalMediaLinks(promotionalMedia.PromotionalMediaId, mediaId, promotionalMedia.ReleaseId);
 
             var result = _pagingHelper.CreatePaging(
                 nameof(GetPromotionalMediaOfRelease),
@@ -76,7 +76,7 @@ public class PromotionalMediaController : ControllerBase
         {
             var result = await _manager.GetPromotionalMediaByIdAsync(id, mediaId, releaseId);
 
-            result.Links = AddPromotionalMediaLinks(result, mediaId, releaseId);
+            result.Links = Url.AddPromotionalMediaLinks(id, mediaId, releaseId);
             return Ok(result);
         }
         catch (Exception e)
@@ -102,12 +102,12 @@ public class PromotionalMediaController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreatePromotionalMedia([FromRoute] int mediaId, [FromRoute] int releaseId, [FromBody] PromotionalMediaCreateRequest model)
+    public async Task<IActionResult> CreatePromotionalMedia(int mediaId, int releaseId, [FromBody] PromotionalMediaCreateRequest model)
     {
         try
         {
             var response = await _manager.CreatePromotionalMediaAsync(mediaId, releaseId, model);
-            response.Links = AddPromotionalMediaLinks(response, mediaId, releaseId);
+            response.Links = Url.AddPromotionalMediaLinks(response.PromotionalMediaId, mediaId, releaseId);
             return CreatedAtAction(nameof(CreatePromotionalMedia), response);
         }
         catch (Exception e)
@@ -115,22 +115,4 @@ public class PromotionalMediaController : ControllerBase
             return BadRequest(e.Message);
         }
     }
-
-    private List<Link> AddPromotionalMediaLinks(PromotionalMediaResult promotionalMedia, int mediaId, int releaseId)
-        => [ new Link {
-                Href = _pagingHelper.GetResourceLink(nameof(MediaController.Get), new { id = mediaId }) ?? string.Empty,
-                Rel = "media",
-                Method = "GET"
-            },
-            new Link {
-                Href = _pagingHelper.GetResourceLink(nameof(ReleaseController.GetReleaseOfMediaById), new { mediaId, id = releaseId }) ?? string.Empty,
-                Rel = "release",
-                Method = "GET"
-            },
-            new Link {
-                Href = _pagingHelper.GetResourceLink(nameof(GetPromotionalMediaOfRelease), new { mediaId, releaseId, promotionalMediaId = promotionalMedia.PromotionalMediaId }) ?? string.Empty,
-                Rel = "self",
-                Method = "GET"
-            }
-        ];
 }

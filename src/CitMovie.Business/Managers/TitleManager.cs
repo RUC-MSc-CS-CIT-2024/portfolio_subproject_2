@@ -62,4 +62,8 @@ public class TitleManager : ITitleManager
         IEnumerable<Title> result = _titleRepository.GetForMedia(mediaId);
         return _mapper.Map<IEnumerable<TitleResult>>(result);
     }
+
+    public int GetTotalTitlesCount(int mediaId)
+        => _titleRepository.GetTotalTitles(mediaId);
+
 }

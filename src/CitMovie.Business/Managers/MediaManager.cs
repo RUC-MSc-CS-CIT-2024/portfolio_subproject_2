@@ -76,13 +76,18 @@ public class MediaManager : IMediaManager {
             _ => []
         };
 
-        IEnumerable<MediaBasicResult> basicMedia = _mapper.Map<IEnumerable<MediaBasicResult>>(result.OfType<Media>());
-        IEnumerable<MediaBasicResult> episodes = _mapper.Map<IEnumerable<MediaBasicResult>>(result.OfType<Episode>());
+        List<MediaBasicResult> mediaResult = [];
+        foreach(Media media in result)
+        {
+            if (media is Episode e)
+                mediaResult.Add(_mapper.Map<MediaBasicResult>(e));
+            else if (media is Season s)
+                mediaResult.Add(_mapper.Map<MediaBasicResult>(s));
+            else
+                mediaResult.Add(_mapper.Map<MediaBasicResult>(media));
+        }
         
-        return basicMedia.Concat(episodes)
-            .DistinctBy(x => x.Id)
-            .OrderBy(x => x.Id)
-            .ThenBy(x => x.Title); 
+        return mediaResult; 
     }
 
     public async Task<int> GetTotalRelatedMediaCountAsync(int id)

@@ -45,12 +45,17 @@ public class PersonManager : IPersonManager
 
     public async Task<IEnumerable<PersonCrewResult>> GetMediaByPersonIdAsync(int id, int page, int pageSize)
     {
-        IEnumerable<CrewBase> media = await _personRepository.GetMediaByPersonIdAsync(id, page, pageSize);
+        IEnumerable<CrewBase> crewBaseList = await _personRepository.GetMediaByPersonIdAsync(id, page, pageSize);
 
-        IEnumerable<PersonCrewResult> crewResults = _mapper.Map<IEnumerable<PersonCrewResult>>(media.OfType<CrewMember>());
-        IEnumerable<PersonCrewResult> castResults = _mapper.Map<IEnumerable<PersonCrewResult>>(media.OfType<CastMember>());
-
-        return crewResults.Concat(castResults);
+        List<PersonCrewResult> result = [];
+        foreach (CrewBase c in crewBaseList) {
+            if (c is CrewMember crew) {
+                result.Add(_mapper.Map<PersonCrewResult>(crew));
+            } else if (c is CastMember cast) {
+                result.Add(_mapper.Map<PersonCrewResult>(cast));
+            }
+        }
+        return result;
     }
 
     public async Task<int> GetMediaByPersonIdCountAsync(int id)
@@ -76,7 +81,5 @@ public class PersonManager : IPersonManager
     }
 
     public async Task<int> GetFrequentCoActorsCountAsync(int id)
-    {
-        return await _personRepository.GetFrequentCoActorsCountAsync(id);
-    }
+        => await _personRepository.GetFrequentCoActorsCountAsync(id);
 }

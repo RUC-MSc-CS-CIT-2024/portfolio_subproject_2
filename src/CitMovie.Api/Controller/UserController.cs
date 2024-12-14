@@ -19,14 +19,23 @@ public class UserController : ControllerBase
         _loginService = loginService;
     }
 
-    
     [HttpGet("{userId}", Name = nameof(GetUser))]
-    public async Task<ActionResult> GetUser(int userId)
-    {
+    [HttpGet("/api/user")]
+    public async Task<ActionResult> GetUser(int? userId)
+    {   
+        if (userId == null) {
+            string? userIdString = User.Claims.FirstOrDefault(x => x.Type == "user_id")?.Value;
+            if (int.TryParse(userIdString, out int parseResult))
+                userId = parseResult;
+        }
+        
+        if (!userId.HasValue)
+            return Unauthorized("User not found");
+
         try
         {
-            UserResult user = await _userManager.GetUserAsync(userId);
-            user.Links = AddUserkLinks(user);
+            UserResult user = await _userManager.GetUserAsync(userId.Value);
+            user.Links = Url.AddUserLinks(userId.Value);
             return Ok(user);
         }
         catch (Exception ex)
@@ -59,13 +68,13 @@ public class UserController : ControllerBase
         }
     }
 
-    [Authorize(Policy = "user_scope")]
     [HttpPatch("{userId}")]
     public async Task<ActionResult> UpdateUser(int userId, [FromBody] UserUpdateRequest user)
     {
         try
         {
             UserResult updatedUser = await _userManager.UpdateUserAsync(userId, user);
+            updatedUser.Links = Url.AddUserLinks(userId);
             return Ok(updatedUser);
         }
         catch (Exception ex)
@@ -75,7 +84,6 @@ public class UserController : ControllerBase
         }
     }
 
-    [Authorize(Policy = "user_scope")]
     [HttpDelete("{userId}")]
     public async Task<ActionResult> DeleteUser(int userId)
     {
@@ -92,12 +100,4 @@ public class UserController : ControllerBase
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
     }
-
-    private List<Link> AddUserkLinks(UserResult user)
-        => [ new Link {
-                Href = _pagingHelper.GetResourceLink(nameof(GetUser), new { userId = user.Id }) ?? string.Empty,
-                Rel = "self",
-                Method = "GET"
-            }
-        ];
 }
