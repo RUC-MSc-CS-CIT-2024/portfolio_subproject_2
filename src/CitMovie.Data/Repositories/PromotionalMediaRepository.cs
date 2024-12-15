@@ -13,8 +13,10 @@ public class PromotionalMediaRepository : IPromotionalMediaRepository
     {
         await ReleaseIdAndMediaIdValidator(mediaId, null);
         return await _context.PromotionalMedia
+            .AsNoTracking()
             .Include(pm => pm.Release)
             .Where(pm => pm.Release!.MediaId == mediaId)
+            .OrderBy(pm => pm.PromotionalMediaId)
             .Pagination(page, pageSize)
             .ToListAsync();
     }
@@ -24,8 +26,8 @@ public class PromotionalMediaRepository : IPromotionalMediaRepository
         await ReleaseIdAndMediaIdValidator(mediaId, releaseId);
         return await _context.PromotionalMedia
             .Include(pm => pm.Release)
-            .Where(pm => pm.ReleaseId == releaseId)
-            .Where(pm => pm.Release!.MediaId == mediaId)
+            .Where(pm => pm.ReleaseId == releaseId && pm.Release!.MediaId == mediaId)
+            .OrderBy(pm => pm.PromotionalMediaId)
             .Pagination(page, pageSize)
             .ToListAsync();
     }
@@ -41,9 +43,9 @@ public class PromotionalMediaRepository : IPromotionalMediaRepository
         
         return await _context.PromotionalMedia
             .Include(pm => pm.Release)
-            .Where(pm => pm.ReleaseId == releaseId)
-            .Where(pm => pm.Release!.MediaId == mediaId)
-            .FirstAsync(p => p.PromotionalMediaId == id);
+            .FirstAsync(pm => pm.PromotionalMediaId == id 
+                && pm.ReleaseId == releaseId 
+                && pm.Release!.MediaId == mediaId);
         
     }
 
@@ -53,9 +55,9 @@ public class PromotionalMediaRepository : IPromotionalMediaRepository
             await ReleaseIdAndMediaIdValidator(mediaId, releaseId);
             PromotionalMedia promotionalMediaToDelete = _context.PromotionalMedia
                 .Include(pm => pm.Release)
-                .Where(pm => pm.ReleaseId == releaseId)
-                .Where(pm => pm.Release!.MediaId == mediaId)
-                .First(x => x.PromotionalMediaId == id);
+                .First(pm => pm.PromotionalMediaId == id 
+                    && pm.ReleaseId == releaseId 
+                    && pm.Release!.MediaId == mediaId);
             
             _context.PromotionalMedia.Remove(promotionalMediaToDelete);
             await _context.SaveChangesAsync();
@@ -78,7 +80,6 @@ public class PromotionalMediaRepository : IPromotionalMediaRepository
     { 
         return parameter switch {
             "release" => await _context.PromotionalMedia
-                                        .Include(x => x.Release)
                                         .CountAsync(r => r.ReleaseId == id),
             "media" => await _context.PromotionalMedia
                                         .Include(x => x.Release)

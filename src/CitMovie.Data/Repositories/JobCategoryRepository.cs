@@ -12,6 +12,8 @@ public class JobCategoryRepository : IJobCategoryRepository
     {
         return await _context.JobCategories
             .AsNoTracking()
+            .OrderBy(jc => jc.Name)
+            .ThenBy(jc => jc.JobCategoryId)
             .Pagination(page, pageSize)
             .ToListAsync();
     }

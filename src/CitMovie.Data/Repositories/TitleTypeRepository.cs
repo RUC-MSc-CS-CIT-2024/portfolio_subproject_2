@@ -12,6 +12,9 @@ public class TitleTypeRepository : ITitleTypeRepository
     public async Task<List<TitleType>> GetTitleTypesAsync(int page, int pageSize)
     {
         return await _context.TitleTypes
+            .AsNoTracking()
+            .OrderBy(tt => tt.Name)
+            .ThenBy(tt => tt.TitleTypeId)
             .Pagination(page, pageSize)
             .ToListAsync();
     }

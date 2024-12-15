@@ -18,6 +18,9 @@ public class LanguageRepository : ILanguageRepository
     public async Task<List<Language>> GetLanguagesAsync(int page, int pageSize)
     {
         return await _context.Languages
+            .AsNoTracking()
+            .OrderBy(l => l.Name)
+            .ThenBy(l => l.LanguageId)
             .Pagination(page, pageSize)
             .ToListAsync();
     }
