@@ -13,6 +13,8 @@ public class TitleAttributeRepository : ITitleAttributeRepository
     {
         return await _context.TitleAttributes
             .Include(x => x.Titles)
+            .OrderBy(x => x.Name)
+            .ThenBy(x => x.TitleAttributeId)
             .Pagination(page, pageSize)
             .ToListAsync();
     }

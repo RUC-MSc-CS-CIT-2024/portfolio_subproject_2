@@ -34,13 +34,14 @@ public class CompletedRepository : ICompletedRepository
         return await _context.Completed.FirstAsync(x => x.MediaId == mediaId && x.UserId == userId);
     }
 
-    public async Task<Completed?> GetCompletedByIdAsync(int completedId) =>
-        await _context.Completed.FindAsync(completedId);
+    public async Task<Completed?> GetCompletedByIdAsync(int completedId) 
+        => await _context.Completed.FirstAsync(x => x.CompletedId == completedId);
 
     public async Task<IEnumerable<Completed>> GetUserCompletedItemsAsync(int userId, int page, int pageSize) =>
         await _context.Completed
-            .Where(c => c.UserId == userId)
             .AsNoTracking()
+            .Where(c => c.UserId == userId)
+            .OrderBy(c => c.CompletedId)
             .Pagination(page, pageSize)
             .ToListAsync();
 

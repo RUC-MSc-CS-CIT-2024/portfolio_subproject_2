@@ -13,6 +13,8 @@ public class CountryRepository : ICountryRepository
     {
         return await _context.Countries
             .AsNoTracking()
+            .OrderBy(c => c.Name)
+            .ThenBy(c => c.CountryId)
             .Pagination(page, pageSize)
             .ToListAsync();
     }

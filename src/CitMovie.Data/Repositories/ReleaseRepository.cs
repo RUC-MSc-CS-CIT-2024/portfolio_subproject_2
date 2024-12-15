@@ -16,6 +16,7 @@ public class ReleaseRepository : IReleaseRepository
             .Include(x => x.Country)
             .Include(x => x.SpokenLanguages)
             .Where(r => r.MediaId == mediaId)
+            .OrderByDescending(r => r.ReleaseDate)
             .Pagination(page, pageSize)
             .ToListAsync();
     }
@@ -26,8 +27,7 @@ public class ReleaseRepository : IReleaseRepository
         var result = await _context.Releases
             .Include(x => x.Country)
             .Include(x => x.SpokenLanguages)
-            .Where(r => r.MediaId == mediaId)
-            .FirstAsync(r => r.ReleaseId == releaseId);
+            .FirstAsync(r => r.ReleaseId == releaseId && r.MediaId == mediaId);
         
         return result;
     }

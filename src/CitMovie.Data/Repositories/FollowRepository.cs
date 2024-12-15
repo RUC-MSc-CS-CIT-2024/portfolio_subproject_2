@@ -14,6 +14,7 @@ public class FollowRepository : IFollowRepository
         return await _context.Follows
             .AsNoTracking()
             .Where(f => f.UserId == userId)
+            .OrderBy(f => f.FollowingId)
             .Pagination(page, pageSize)
             .ToListAsync();
     }

@@ -13,6 +13,7 @@ public class SearchHistoryRepository : ISearchHistoryRepository
         return await _context.SearchHistories
             .AsNoTracking()
             .Where(sh => sh.UserId == userId)
+            .OrderBy(sh => sh.SearchHistoryId)
             .Pagination(page, pageSize)
             .ToListAsync();
     }
@@ -20,8 +21,7 @@ public class SearchHistoryRepository : ISearchHistoryRepository
     public async Task<int> GetUsersTotalSearchHistoriesCountAsync(int userId)
     {
         return await _context.SearchHistories
-            .Where(sh => sh.UserId == userId)
-            .CountAsync();
+            .CountAsync(sh => sh.UserId == userId);
 
     }
 

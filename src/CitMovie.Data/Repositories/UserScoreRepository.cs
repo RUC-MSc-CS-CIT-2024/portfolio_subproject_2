@@ -15,6 +15,7 @@ public class UserScoreRepository : IUserScoreRepository
     public async Task<IEnumerable<UserScore>> GetUserScoresAsync(int userId, int page, int pageSize, string? mediaType, int? mediaId, string? mediaName)
     {
         var userScoresQuery = _frameworkContext.UserScores
+            .AsNoTracking()
             .Where(us => us.UserId == userId);
 
         var mediaQuery = _dataContext.Media.AsQueryable();
@@ -38,6 +39,9 @@ public class UserScoreRepository : IUserScoreRepository
         
         var filteredUserScores = await userScoresQuery
             .Where(us => mediaIds.Contains(us.MediaId) && (string.IsNullOrEmpty(mediaName) || titleMediaIds.Contains(us.MediaId)))
+            .GroupBy(us => us.MediaId)
+            .Select(g => g.OrderByDescending(us => us.CreatedAt).First())
+            .OrderBy(us => us.UserScoreId)
             .Pagination(page, pageSize)
             .ToListAsync();
 

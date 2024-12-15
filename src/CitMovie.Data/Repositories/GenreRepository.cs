@@ -12,6 +12,8 @@ public class GenreRepository : IGenreRepository
     {
         return await _context.Genres
             .AsNoTracking()
+            .OrderBy(g => g.Name)
+            .ThenBy(g => g.GenreId)
             .Pagination(page, pageSize)
             .ToListAsync();
     }
