@@ -24,7 +24,7 @@ public class TitleController : ControllerBase {
             }
             int total = _titleManager.GetTotalTitlesCount(mediaId);
             PagingResult<TitleResult> pagingResult = _pagingHelper.CreatePaging(nameof(GetAllTitles), page.Number, page.Count, total, results);
-            return Ok();
+            return Ok(pagingResult);
         } catch (KeyNotFoundException) {
             return NotFound();
         } catch (Exception e) {
