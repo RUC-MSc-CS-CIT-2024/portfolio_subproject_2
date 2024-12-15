@@ -59,7 +59,7 @@ public class TitleManager : ITitleManager
 
     public IEnumerable<TitleResult> GetAllForMedia(int mediaId, PageQueryParameter page)
     {
-        IEnumerable<Title> result = _titleRepository.GetForMedia(mediaId);
+        IEnumerable<Title> result = _titleRepository.GetForMedia(mediaId, page.Number, page.Count);
         return _mapper.Map<IEnumerable<TitleResult>>(result);
     }
 
