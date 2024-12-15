@@ -22,6 +22,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
+    options.CustomSchemaIds(type => type.ToString());
     options.AddSecurityDefinition("basic", new OpenApiSecurityScheme()
     {
         Type = SecuritySchemeType.Http,
