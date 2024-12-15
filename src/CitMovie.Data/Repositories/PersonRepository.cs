@@ -13,7 +13,8 @@ public class PersonRepository : IPersonRepository
     {
         return await _dataContext.People
             .AsNoTracking()
-            .OrderBy(p => p.PersonId)
+            .OrderBy(p => p.Name)
+            .ThenBy(p => p.PersonId)
             .Pagination(page, pageSize)
             .ToListAsync();
     }
@@ -21,13 +22,15 @@ public class PersonRepository : IPersonRepository
     public async Task<IEnumerable<Person>> GetPersonsByNameAsync(string name, int? userId, int page, int pageSize) {
         IQueryable<int> ids = _dataContext
             .PersonSearch(name, userId)
-            .Pagination(page, pageSize)
-            .Select(x => x.Id)
-            .Distinct();;
+            .Select(x => x.Id);
         
         return await _dataContext.People
             .AsNoTracking()
             .Where(x => ids.Contains(x.PersonId))
+            .OrderBy(p => p.Score)
+            .ThenBy(p => p.NameRating)
+            .ThenBy(p => p.Name)
+            .Pagination(page, pageSize)
             .ToListAsync();
     }
 
