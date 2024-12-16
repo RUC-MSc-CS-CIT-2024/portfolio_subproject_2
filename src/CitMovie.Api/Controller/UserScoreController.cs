@@ -27,7 +27,7 @@ public class UserScoreController : ControllerBase
         [FromQuery] int? mediaId = null,
         [FromQuery] string? mediaName = null)
     {
-        var totalCount = await _userScoreManager.GetTotalUserScoresCountAsync(userId);
+        var totalCount = await _userScoreManager.GetTotalUserScoresCountAsync(userId, mediaType, mediaId, mediaName);
         var scores = await _userScoreManager.GetScoresByUserIdAsync(userId, page.Number, page.Count, mediaType, mediaId, mediaName);
 
         foreach (var score in scores)

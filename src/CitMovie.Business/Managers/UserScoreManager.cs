@@ -17,10 +17,8 @@ public class UserScoreManager : IUserScoreManager
         return _mapper.Map<IEnumerable<UserScoreResult>>(userScores);
     }
 
-    public async Task<int> GetTotalUserScoresCountAsync(int userId)
-    {
-        return await _userScoreRepository.GetTotalUserScoresCountAsync(userId);
-    }
+    public async Task<int> GetTotalUserScoresCountAsync(int userId, string? mediaType, int? mediaId, string? mediaName)
+        => await _userScoreRepository.GetTotalUserScoresCountAsync(userId, mediaType, mediaId, mediaName);
 
     public async Task CreateUserScoreAsync(int userId, UserScoreCreateRequest createRequest)
     {
