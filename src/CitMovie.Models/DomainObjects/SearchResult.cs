@@ -8,6 +8,16 @@ public class MediaSearchResult
     public required string Title { get; set; }
 }
 
+public class BestMatchResult
+{    
+    [Column("media_id")]
+    public required int Id { get; set; }
+    [Column("title")]
+    public required string Title { get; set; }
+    [Column("relevance")]
+    public required decimal Relevance { get; set; }
+}
+
 public class PersonSearchResult
 {
     [Column("person_id")]

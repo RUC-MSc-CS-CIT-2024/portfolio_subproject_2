@@ -113,7 +113,7 @@ public class DataContext : DbContext
     public IQueryable<MediaSearchResult> ExactMatchSearch(string[] keywords, int? userId)
         => FromExpression(() => ExactMatchSearch(keywords, userId));
     
-    public IQueryable<MediaSearchResult> BestMatchSearch(string[] keywords, int? userId)
+    public IQueryable<BestMatchResult> BestMatchSearch(string[] keywords, int? userId)
         => FromExpression(() => BestMatchSearch(keywords, userId));
     
     public IQueryable<MediaSearchResult> SimpleSearch(string query, int? userId)
