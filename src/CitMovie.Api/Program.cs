@@ -118,7 +118,11 @@ builder.Services.AddAuthorization(options =>
         policy.RequireClaim("user_id");
         policy.RequireAssertion(context =>
         {
-            string? userId = (context.Resource as HttpContext)?.Request.RouteValues["userId"]?.ToString();
+            HttpContext? httpContext = context.Resource as HttpContext;
+            object? userIdRoute = httpContext?.Request.RouteValues["userId"];
+            if (userIdRoute is null)
+                return true;
+            string? userId = userIdRoute.ToString();
             return userId != null && context.User.FindFirstValue("user_id") == userId;
         });
     });
